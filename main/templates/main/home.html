@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style type="text/css">
+            body {
+                min-height: 100vh;
+                width: 100%;
+            }
+
+            .home {
+                padding: auto;
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+            }
+
+            .home_button {
+                margin: 0 12px;
+            }
+        </style>
+
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href>
+    </head>
+    <body>
+        <div class="home">
+            {% csrf_token %}
+            <a class="home_button" href="/teacher"><h1>I'm a teacher</h1></a>
+            {% if not user_id %}
+                <a class="home_button" href="/singleplayer"><h1>Play Single Player
+                        Game</h1></a>
+            {% else %}
+                <a class="home_button" href="/singleplayer/weekly"><h1>Return Player
+                        Game</h1></a>
+            {% endif %}
+        </div>
+    </body>
+</html>

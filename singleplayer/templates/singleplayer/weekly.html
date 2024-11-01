@@ -1,0 +1,254 @@
+{% extends "singleplayer/base.html" %} {% block content %}
+<div>
+  <style type="text/css">
+    .row {
+      display: flex;
+      flex-direction: row;
+    }
+    .weatherRow {
+      justify-content: space-between;
+      margin-bottom: 16px;
+      width: 400px;
+    }
+    .column {
+      display: flex;
+      flex-direction: column;
+    }
+    .weatherBox {
+      border: 1px solid black;
+      align-items: left;
+      padding: 0px 16px;
+      margin: 8px 0;
+    }
+    .weatherItem {
+      padding: 0px 4px;
+      display: flex;
+      flex-direction: row;
+    }
+    .redItem {
+      color: red;
+    }
+    .blueItem {
+      color: blue;
+    }
+    .bolded {
+      font-weight: bold;
+      margin-right: 10px;
+    }
+    .selectionRow {
+      width: 400px;
+    }
+    .weeklySection {
+      padding: 0px 3vw;
+      align-items: center;
+      justify-content: space-between;
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: flex-start;
+    }
+    .date {
+      font-size: 18px;
+      margin-top: 20px;
+      margin-bottom: 4px;
+    }
+    .irrigationLabel {
+      margin-right: 10px;
+    }
+    .graphs {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+  </style>
+
+  <h1>WEEK {{week}}</h1>
+  <div class="weeklySection">
+    <form action="weekly" method="post">
+      {% csrf_token %} 
+        <div class="row selectionRow">
+          <p class="irrigationLabel">Fertilizer:</p>
+          <p class="irrigationField">{{fform.fertilizer}} lbs</p>
+        </div>
+      <div>Total Irrigation Costs: ${{irr_cost}}</div>
+      <div>Total Fertilizer Costs: ${{fert_cost}}</div>
+      <div>Other Costs: ${{other_costs}}</div>
+      <div class="column weatherRow">
+        <h1 class="date">{{weather.0.day}}</h1>
+        <div class="column weatherBox">
+          <div class="column">
+            <div class="weatherItem">
+              <p class="redItem bolded">High Temperature:</p>
+              <p class="redItem">{{weather.0.tHigh}}&deg;F</p>
+            </div>
+            <div class="weatherItem">
+              <p class="blueItem bolded">Low Temperature:</p>
+              <p class="blueItem">{{weather.0.tLow}}&deg;F</p>
+            </div>
+          </div>
+          <p class="weatherItem">Expected Rainfall: {{weather.0.pRain}} in.</p>
+        </div>
+        <div class="row selectionRow">
+          <p class="irrigationLabel">Daily Irrigation:</p>
+          <p class="irrigationField">{{iform.monday}} in.</p>
+        </div>
+      </div>
+
+      <div class="column weatherRow">
+        <h1 class="date">{{weather.1.day}}</h1>
+        <div class="column weatherBox">
+          <div class="column">
+            <div class="weatherItem">
+              <p class="redItem bolded">High Temperature:</p>
+              <p class="redItem">{{weather.1.tHigh}}&deg;F</p>
+            </div>
+            <div class="weatherItem">
+              <p class="blueItem bolded">Low Temperature:</p>
+              <p class="blueItem">{{weather.1.tLow}}&deg;F</p>
+            </div>
+          </div>
+          <p class="weatherItem">Expected Rainfall: {{weather.1.pRain}} in.</p>
+        </div>
+        <div class="row selectionRow">
+          <p class="irrigationLabel">Daily Irrigation:</p>
+          <p class="irrigationField">{{iform.tuesday}} in.</p>
+        </div>
+      </div>
+
+      <div class="column weatherRow">
+        <h1 class="date">{{weather.2.day}}</h1>
+        <div class="column weatherBox">
+          <div class="column">
+            <div class="weatherItem">
+              <p class="redItem bolded">High Temperature:</p>
+              <p class="redItem">{{weather.2.tHigh}}&deg;F</p>
+            </div>
+            <div class="weatherItem">
+              <p class="blueItem bolded">Low Temperature:</p>
+              <p class="blueItem">{{weather.2.tLow}}&deg;F</p>
+            </div>
+          </div>
+          <p class="weatherItem">Expected Rainfall: {{weather.2.pRain}} in.</p>
+        </div>
+        <div class="row selectionRow">
+          <p class="irrigationLabel">Daily Irrigation:</p>
+          <p class="irrigationField">{{iform.wednesday}} in.</p>
+        </div>
+      </div>
+
+      <div class="column weatherRow">
+        <h1 class="date">{{weather.3.day}}</h1>
+        <div class="column weatherBox">
+          <div class="column">
+            <div class="weatherItem">
+              <p class="redItem bolded">High Temperature:</p>
+              <p class="redItem">{{weather.3.tHigh}}&deg;F</p>
+            </div>
+            <div class="weatherItem">
+              <p class="blueItem bolded">Low Temperature:</p>
+              <p class="blueItem">{{weather.3.tLow}}&deg;F</p>
+            </div>
+          </div>
+          <p class="weatherItem">Expected Rainfall: {{weather.3.pRain}} in.</p>
+        </div>
+        <div class="row selectionRow">
+          <p class="irrigationLabel">Daily Irrigation:</p>
+          <p class="irrigationField">{{iform.thursday}} in.</p>
+        </div>
+      </div>
+
+      <div class="column weatherRow">
+        <h1 class="date">{{weather.4.day}}</h1>
+        <div class="column weatherBox">
+          <div class="column">
+            <div class="weatherItem">
+              <p class="redItem bolded">High Temperature:</p>
+              <p class="redItem">{{weather.4.tHigh}}&deg;F</p>
+            </div>
+            <div class="weatherItem">
+              <p class="blueItem bolded">Low Temperature:</p>
+              <p class="blueItem">{{weather.4.tLow}}&deg;F</p>
+            </div>
+          </div>
+          <p class="weatherItem">Expected Rainfall: {{weather.4.pRain}} in.</p>
+        </div>
+        <div class="row selectionRow">
+          <p class="irrigationLabel">Daily Irrigation:</p>
+          <p class="irrigationField">{{iform.friday}} in.</p>
+        </div>
+      </div>
+
+      <div class="column weatherRow">
+        <h1 class="date">{{weather.5.day}}</h1>
+        <div class="column weatherBox">
+          <div class="column">
+            <div class="weatherItem">
+              <p class="redItem bolded">High Temperature:</p>
+              <p class="redItem">{{weather.5.tHigh}}&deg;F</p>
+            </div>
+            <div class="weatherItem">
+              <p class="blueItem bolded">Low Temperature:</p>
+              <p class="blueItem">{{weather.5.tLow}}&deg;F</p>
+            </div>
+          </div>
+          <p class="weatherItem">Expected Rainfall: {{weather.5.pRain}} in.</p>
+        </div>
+        <div class="row selectionRow">
+          <p class="irrigationLabel">Daily Irrigation:</p>
+          <p class="irrigationField">{{iform.saturday}} in.</p>
+        </div>
+      </div>
+
+      <div class="column weatherRow">
+        <h1 class="date">{{weather.6.day}}</h1>
+        <div class="column weatherBox">
+          <div class="column">
+            <div class="weatherItem">
+              <p class="redItem bolded">High Temperature:</p>
+              <p class="redItem">{{weather.6.tHigh}}&deg;F</p>
+            </div>
+            <div class="weatherItem">
+              <p class="blueItem bolded">Low Temperature:</p>
+              <p class="blueItem">{{weather.6.tLow}}&deg;F</p>
+            </div>
+          </div>
+          <p class="weatherItem">Expected Rainfall: {{weather.6.pRain}} in.</p>
+        </div>
+        <div class="row selectionRow">
+          <p class="irrigationLabel">Daily Irrigation:</p>
+          <p class="irrigationField">{{iform.sunday}} in.</p>
+        </div>
+      </div>
+
+      <input type="submit" value="Continue" />
+    </form>
+    <div class="graphs">
+      <div>{{ aquaspy|safe }}</div>
+      <!-- <div>
+                {{ SWgraph | safe}}
+            </div>
+            <div>
+                {{ nitrogen_stress_graph | safe }}
+            </div>
+            <div>
+                {{ leached_nitrogen_graph | safe}}
+            </div>
+            <div>
+                {{ water_stress_graph1 | safe }}
+            </div>
+            <div>
+                {{ water_stress_graph2 | safe }}
+            </div>
+            <div>
+                {{ cum_precip_graph | safe }}
+            </div>
+            <div>
+                {{ cum_irrigation_graph | safe }}
+            </div>
+            <div>
+                {{ total_soil_water_graph | safe }}
+            </div> -->
+    </div>
+  </div>
+</div>
+{% endblock %}

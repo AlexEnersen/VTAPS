@@ -1,0 +1,25 @@
+{% extends "singleplayer/base.html" %}
+
+{% block content %}
+<div>
+    <div>
+        {{ leaf_weight_graph | safe }}
+    </div>
+    <div>
+        {{ stem_weight_graph | safe }}
+    </div>
+    <div>
+        {{ grain_weight_graph | safe }}
+    </div>
+    <div>
+        {{ root_weight_graph | safe }}
+    </div>
+    <div>
+        {{ tops_weight_graph | safe }}
+    </div>
+    <div>
+        {{ pod_weight_graph | safe }}
+    </div>
+</div>
+
+{% endblock %}
