@@ -16,6 +16,10 @@ import shutil
 import zipfile
 import boto3
 from django.contrib.sessions.models import Session
+import environ
+
+env = environ.Env()
+environ.Env.read_env()
 
 def startGame(request):
     user = SingleplayerProfile()
@@ -748,7 +752,7 @@ def computeDSSAT(user_id, hybrid, controlFile):
     zip.write("UNLI2201.MZX")
     zip.close()
 
-    s3 = boto3.client("s3", aws_access_key_id="AKIAXYKJU6KZNDJ3SSUA", aws_secret_access_key="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",)
+    s3 = boto3.client("s3", aws_access_key_id=env('AWS_ACCESS_KEY_ID'), aws_secret_access_key=env('AWS_SECRET_ACCESS_KEY'),)
     s3.upload_file("id-%s.zip" % (user_id), "vtapsbucket", "id-%s.zip" % (user_id))
 
     os.remove("id-%s.zip" % (user_id))
