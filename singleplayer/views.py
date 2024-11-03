@@ -19,10 +19,7 @@ from django.contrib.sessions.models import Session
 import environ
 
 env = environ.Env()
-
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-print(BASE_DIR)
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+environ.Env.read_env()
 
 def startGame(request):
     user = SingleplayerProfile()
