@@ -4,9 +4,12 @@ build:
   commands:
     build:
       - python3 -m pip install --upgrade pip
-      - pip install -r requirements.txt
+      - pip3 install -r requirements.txt
 run:
   runtime-version: 3.11.10
+  pre-run:
+    - python3 -m pip install --upgrade pip
+    - pip3 install -r requirements.txt
   command: sh startup.sh
   network:
     port: 8000
