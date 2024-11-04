@@ -16,6 +16,8 @@ from botocore.exceptions import ClientError
 import environ
 import os
 
+print("RUNNING")
+
 secret_name = "SECRET_KEY"
 region_name = "us-east-1"
 
@@ -43,6 +45,7 @@ SECRET_KEY = get_secret_value_response['SecretString']
 # ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # print(ROOT_DIR)
 # environ.Env.read_env(os.path.join(ROOT_DIR, '.env'))
+# SECRET_KEY = env('SECRET_KEY')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
