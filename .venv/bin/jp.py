@@ -1,4 +1,4 @@
-#!/home/alex/Documents/VTAPS/Temp VTAPS/.venv/bin/python3
+#!/home/alex/Documents/VTAPS/Temp VTAPS/.venv/bin/python
 
 import sys
 import json

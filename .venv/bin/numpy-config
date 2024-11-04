@@ -1,5 +1,5 @@
 #!/bin/sh
-'''exec' "/home/alex/Documents/VTAPS/Temp VTAPS/.venv/bin/python3" "$0" "$@"
+'''exec' "/home/alex/Documents/VTAPS/Temp VTAPS/.venv/bin/python" "$0" "$@"
 ' '''
 # -*- coding: utf-8 -*-
 import re
