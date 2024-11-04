@@ -4,9 +4,10 @@ build:
   commands:
     build:
       - python3 -m pip install --upgrade pip
-      - pip3 install -r requirements.txt
+      - pip install django==5.1.2
+      - pip install -r requirements.txt
 run:
-  runtime-version: 3.8.16
+  runtime-version: 3.11
   command: sh startup.sh
   network:
     port: 8000
