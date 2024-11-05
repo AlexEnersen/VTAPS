@@ -16,8 +16,6 @@ from botocore.exceptions import ClientError
 import environ
 import os
 
-print("RUNNING")
-
 secret_name = "SECRET_KEY"
 region_name = "us-east-1"
 
@@ -57,7 +55,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['129.93.1.31', 'localhost', ".awsapprunner.com", "vtaps.org/"]
+ALLOWED_HOSTS = ['129.93.1.31', 'localhost', ".awsapprunner.com", "vtaps.org"]
 
 
 # Application definition
