@@ -42,6 +42,7 @@ def pickHybrid(request):
     return render(request, "singleplayer/hybrid.html", context)
 
 def weeklySelection(request):
+    print("Hello")
     Session.objects.all().delete()
 
 #     matplotlib.pyplot.close()
@@ -753,7 +754,7 @@ def finalResults(request):
 #     zip.write("UNLI2201.MZX")
 #     zip.close()
 
-#     secret_name = "SECRET_KEY"
+#     secret_name = "S3_Keys"
 #     region_name = "us-east-1"
 
 #     # Create a Secrets Manager client
