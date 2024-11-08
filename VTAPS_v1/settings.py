@@ -37,26 +37,6 @@ except ClientError as e:
 SECRET_KEY = get_secret_value_response['SecretString']
 
 
-try:
-    secret_name = "S3_Keys"
-    region_name = "us-east-1"
-
-    # Create a Secrets Manager client
-    session = boto3.session.Session()
-    client = session.client(
-        service_name='secretsmanager',
-        region_name=region_name
-    )
-    get_secret_value_response = client.get_secret_value(
-        SecretId=secret_name
-    )
-except ClientError as e:
-    # For a list of exceptions thrown, see
-    # https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
-    raise e
-print(get_secret_value_response['SecretString'])
-
-
 # SECURITY WARNING: keep the secret key used in production secret!
 
 # env = environ.Env()
