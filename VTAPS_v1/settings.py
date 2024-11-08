@@ -41,7 +41,6 @@ SECRET_KEY = get_secret_value_response['SecretString']
 
 # env = environ.Env()
 # ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-# print(ROOT_DIR)
 # environ.Env.read_env(os.path.join(ROOT_DIR, '.env'))
 # SECRET_KEY = env('SECRET_KEY')
 
