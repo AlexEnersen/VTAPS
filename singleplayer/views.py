@@ -24,7 +24,7 @@ import environ
 
 def startGame(request):
     user = SingleplayerProfile()
-    # user.save()
+    user.save()
     # request.session['user_id'] = user.id
     return render(request, "singleplayer/home.html", {})
 
