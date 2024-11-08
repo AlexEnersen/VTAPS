@@ -753,43 +753,60 @@ def computeDSSAT(user_id, hybrid, controlFile):
     zip.write("UNLI2201.MZX")
     zip.close()
 
-    s3 = boto3.client("s3", aws_access_key_id=env('S3_ACCESS_KEY_ID'), aws_secret_access_key=env('S3_SECRET_ACCESS_KEY'),)
-    s3.upload_file("id-%s.zip" % (user_id), "vtapsbucket", "id-%s.zip" % (user_id))
+secret_name = "SECRET_KEY"
+region_name = "us-east-1"
 
-    os.remove("id-%s.zip" % (user_id))
-    os.remove("command.ps1")
+# Create a Secrets Manager client
+session = boto3.session.Session()
+client = session.client(
+    service_name='secretsmanager',
+    region_name=region_name
+)
+
+try:
+        get_secret_value_response = client.get_secret_value(
+            SecretId=secret_name
+        )
+        SECRET_KEY = get_secret_value_response['SecretString']
+        s3 = boto3.client("s3", aws_access_key_id=SECRET_KEY['S3_ACCESS_KEY_ID'], aws_secret_access_key=SECRET_KEY['S3_SECRET_ACCESS_KEY'],)
+        s3.upload_file("id-%s.zip" % (user_id), "vtapsbucket", "id-%s.zip" % (user_id))
+
+        os.remove("id-%s.zip" % (user_id))
+        os.remove("command.ps1")
 
 
-    file_present = False
+        file_present = False
 
-    bucket = None
-    timeout = time.time() + 60*5
+        bucket = None
+        timeout = time.time() + 60*5
 
-    while not file_present:
-        bucket = s3.list_objects_v2(
-            Bucket='outputvtapsbucket',
-            Prefix ='id-%s/' % (user_id),
-            MaxKeys=100 )
-        
-        if time.time() > timeout:
-            break
-        elif bucket['KeyCount'] > 0:
-            file_present = True
+        while not file_present:
+            bucket = s3.list_objects_v2(
+                Bucket='outputvtapsbucket',
+                Prefix ='id-%s/' % (user_id),
+                MaxKeys=100 )
+            
+            if time.time() > timeout:
+                break
+            elif bucket['KeyCount'] > 0:
+                file_present = True
 
-    s3.download_file('outputvtapsbucket', "id-%s/id-%s.zip" % (user_id, user_id), "id-%s.zip" % user_id)
+        s3.download_file('outputvtapsbucket', "id-%s/id-%s.zip" % (user_id, user_id), "id-%s.zip" % user_id)
 
-    s3.delete_object(Bucket='outputvtapsbucket', Key='id-%s/id-%s.zip' % (user_id, user_id))
+        s3.delete_object(Bucket='outputvtapsbucket', Key='id-%s/id-%s.zip' % (user_id, user_id))
 
-    zip = zipfile.ZipFile("id-%s.zip" % user_id, 'r')
-    zip.extractall(".")
-    zip.close()
+        zip = zipfile.ZipFile("id-%s.zip" % user_id, 'r')
+        zip.extractall(".")
+        zip.close()
 
-    files = os.listdir(".")
-    for file in files:
-        if file.startswith("id-%s\\" % user_id):
-            os.rename(file,file.split("\\")[1])
+        files = os.listdir(".")
+        for file in files:
+            if file.startswith("id-%s\\" % user_id):
+                os.rename(file,file.split("\\")[1])
 
-    os.remove("id-%s.zip" % user_id)
+        os.remove("id-%s.zip" % user_id)
+    except:
+        print("Error")
 
 def createDirectory(user_id):
     if not os.path.isdir("id-%s" % (user_id)):
