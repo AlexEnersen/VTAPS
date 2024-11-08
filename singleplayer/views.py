@@ -23,9 +23,9 @@ import environ
 # environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 def startGame(request):
-    user = SingleplayerProfile()
-    user.save()
-    request.session['user_id'] = user.id
+    # user = SingleplayerProfile()
+    # user.save()
+    # request.session['user_id'] = user.id
     return render(request, "singleplayer/home.html", {})
 
 def pickHybrid(request):
