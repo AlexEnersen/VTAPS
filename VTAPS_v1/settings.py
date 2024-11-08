@@ -59,11 +59,11 @@ print(get_secret_value_response['SecretString'])
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
-env = environ.Env()
-ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-print(ROOT_DIR)
-environ.Env.read_env(os.path.join(ROOT_DIR, '.env'))
-SECRET_KEY = env('SECRET_KEY')
+# env = environ.Env()
+# ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# print(ROOT_DIR)
+# environ.Env.read_env(os.path.join(ROOT_DIR, '.env'))
+# SECRET_KEY = env('SECRET_KEY')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
