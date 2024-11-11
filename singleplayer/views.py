@@ -25,7 +25,7 @@ import environ
 def startGame(request):
     user = SingleplayerProfile()
     user.save()
-    # request.session['user_id'] = user.id
+    request.session['user_id'] = user.id
     return render(request, "singleplayer/home.html", {})
 
 def pickHybrid(request):
@@ -42,9 +42,6 @@ def pickHybrid(request):
     return render(request, "singleplayer/hybrid.html", context)
 
 def weeklySelection(request):
-    print("Hello")
-    Session.objects.all().delete()
-
     matplotlib.pyplot.close()
     user_id = request.session.get('user_id', None) 
     user = SingleplayerProfile.objects.get(id=user_id)
