@@ -117,7 +117,7 @@ WSGI_APPLICATION = 'VTAPS_v1.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'vtapsdb',
         'USER': 'postgres',
         'PASSWORD': "._TXgQB}0<#<4WTxaPw42_n9w8*u",
