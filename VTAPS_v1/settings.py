@@ -119,7 +119,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'vtapsdb',
-        'USER': 'postgres',
+        'USER': 'VTAPSAdmin',
         'PASSWORD': "._TXgQB}0<#<4WTxaPw42_n9w8*u",
         'HOST': 'vtapsdb.chc86muum2v4.us-east-1.rds.amazonaws.com',
         'PORT': '5432'
