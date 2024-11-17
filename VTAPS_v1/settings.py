@@ -43,7 +43,6 @@ SECRET_KEY = get_secret_value_response['SecretString']
 # ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # environ.Env.read_env(os.path.join(ROOT_DIR, '.env'))
 # SECRET_KEY = env('SECRET_KEY')
-# DB_PASSWORD = env('DB_PASSWORD')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -118,9 +117,9 @@ WSGI_APPLICATION = 'VTAPS_v1.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'vtapsdb',
-        'USER': 'VTAPSAdmin',
-        'PASSWORD': "._TXgQB}0<#<4WTxaPw42_n9w8*u",
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': '._TXgQB}0<#<4WTxaPw42_n9w8*u',
         'HOST': 'vtapsdb.chc86muum2v4.us-east-1.rds.amazonaws.com',
         'PORT': '5432'
     }
