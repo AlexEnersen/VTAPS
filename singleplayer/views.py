@@ -18,10 +18,6 @@ import boto3
 from django.contrib.sessions.models import Session
 import environ
 
-# env = environ.Env()
-# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-# environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-
 def startGame(request):
     user = SingleplayerProfile()
     user.save()
@@ -754,14 +750,14 @@ def computeDSSAT(user_id, hybrid, controlFile):
     secret_name = "S3_Keys"
     region_name = "us-east-1"
 
-    # Create a Secrets Manager client
-    session = boto3.session.Session()
-    client = session.client(
-        service_name='secretsmanager',
-        region_name=region_name
-    )
-
     try:
+        # Create a Secrets Manager client
+        session = boto3.session.Session()
+        client = session.client(
+            service_name='secretsmanager',
+            region_name=region_name
+        )
+
         get_secret_value_response = client.get_secret_value(
             SecretId=secret_name
         )
@@ -769,6 +765,13 @@ def computeDSSAT(user_id, hybrid, controlFile):
         print(SECRET_KEY)
         print(SECRET_KEY['S3_ACCESS_KEY_ID'])
         s3 = boto3.client("s3", aws_access_key_id=SECRET_KEY['S3_ACCESS_KEY_ID'], aws_secret_access_key=SECRET_KEY['S3_SECRET_ACCESS_KEY'],)
+
+        # print("HELLO?")
+        # env = environ.Env()
+        # BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        # environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+        # s3 = boto3.client("s3", aws_access_key_id=env('S3_ACCESS_KEY_ID'), aws_secret_access_key=env('S3_SECRET_ACCESS_KEY'),)
+        
         s3.upload_file("id-%s.zip" % (user_id), "vtapsbucket", "id-%s.zip" % (user_id))
 
         os.remove("id-%s.zip" % (user_id))
@@ -805,8 +808,8 @@ def computeDSSAT(user_id, hybrid, controlFile):
                 os.rename(file,file.split("\\")[1])
 
         os.remove("id-%s.zip" % user_id)
-    except:
-        print("Error")
+    except Exception as error:
+        print("Error:", error)
 
 def createDirectory(user_id):
     if not os.path.isdir("id-%s" % (user_id)):
