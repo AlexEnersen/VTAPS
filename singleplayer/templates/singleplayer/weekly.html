@@ -64,12 +64,11 @@
 
   <h1>WEEK {{week}}</h1>
   <div class="weeklySection">
-    <form action="weekly" method="post">
-      {% csrf_token %} 
-        <div class="row selectionRow">
-          <p class="irrigationLabel">Fertilizer:</p>
-          <p class="irrigationField">{{fform.fertilizer}} lbs</p>
-        </div>
+    <form action="weekly" method="post">{% csrf_token %}      
+      <div class="row selectionRow">
+        <p class="irrigationLabel">Fertilizer:</p>
+        <p class="irrigationField">{{fform.fertilizer}} lbs</p>
+      </div>
       <div>Total Irrigation Costs: ${{irr_cost}}</div>
       <div>Total Fertilizer Costs: ${{fert_cost}}</div>
       <div>Other Costs: ${{other_costs}}</div>

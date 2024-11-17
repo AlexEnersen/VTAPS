@@ -751,26 +751,28 @@ def computeDSSAT(user_id, hybrid, controlFile):
     region_name = "us-east-1"
 
     try:
+        print("1")
+
         # Create a Secrets Manager client
         session = boto3.session.Session()
         client = session.client(
             service_name='secretsmanager',
             region_name=region_name
         )
+        print("2")
 
-        get_secret_value_response = client.get_secret_value(
-            SecretId=secret_name
-        )
-        SECRET_KEY = get_secret_value_response['SecretString']
-        print(SECRET_KEY)
-        print(SECRET_KEY['S3_ACCESS_KEY_ID'])
-        s3 = boto3.client("s3", aws_access_key_id=SECRET_KEY['S3_ACCESS_KEY_ID'], aws_secret_access_key=SECRET_KEY['S3_SECRET_ACCESS_KEY'],)
+        # get_secret_value_response = client.get_secret_value(
+        #     SecretId=secret_name
+        # )
+        # SECRET_KEY = get_secret_value_response['SecretString']
+        # print(SECRET_KEY)
+        # print(SECRET_KEY['S3_ACCESS_KEY_ID'])
+        # s3 = boto3.client("s3", aws_access_key_id=SECRET_KEY['S3_ACCESS_KEY_ID'], aws_secret_access_key=SECRET_KEY['S3_SECRET_ACCESS_KEY'],)
 
-        # print("HELLO?")
-        # env = environ.Env()
-        # BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        # environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-        # s3 = boto3.client("s3", aws_access_key_id=env('S3_ACCESS_KEY_ID'), aws_secret_access_key=env('S3_SECRET_ACCESS_KEY'),)
+        env = environ.Env()
+        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+        s3 = boto3.client("s3", aws_access_key_id=env('S3_ACCESS_KEY_ID'), aws_secret_access_key=env('S3_SECRET_ACCESS_KEY'),)
         
         s3.upload_file("id-%s.zip" % (user_id), "vtapsbucket", "id-%s.zip" % (user_id))
 
