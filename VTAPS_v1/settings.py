@@ -56,6 +56,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['129.93.1.31', 'localhost', ".awsapprunner.com", "vtaps.org"]
 
+CSRF_TRUSTED_ORIGINS=['https://vtaps.org']
+
 
 # Application definition
 
