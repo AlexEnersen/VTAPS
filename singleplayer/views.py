@@ -736,6 +736,8 @@ def getRootDepth(date):
 
 def computeDSSAT(user_id, hybrid, controlFile):
 
+    print(os.path.dirname(os.path.realpath(__file__)))
+    print(os.listdir(os.path.dirname(os.path.realpath(__file__))))
     commandFile = open("command.ps1", "w")
     commandFile.write("../../DSCSM048 %s A %s" % (hybrid, controlFile))
     commandFile.close()
