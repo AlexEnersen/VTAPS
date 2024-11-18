@@ -56,6 +56,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['129.93.1.31', 'localhost', ".awsapprunner.com", "vtaps.org"]
 
+CSRF_COOKIE_DOMAIN = 'vtaps.org'
+
 CSRF_TRUSTED_ORIGINS=['https://vtaps.org']
 
 
@@ -71,6 +73,7 @@ INSTALLED_APPS = [
     'main.apps.MainConfig',
     'teacher.apps.TeacherConfig',
     'singleplayer.apps.SingleplayerConfig',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
@@ -83,6 +86,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    'corsheaders.middleware.CorsMiddleware'
 ]
 
 ROOT_URLCONF = 'VTAPS_v1.urls'
