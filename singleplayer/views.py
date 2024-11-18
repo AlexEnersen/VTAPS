@@ -765,7 +765,7 @@ def computeDSSAT(user_id, hybrid, controlFile):
         get_secret_value_response = client.get_secret_value(
             SecretId=secret_name
         )
-        SECRET_KEY = get_secret_value_response['SecretString']
+        SECRET_KEY = dict(get_secret_value_response['SecretString'])
         print(SECRET_KEY)
         print(SECRET_KEY['S3_ACCESS_KEY_ID'])
         s3 = boto3.client("s3", aws_access_key_id=SECRET_KEY['S3_ACCESS_KEY_ID'], aws_secret_access_key=SECRET_KEY['S3_SECRET_ACCESS_KEY'],)
