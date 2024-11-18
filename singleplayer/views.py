@@ -85,6 +85,7 @@ def weeklySelection(request):
         user.week += 1
         user.save()
 
+        date = str(int(start_date) + (((user.week)-1) * 7))
         file = open(controlFile, 'r')
         text = file.readlines()
         file.close()
