@@ -813,6 +813,7 @@ def computeDSSAT(user_id, hybrid, controlFile):
         os.remove("id-%s.zip" % user_id)
     except Exception as error:
         print("Error:", error)
+        time.sleep(60)
 
 def createDirectory(user_id):
     if not os.path.isdir("id-%s" % (user_id)):
