@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.sessions.models import Session
 
 def home(response):
@@ -8,3 +8,8 @@ def home(response):
     if not user_id == None:
         return render(response, 'main/home.html', {"user_id": user_id})
     return render(response, 'main/home.html', {})
+
+def reset(response):
+    response.session.clear()
+    # Session.objects.all().delete()
+    return redirect("/")

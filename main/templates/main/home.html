@@ -17,6 +17,11 @@
             .home_button {
                 margin: 0 12px;
             }
+            .reset_button {
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+            }
         </style>
 
         <meta charset="utf-8">
@@ -26,7 +31,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href>
     </head>
-    <body>
+    <body>{% csrf_token %}
         <div class="home">
             {% csrf_token %}
             <a class="home_button" href="/teacher"><h1>I'm a teacher</h1></a>
@@ -38,5 +43,8 @@
                         Game</h1></a>
             {% endif %}
         </div>
+        {% if user_id %}
+            <a class="reset_button" href="/reset">RESET GAME</a>
+        {% endif %}
     </body>
 </html>
