@@ -174,12 +174,14 @@ def finalResults(request):
     user = SingleplayerProfile.objects.get(id=user_id)
     date = str(start_date + (user.week * 7))
     
-    # context['leaf_weight_graph'] = plotOneAttribute(date, start_day, 'PlantGro.OUT', 'LWAD', 'kg [dm] / ha', 'Leaf Weight')
-    # context['stem_weight_graph'] = plotOneAttribute(date, start_day, 'PlantGro.OUT', 'SWAD', 'kg [dm] / ha', 'Stem Weight')
-    # context['grain_weight_graph'] = plotOneAttribute(date, start_day, 'PlantGro.OUT', 'GWAD', 'kg [dm] / ha', 'Grain Weight')
-    # context['root_weight_graph'] = plotOneAttribute(date, start_day, 'PlantGro.OUT', 'RWAD', 'kg [dm] / ha', 'Root Weight')
-    # context['tops_weight_graph'] = plotOneAttribute(date, start_day, 'PlantGro.OUT', 'CWAD', 'kg [dm] / ha', 'Tops Weight')
-    # context['pod_weight_graph'] = plotOneAttribute(date, start_day, 'PlantGro.OUT', 'PWAD', 'kg [dm] / ha', 'Pod Weight')
+    context['leaf_weight_graph'] = plotOneAttribute(date, start_day, 'PlantGro.OUT', 'LWAD', 'kg [dm] / ha', 'Leaf Weight')
+    context['stem_weight_graph'] = plotOneAttribute(date, start_day, 'PlantGro.OUT', 'SWAD', 'kg [dm] / ha', 'Stem Weight')
+    context['grain_weight_graph'] = plotOneAttribute(date, start_day, 'PlantGro.OUT', 'GWAD', 'kg [dm] / ha', 'Grain Weight')
+    context['root_weight_graph'] = plotOneAttribute(date, start_day, 'PlantGro.OUT', 'RWAD', 'kg [dm] / ha', 'Root Weight')
+    context['tops_weight_graph'] = plotOneAttribute(date, start_day, 'PlantGro.OUT', 'CWAD', 'kg [dm] / ha', 'Tops Weight')
+    context['pod_weight_graph'] = plotOneAttribute(date, start_day, 'PlantGro.OUT', 'PWAD', 'kg [dm] / ha', 'Pod Weight')
+
+    request.session.clear()
 
     return render(request, "singleplayer/final.html", context)
     
