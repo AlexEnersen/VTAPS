@@ -765,11 +765,7 @@ def computeDSSAT(user_id, hybrid, controlFile):
         get_secret_value_response = client.get_secret_value(
             SecretId=secret_name
         )
-        SECRET_KEY = get_secret_value_response['SecretString']
-        print(type(SECRET_KEY))
-        SECRET_KEY = eval(SECRET_KEY)
-        print(SECRET_KEY)
-        print(SECRET_KEY['S3_ACCESS_KEY_ID'])
+        SECRET_KEY = eval(get_secret_value_response['SecretString'])
         s3 = boto3.client("s3", aws_access_key_id=SECRET_KEY['S3_ACCESS_KEY_ID'], aws_secret_access_key=SECRET_KEY['S3_SECRET_ACCESS_KEY'],)
 
         # env = environ.Env()
@@ -778,6 +774,9 @@ def computeDSSAT(user_id, hybrid, controlFile):
         # s3 = boto3.client("s3", aws_access_key_id=env('S3_ACCESS_KEY_ID'), aws_secret_access_key=env('S3_SECRET_ACCESS_KEY'),)
         
         s3.upload_file("id-%s.zip" % (user_id), "vtapsbucket", "id-%s.zip" % (user_id))
+        
+
+        print("Yooo?")
 
         os.remove("id-%s.zip" % (user_id))
         os.remove("command.ps1")
@@ -803,6 +802,8 @@ def computeDSSAT(user_id, hybrid, controlFile):
 
         s3.delete_object(Bucket='outputvtapsbucket', Key='id-%s/id-%s.zip' % (user_id, user_id))
 
+        print("Yoo?")
+
         zip = zipfile.ZipFile("id-%s.zip" % user_id, 'r')
         zip.extractall(".")
         zip.close()
@@ -812,11 +813,13 @@ def computeDSSAT(user_id, hybrid, controlFile):
             if file.startswith("id-%s\\" % user_id):
                 os.rename(file,file.split("\\")[1])
 
+        print("Yo?")
+
         os.remove("id-%s.zip" % user_id)
     except Exception as error:
         print("Error:", error)
     
-    time.sleep(60)
+    print('done!')
 
 def createDirectory(user_id):
     if not os.path.isdir("id-%s" % (user_id)):
