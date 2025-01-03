@@ -16,33 +16,33 @@ from botocore.exceptions import ClientError
 import environ
 import os
 
-try:
-    secret_name = "SECRET_KEY"
-    region_name = "us-east-1"
+# try:
+#     secret_name = "SECRET_KEY"
+#     region_name = "us-east-1"
 
-    # Create a Secrets Manager client
-    session = boto3.session.Session()
-    client = session.client(
-        service_name='secretsmanager',
-        region_name=region_name
-    )
-    get_secret_value_response = client.get_secret_value(
-        SecretId=secret_name
-    )
-except ClientError as e:
-    # For a list of exceptions thrown, see
-    # https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
-    raise e
+#     # Create a Secrets Manager client
+#     session = boto3.session.Session()
+#     client = session.client(
+#         service_name='secretsmanager',
+#         region_name=region_name
+#     )
+#     get_secret_value_response = client.get_secret_value(
+#         SecretId=secret_name
+#     )
+# except ClientError as e:
+#     # For a list of exceptions thrown, see
+#     # https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
+#     raise e
 
-SECRET_KEY = get_secret_value_response['SecretString']
+# SECRET_KEY = get_secret_value_response['SecretString']
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
-# env = environ.Env()
-# ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-# environ.Env.read_env(os.path.join(ROOT_DIR, '.env'))
-# SECRET_KEY = env('SECRET_KEY')
+env = environ.Env()
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+environ.Env.read_env(os.path.join(ROOT_DIR, '.env'))
+SECRET_KEY = env('SECRET_KEY')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -125,7 +125,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'postgres',
         'USER': 'postgres',
-        'PASSWORD': '.Vke<$Jvw6113?x2:S#4C}y(nSCc',
+        'PASSWORD': '2f?M9)yYZss>N_tnp8R5YB:ICo84',
         'HOST': 'vtapsdb.chc86muum2v4.us-east-1.rds.amazonaws.com',
         'PORT': '5432'
     }
