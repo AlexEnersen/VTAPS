@@ -791,10 +791,13 @@ def computeDSSAT(user_id, hybrid, controlFile):
         timeout = time.time() + 60*5
 
         while not file_present:
-            bucket = s3.list_objects_v2(
-                Bucket='outputvtapsbucket',
-                Prefix ='id-%s/' % (user_id),
-                MaxKeys=100 )
+            try:
+                bucket = s3.list_objects_v2(
+                    Bucket='outputvtapsbucket',
+                    Prefix ='id-%s/' % (user_id),
+                    MaxKeys=100 )
+            except Exception as error:
+                print('e:', error)
             
             if time.time() > timeout:
                 break
