@@ -363,8 +363,10 @@ def getWeather(date):
 
     day = date[len(date) - 3:]
 
+    print("TESTING")
     print(os.path.dirname(os.path.realpath(__file__)))
     print(os.listdir(os.path.dirname(os.path.realpath(__file__))))
+    print("TESTING OVER")
 
     file = open("forecast.txt", 'r')
     text = file.readlines()
