@@ -702,6 +702,8 @@ def getRootDepth(date):
     day = int(date[len(date) - 3:])
     reading = False
 
+    print("day:", day)
+
     for line in text:
         items = list(filter(None, line.split(" ")))
         if len(items) > 0 and items[0] == "@YEAR":
