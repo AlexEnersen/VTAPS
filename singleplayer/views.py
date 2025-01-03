@@ -317,6 +317,9 @@ def compileWeather():
     weather_text = weather_file.readlines()
     weather_file.close()
 
+    print(os.path.dirname(os.path.realpath(__file__)))
+    print(os.listdir(os.path.dirname(os.path.realpath(__file__))))
+
     forecast_file = open("forecast.txt", 'w')
 
     for line in weather_text:
