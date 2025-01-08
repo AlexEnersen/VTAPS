@@ -52,6 +52,10 @@ except ClientError as e:
 SECRET_KEY = secret_key
 print(SECRET_KEY)
 print(db_pass)
+print(type(SECRET_KEY))
+print(type(db_pass))
+print(SECRET_KEY['SECRET_KEY'])
+print(db_pass['DB_PASS'])
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
