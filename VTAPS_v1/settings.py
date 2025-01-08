@@ -17,34 +17,37 @@ import environ
 import os
 import sys
 
-# try:
-#     secret_name = "SECRET_KEY"
-#     region_name = "us-east-1"
+prod = 'collectstatic' in sys.argv
 
-#     # Create a Secrets Manager client
-#     session = boto3.session.Session()
-#     client = session.client(
-#         service_name='secretsmanager',
-#         region_name=region_name
-#     )
-#     get_secret_value_response = client.get_secret_value(
-#         SecretId=secret_name
-#     )
-# except ClientError as e:
-#     # For a list of exceptions thrown, see
-#     # https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
-#     raise e
+if prod:
+    try:
+        region_name = "us-east-1"
+        session = boto3.session.Session()
+        client = session.client(
+            service_name='secretsmanager',
+            region_name=region_name
+        )
 
-# SECRET_KEY = get_secret_value_response['SecretString']
+        get_secretId_response = client.get_secret_value(
+            SecretId='SECRET_KEY'
+        )
+        
+        get_db_pass_response = client.get_secret_value(
+            SecretId='DB_PASS'
+        )
+    except ClientError as e:
+        raise e
 
-print(sys.argv)
+    SECRET_KEY = get_secretId_response['SecretString']
+    DB_PASS = get_db_pass_response['SecretString']
+else:
+    env = environ.Env()
+    ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    environ.Env.read_env(os.path.join(ROOT_DIR, '.env'))
+    SECRET_KEY = env('SECRET_KEY')
+    DB_PASS = env('DB_PASS')
 
 # SECURITY WARNING: keep the secret key used in production secret!
-
-# env = environ.Env()
-# ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-# environ.Env.read_env(os.path.join(ROOT_DIR, '.env'))
-# SECRET_KEY = env('SECRET_KEY')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -54,7 +57,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['129.93.1.31', 'localhost', ".awsapprunner.com", "vtaps.org"]
 
@@ -115,30 +118,23 @@ WSGI_APPLICATION = 'VTAPS_v1.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
-# print(env('DB_PASSWORD'))
-# print(os.environ.pop('DB_PASSWORD'))
-# del os.environ['DB_PASSWORD']
-# print(env('DB_PASSWORD'))
-# print(env('test'))
-# print("TEST2:", env('test2'))
-
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'postgres',
-#         'USER': 'postgres',
-#         'PASSWORD': '$xCy!)?G!lB3ZWnO~14[nX:a990f',
-#         'HOST': 'vtapsdb.chc86muum2v4.us-east-1.rds.amazonaws.com',
-#         'PORT': '5432'
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': DB_PASS,
+        'HOST': 'vtapsdb.chc86muum2v4.us-east-1.rds.amazonaws.com',
+        'PORT': '5432'
+    }
+}
 
 
 # Password validation
