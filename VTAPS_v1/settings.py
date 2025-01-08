@@ -34,12 +34,12 @@ try:
     get_secretId_response = client.get_secret_value(
         SecretId='SECRET_KEY'
     )
-    secret_key = eval(get_secretId_response['SecretString'])
+    secret_key = eval(get_secretId_response['SecretString'])['SECRET_KEY']
     
     get_db_pass_response = client.get_secret_value(
         SecretId='DB_PASS'
     )
-    db_pass = eval(get_db_pass_response['SecretString'])
+    db_pass = eval(get_db_pass_response['SecretString'])['DB_PASS']
 except ClientError as e:
     raise e
 # else:
@@ -54,8 +54,6 @@ print(SECRET_KEY)
 print(db_pass)
 print(type(SECRET_KEY))
 print(type(db_pass))
-print(SECRET_KEY['SECRET_KEY'])
-print(db_pass['DB_PASS'])
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
