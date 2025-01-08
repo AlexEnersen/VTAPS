@@ -34,12 +34,12 @@ try:
     get_secretId_response = client.get_secret_value(
         SecretId='SECRET_KEY'
     )
-    secret_key = get_secretId_response['SecretString']
+    secret_key = eval(get_secretId_response['SecretString'])
     
     get_db_pass_response = client.get_secret_value(
         SecretId='DB_PASS'
     )
-    db_pass = get_db_pass_response['SecretString']
+    db_pass = eval(get_db_pass_response['SecretString'])
 except ClientError as e:
     raise e
 # else:
