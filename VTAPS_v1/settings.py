@@ -18,9 +18,12 @@ import os
 import sys
 
 prod = 'collectstatic' in sys.argv
+print(sys.argv)
+print(prod)
 
 if prod:
     try:
+        print("HI FROM PROD")
         region_name = "us-east-1"
         session = boto3.session.Session()
         client = session.client(
@@ -35,11 +38,11 @@ if prod:
         get_db_pass_response = client.get_secret_value(
             SecretId='DB_PASS'
         )
+
+        SECRET_KEY = get_secretId_response['SecretString']
+        DB_PASS = get_db_pass_response['SecretString']
     except ClientError as e:
         raise e
-
-    SECRET_KEY = get_secretId_response['SecretString']
-    DB_PASS = get_db_pass_response['SecretString']
 else:
     env = environ.Env()
     ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
