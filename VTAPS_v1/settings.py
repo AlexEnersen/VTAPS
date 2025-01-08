@@ -17,37 +17,37 @@ import environ
 import os
 import sys
 
-prod = not (sys.argv[0] == 'manage.py' and sys.argv[1] == 'runserver')
-print(sys.argv)
-print(prod)
+# prod = not (sys.argv[0] == 'manage.py' and sys.argv[1] == 'runserver' and len(sys.argv) == 2)
+# print(sys.argv)
+# print(prod)
 
-if prod:
-    try:
-        print("HI FROM PROD")
-        region_name = "us-east-1"
-        session = boto3.session.Session()
-        client = session.client(
-            service_name='secretsmanager',
-            region_name=region_name
-        )
+# if prod:
+try:
+    print("HI FROM PROD")
+    region_name = "us-east-1"
+    session = boto3.session.Session()
+    client = session.client(
+        service_name='secretsmanager',
+        region_name=region_name
+    )
 
-        get_secretId_response = client.get_secret_value(
-            SecretId='SECRET_KEY'
-        )
-        secret_key = get_secretId_response['SecretString']
-        
-        get_db_pass_response = client.get_secret_value(
-            SecretId='DB_PASS'
-        )
-        db_pass = get_db_pass_response['SecretString']
-    except ClientError as e:
-        raise e
-else:
-    env = environ.Env()
-    ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    environ.Env.read_env(os.path.join(ROOT_DIR, '.env'))
-    secret_key = env('SECRET_KEY')
-    db_pass = env('DB_PASS')
+    get_secretId_response = client.get_secret_value(
+        SecretId='SECRET_KEY'
+    )
+    secret_key = get_secretId_response['SecretString']
+    
+    get_db_pass_response = client.get_secret_value(
+        SecretId='DB_PASS'
+    )
+    db_pass = get_db_pass_response['SecretString']
+except ClientError as e:
+    raise e
+# else:
+#     env = environ.Env()
+#     ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+#     environ.Env.read_env(os.path.join(ROOT_DIR, '.env'))
+#     secret_key = env('SECRET_KEY')
+#     db_pass = env('DB_PASS')
 
 SECRET_KEY = secret_key
 DB_PASS = db_pass
