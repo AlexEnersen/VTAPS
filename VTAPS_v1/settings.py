@@ -115,25 +115,30 @@ WSGI_APPLICATION = 'VTAPS_v1.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-# print(env('S3_SECRET_ACCESS_KEY'))
-# print(env('DB_PASSWORD'))
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': '$xCy!)?G!lB3ZWnO~14[nX:a990f',
-        'HOST': 'vtapsdb.chc86muum2v4.us-east-1.rds.amazonaws.com',
-        'PORT': '5432'
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# print(env('DB_PASSWORD'))
+# print(os.environ.pop('DB_PASSWORD'))
+# del os.environ['DB_PASSWORD']
+# print(env('DB_PASSWORD'))
+# print(env('test'))
+# print("TEST2:", env('test2'))
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'postgres',
+#         'USER': 'postgres',
+#         'PASSWORD': '$xCy!)?G!lB3ZWnO~14[nX:a990f',
+#         'HOST': 'vtapsdb.chc86muum2v4.us-east-1.rds.amazonaws.com',
+#         'PORT': '5432'
+#     }
+# }
 
 
 # Password validation
