@@ -21,34 +21,34 @@ prod = 'collectstatic' in sys.argv
 print(sys.argv)
 print(prod)
 
-if prod:
-    try:
-        print("HI FROM PROD")
-        region_name = "us-east-1"
-        session = boto3.session.Session()
-        client = session.client(
-            service_name='secretsmanager',
-            region_name=region_name
-        )
+# if prod:
+try:
+    print("HI FROM PROD")
+    region_name = "us-east-1"
+    session = boto3.session.Session()
+    client = session.client(
+        service_name='secretsmanager',
+        region_name=region_name
+    )
 
-        get_secretId_response = client.get_secret_value(
-            SecretId='SECRET_KEY'
-        )
-        
-        get_db_pass_response = client.get_secret_value(
-            SecretId='DB_PASS'
-        )
+    get_secretId_response = client.get_secret_value(
+        SecretId='SECRET_KEY'
+    )
+    
+    get_db_pass_response = client.get_secret_value(
+        SecretId='DB_PASS'
+    )
 
-        SECRET_KEY = get_secretId_response['SecretString']
-        DB_PASS = get_db_pass_response['SecretString']
-    except ClientError as e:
-        raise e
-else:
-    env = environ.Env()
-    ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    environ.Env.read_env(os.path.join(ROOT_DIR, '.env'))
-    SECRET_KEY = env('SECRET_KEY')
-    DB_PASS = env('DB_PASS')
+    SECRET_KEY = get_secretId_response['SecretString']
+    DB_PASS = get_db_pass_response['SecretString']
+except ClientError as e:
+    raise e
+# else:
+#     env = environ.Env()
+#     ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+#     environ.Env.read_env(os.path.join(ROOT_DIR, '.env'))
+#     SECRET_KEY = env('SECRET_KEY')
+#     DB_PASS = env('DB_PASS')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
