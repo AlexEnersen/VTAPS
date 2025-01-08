@@ -121,8 +121,8 @@ WSGI_APPLICATION = 'VTAPS_v1.wsgi.application'
 #         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
-print(env('S3_SECRET_ACCESS_KEY'))
-print(env('DB_PASSWORD'))
+# print(env('S3_SECRET_ACCESS_KEY'))
+# print(env('DB_PASSWORD'))
 
 DATABASES = {
     'default': {
