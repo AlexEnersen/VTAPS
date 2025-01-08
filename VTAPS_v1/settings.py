@@ -50,7 +50,7 @@ except ClientError as e:
 #     db_pass = env('DB_PASS')
 
 SECRET_KEY = secret_key
-DB_PASS = db_pass
+print(db_pass)
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
@@ -130,12 +130,13 @@ WSGI_APPLICATION = 'VTAPS_v1.wsgi.application'
 #     }
 # }
 
+print('dbing')
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'postgres',
         'USER': 'postgres',
-        'PASSWORD': DB_PASS,
+        'PASSWORD': db_pass,
         'HOST': 'vtapsdb.chc86muum2v4.us-east-1.rds.amazonaws.com',
         'PORT': '5432'
     }
