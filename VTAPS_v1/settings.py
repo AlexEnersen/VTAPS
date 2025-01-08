@@ -39,7 +39,7 @@ try:
     get_db_pass_response = client.get_secret_value(
         SecretId='DB_PASS'
     )
-    db_pass = get_db_pass_response['SecretString']['DB_PASS']
+    db_pass = get_db_pass_response['SecretString']
 except ClientError as e:
     raise e
 # else:
