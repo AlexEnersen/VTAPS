@@ -39,7 +39,7 @@ try:
     get_db_pass_response = client.get_secret_value(
         SecretId='DB_PASS'
     )
-    db_pass = get_db_pass_response['SecretString']
+    db_pass = get_db_pass_response['SecretString']['DB_PASS']
 except ClientError as e:
     raise e
 # else:
@@ -50,6 +50,7 @@ except ClientError as e:
 #     db_pass = env('DB_PASS')
 
 SECRET_KEY = secret_key
+print(SECRET_KEY)
 print(db_pass)
 
 # SECURITY WARNING: keep the secret key used in production secret!
