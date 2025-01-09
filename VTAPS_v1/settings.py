@@ -17,13 +17,13 @@ import environ
 import os
 import sys
 
-prod = not (sys.argv[0] == 'manage.py' and sys.argv[1] == 'runserver' and len(sys.argv) == 2)
-os.environ['PROD'] = prod
+env = 'dev' if (len(sys.argv) == 2 and sys.argv[0] == 'manage.py' and sys.argv[1] == 'runserver') else 'prod'
+os.environ['ENV'] = env
 print(sys.argv)
-print(prod)
-print(os.environ['PROD'])
+print(env)
+print(os.environ['ENV'])
 
-if prod:
+if env == 'prod':
     try:
         print("HI FROM PROD")
         region_name = "us-east-1"

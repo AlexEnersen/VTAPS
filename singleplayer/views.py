@@ -19,7 +19,7 @@ from django.contrib.sessions.models import Session
 import environ
 import sys
 
-prod = 'collectstatic' in sys.argv
+env = os.environ['ENV']
 
 def startGame(request):
     user = SingleplayerProfile()
@@ -771,7 +771,7 @@ def computeDSSAT(user_id, hybrid, controlFile):
     region_name = "us-east-1"
 
     try:
-        if prod:
+        if env == 'prod':
             session = boto3.session.Session()
             client = session.client(
                 service_name='secretsmanager',
