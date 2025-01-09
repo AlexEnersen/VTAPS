@@ -44,12 +44,12 @@ if env == 'prod':
         db_pass = eval(get_db_pass_response['SecretString'])['DB_PASS']
     except ClientError as e:
         raise e
-# else:
-#     env = environ.Env()
-#     ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-#     environ.Env.read_env(os.path.join(ROOT_DIR, '.env'))
-#     secret_key = env('SECRET_KEY')
-#     db_pass = env('DB_PASS')
+else:
+    env = environ.Env()
+    ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    environ.Env.read_env(os.path.join(ROOT_DIR, '.env'))
+    secret_key = env('SECRET_KEY')
+    db_pass = env('DB_PASS')
 
 SECRET_KEY = secret_key
 print(SECRET_KEY)

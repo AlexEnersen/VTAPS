@@ -19,7 +19,8 @@ from django.contrib.sessions.models import Session
 import environ
 import sys
 
-env = os.environ['ENV']
+environment = os.environ['ENV']
+print(environment)
 
 def startGame(request):
     user = SingleplayerProfile()
@@ -343,9 +344,9 @@ def compileWeather():
             lowArray.pop(0)
             rainArray.pop(0)
 
-        high_forecast = str(forecastData(highArray))
-        low_forecast = str(forecastData(lowArray))
-        rain_forecast = str(forecastData(rainArray))
+        high_forecast = round(str(forecastData(highArray)), 0)
+        low_forecast = round(str(forecastData(lowArray)), 0)
+        rain_forecast = round(str(forecastData(rainArray)), 0)
 
 
         if high_forecast < low_forecast:
@@ -771,19 +772,19 @@ def computeDSSAT(user_id, hybrid, controlFile):
     region_name = "us-east-1"
 
     try:
-        # if env == 'prod':
-        session = boto3.session.Session()
-        client = session.client(
-            service_name='secretsmanager',
-            region_name=region_name
-        )
+        if environment == 'prod':
+            session = boto3.session.Session()
+            client = session.client(
+                service_name='secretsmanager',
+                region_name=region_name
+            )
 
-        get_secret_value_response = client.get_secret_value(
-            SecretId=secret_name
-        )
-        SECRET_KEY = eval(get_secret_value_response['SecretString'])
-        print(SECRET_KEY)
-        s3 = boto3.client("s3", aws_access_key_id=SECRET_KEY['S3_ACCESS_KEY_ID'], aws_secret_access_key=SECRET_KEY['S3_SECRET_ACCESS_KEY'],)
+            get_secret_value_response = client.get_secret_value(
+                SecretId=secret_name
+            )
+            SECRET_KEY = eval(get_secret_value_response['SecretString'])
+            print(SECRET_KEY)
+            s3 = boto3.client("s3", aws_access_key_id=SECRET_KEY['S3_ACCESS_KEY_ID'], aws_secret_access_key=SECRET_KEY['S3_SECRET_ACCESS_KEY'],)
 
         # else:
         #     env = environ.Env()
