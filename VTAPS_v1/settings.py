@@ -17,31 +17,33 @@ import environ
 import os
 import sys
 
-# prod = not (sys.argv[0] == 'manage.py' and sys.argv[1] == 'runserver' and len(sys.argv) == 2)
-# print(sys.argv)
-# print(prod)
+prod = not (sys.argv[0] == 'manage.py' and sys.argv[1] == 'runserver' and len(sys.argv) == 2)
+os.environ['PROD'] = prod
+print(sys.argv)
+print(prod)
+print(os.environ['PROD'])
 
-# if prod:
-try:
-    print("HI FROM PROD")
-    region_name = "us-east-1"
-    session = boto3.session.Session()
-    client = session.client(
-        service_name='secretsmanager',
-        region_name=region_name
-    )
+if prod:
+    try:
+        print("HI FROM PROD")
+        region_name = "us-east-1"
+        session = boto3.session.Session()
+        client = session.client(
+            service_name='secretsmanager',
+            region_name=region_name
+        )
 
-    get_secretId_response = client.get_secret_value(
-        SecretId='SECRET_KEY'
-    )
-    secret_key = eval(get_secretId_response['SecretString'])['SECRET_KEY']
-    
-    get_db_pass_response = client.get_secret_value(
-        SecretId='DB_PASS'
-    )
-    db_pass = eval(get_db_pass_response['SecretString'])['DB_PASS']
-except ClientError as e:
-    raise e
+        get_secretId_response = client.get_secret_value(
+            SecretId='SECRET_KEY'
+        )
+        secret_key = eval(get_secretId_response['SecretString'])['SECRET_KEY']
+        
+        get_db_pass_response = client.get_secret_value(
+            SecretId='DB_PASS'
+        )
+        db_pass = eval(get_db_pass_response['SecretString'])['DB_PASS']
+    except ClientError as e:
+        raise e
 # else:
 #     env = environ.Env()
 #     ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
