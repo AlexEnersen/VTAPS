@@ -19,7 +19,7 @@ from django.contrib.sessions.models import Session
 import environ
 import sys
 
-# environment = os.environ['ENV']
+environment = os.environ['ENV']
 
 def startGame(request):
     user = SingleplayerProfile()
@@ -54,7 +54,7 @@ def weeklySelection(request):
     file = open(controlFile, 'r')
     text = file.readlines()
     file.close()
-    
+
     start_date = str(int(getDate(text)))
     date = str(int(start_date) + (((user.week)-1) * 7))
 
@@ -346,7 +346,6 @@ def compileWeather():
         high_forecast = str(round(forecastData(highArray), 0))
         low_forecast = str(round(forecastData(lowArray), 0))
         rain_forecast = str(round(forecastData(rainArray), 0))
-
         
         if high_forecast < low_forecast:
             low_forecast = str(round(float(high_forecast) - 1, 1))
@@ -355,7 +354,6 @@ def compileWeather():
 
         forecast_file.write(weather_string)
 
-    print("4")
     forecast_file.close()
 
         
@@ -711,10 +709,7 @@ def getRootDepth(date):
     day = int(date[len(date) - 3:])
     reading = False
 
-    print("day:", day)
-
     for line in text:
-        print("line:", line)
         items = list(filter(None, line.split(" ")))
         if len(items) > 0 and items[0] == "@YEAR":
             reading = True
@@ -756,7 +751,6 @@ def getRootDepth(date):
 #     return [waterTotal, fertTotal]
 
 def computeDSSAT(user_id, hybrid, controlFile):
-    print("HI?")
 
     commandFile = open("command.ps1", "w")
     commandFile.write("../../DSCSM048 %s A %s" % (hybrid, controlFile))
@@ -772,28 +766,28 @@ def computeDSSAT(user_id, hybrid, controlFile):
     secret_name = "S3_Keys"
     region_name = "us-east-1"
     
-    # print(environment)
+    print(environment)
     try:
-        # if environment == 'prod':
-        session = boto3.session.Session()
-        client = session.client(
-            service_name='secretsmanager',
-            region_name=region_name
-        )
-        print(secret_name)
+        if environment == 'prod':
+            session = boto3.session.Session()
+            client = session.client(
+                service_name='secretsmanager',
+                region_name=region_name
+            )
+            print(secret_name)
 
-        get_secret_value_response = client.get_secret_value(
-            SecretId=secret_name
-        )
-        SECRET_KEY = eval(get_secret_value_response['SecretString'])
-        print(SECRET_KEY)
-        s3 = boto3.client("s3", aws_access_key_id=SECRET_KEY['S3_ACCESS_KEY_ID'], aws_secret_access_key=SECRET_KEY['S3_SECRET_ACCESS_KEY'],)
+            get_secret_value_response = client.get_secret_value(
+                SecretId=secret_name
+            )
+            SECRET_KEY = eval(get_secret_value_response['SecretString'])
+            print(SECRET_KEY)
+            s3 = boto3.client("s3", aws_access_key_id=SECRET_KEY['S3_ACCESS_KEY_ID'], aws_secret_access_key=SECRET_KEY['S3_SECRET_ACCESS_KEY'],)
 
-        # else:
-        #     env = environ.Env()
-        #     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        #     environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-        #     s3 = boto3.client("s3", aws_access_key_id=env('S3_ACCESS_KEY_ID'), aws_secret_access_key=env('S3_SECRET_ACCESS_KEY'),)
+        else:
+            env = environ.Env()
+            BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+            s3 = boto3.client("s3", aws_access_key_id=env('S3_ACCESS_KEY_ID'), aws_secret_access_key=env('S3_SECRET_ACCESS_KEY'),)
         
         s3.upload_file("id-%s.zip" % (user_id), "vtapsbucket", "id-%s.zip" % (user_id))
 

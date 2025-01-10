@@ -19,13 +19,9 @@ import sys
 
 env = 'dev' if (len(sys.argv) == 2 and sys.argv[0] == 'manage.py' and sys.argv[1] == 'runserver') else 'prod'
 os.environ['ENV'] = env
-print(sys.argv)
-print(env)
-print(os.environ['ENV'])
 
 if env == 'prod':
     try:
-        print("HI FROM PROD")
         region_name = "us-east-1"
         session = boto3.session.Session()
         client = session.client(
@@ -52,10 +48,6 @@ else:
     db_pass = env('DB_PASS')
 
 SECRET_KEY = secret_key
-print(SECRET_KEY)
-print(db_pass)
-print(type(SECRET_KEY))
-print(type(db_pass))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
@@ -135,7 +127,6 @@ WSGI_APPLICATION = 'VTAPS_v1.wsgi.application'
 #     }
 # }
 
-print('dbing')
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
