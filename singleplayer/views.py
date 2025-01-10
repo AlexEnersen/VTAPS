@@ -342,12 +342,12 @@ def compileWeather():
             highArray.pop(0)
             lowArray.pop(0)
             rainArray.pop(0)
+            
+        high_forecast = str(round(forecastData(highArray), 0))
+        low_forecast = str(round(forecastData(lowArray), 0))
+        rain_forecast = str(round(forecastData(rainArray), 0))
 
-        high_forecast = round(str(forecastData(highArray)), 0)
-        low_forecast = round(str(forecastData(lowArray)), 0)
-        rain_forecast = round(str(forecastData(rainArray)), 0)
-
-
+        
         if high_forecast < low_forecast:
             low_forecast = str(round(float(high_forecast) - 1, 1))
         
@@ -355,6 +355,7 @@ def compileWeather():
 
         forecast_file.write(weather_string)
 
+    print("4")
     forecast_file.close()
 
         
@@ -755,6 +756,7 @@ def getRootDepth(date):
 #     return [waterTotal, fertTotal]
 
 def computeDSSAT(user_id, hybrid, controlFile):
+    print("HI?")
 
     commandFile = open("command.ps1", "w")
     commandFile.write("../../DSCSM048 %s A %s" % (hybrid, controlFile))
@@ -778,6 +780,7 @@ def computeDSSAT(user_id, hybrid, controlFile):
             service_name='secretsmanager',
             region_name=region_name
         )
+        print(secret_name)
 
         get_secret_value_response = client.get_secret_value(
             SecretId=secret_name
