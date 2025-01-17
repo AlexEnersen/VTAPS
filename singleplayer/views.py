@@ -316,14 +316,20 @@ def compileWeather():
     highArray = []
     rainArray = []
 
-    weather_file = open("NENP2201.WTH", 'r')
-    weather_text = weather_file.readlines()
-    weather_file.close()
+    try:
+        weather_file = open("NENP2201.WTH", 'r')
+        weather_text = weather_file.readlines()
+        weather_file.close()
+    except Exception as error:
+        print("error:", error)
 
     print(os.path.dirname(os.path.realpath(__file__)))
     print(os.listdir(os.path.dirname(os.path.realpath(__file__))))
 
-    forecast_file = open("forecast.txt", 'w')
+    try:
+        forecast_file = open("forecast.txt", 'w')
+    except Exception as error:
+        print("error:", error)
 
     for line in weather_text:
         items = list(filter(None, line.split(" ")))
@@ -365,14 +371,15 @@ def getWeather(date):
 
     day = date[len(date) - 3:]
 
-    print("TESTING")
     print(os.path.dirname(os.path.realpath(__file__)))
     print(os.listdir(os.path.dirname(os.path.realpath(__file__))))
-    print("TESTING OVER")
 
-    file = open("forecast.txt", 'r')
-    text = file.readlines()
-    file.close()
+    try:
+        file = open("forecast.txt", 'r')
+        text = file.readlines()
+        file.close()
+    except Exception as error:
+        print("getWeather error:", error)
 
     for line in text:
         items = list(filter(None, line.split(" ")))
@@ -472,9 +479,12 @@ def inchesToMM(inches):
     return str(mm)
 
 def plotRoots(date, start_day):
-    file = open('PlantGro.OUT', 'r')
-    text = file.readlines()
-    file.close()
+    try:
+        file = open('PlantGro.OUT', 'r')
+        text = file.readlines()
+        file.close()
+    except Exception as error:
+        print("error:", error)
 
     day = int(date[len(date) - 3:])
     
@@ -766,7 +776,6 @@ def computeDSSAT(user_id, hybrid, controlFile):
     secret_name = "S3_Keys"
     region_name = "us-east-1"
     
-    print(environment)
     try:
         if environment == 'prod':
             session = boto3.session.Session()
@@ -774,13 +783,11 @@ def computeDSSAT(user_id, hybrid, controlFile):
                 service_name='secretsmanager',
                 region_name=region_name
             )
-            print(secret_name)
 
             get_secret_value_response = client.get_secret_value(
                 SecretId=secret_name
             )
             SECRET_KEY = eval(get_secret_value_response['SecretString'])
-            print(SECRET_KEY)
             s3 = boto3.client("s3", aws_access_key_id=SECRET_KEY['S3_ACCESS_KEY_ID'], aws_secret_access_key=SECRET_KEY['S3_SECRET_ACCESS_KEY'],)
 
         else:
@@ -819,8 +826,6 @@ def computeDSSAT(user_id, hybrid, controlFile):
 
         s3.delete_object(Bucket='outputvtapsbucket', Key='id-%s/id-%s.zip' % (user_id, user_id))
 
-        print("Yoo?")
-
         zip = zipfile.ZipFile("id-%s.zip" % user_id, 'r')
         zip.extractall(".")
         zip.close()
@@ -830,13 +835,9 @@ def computeDSSAT(user_id, hybrid, controlFile):
             if file.startswith("id-%s\\" % user_id):
                 os.rename(file,file.split("\\")[1])
 
-        print("Yo?")
-
         os.remove("id-%s.zip" % user_id)
     except Exception as error:
         print("Error:", error)
-    
-    print('done!')
 
 def createDirectory(user_id):
     if not os.path.isdir("id-%s" % (user_id)):
