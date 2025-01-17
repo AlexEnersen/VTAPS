@@ -22,12 +22,14 @@ import sys
 environment = os.environ['ENV']
 
 def startGame(request):
+    print("START GAME")
     user = SingleplayerProfile()
     user.save()
     request.session['user_id'] = user.id
     return render(request, "singleplayer/home.html", {})
 
 def pickHybrid(request):
+    print("HYBRID")
     context = {}
     hybrid_form = SingleplayerProfileForm()
     fert_form = FertilizerInitForm()
@@ -41,6 +43,7 @@ def pickHybrid(request):
     return render(request, "singleplayer/hybrid.html", context)
 
 def weeklySelection(request):
+    print('WEEKLY')
     matplotlib.pyplot.close()
     
     print(os.path.dirname(os.path.realpath(__file__)))
@@ -51,9 +54,12 @@ def weeklySelection(request):
         return redirect("/singleplayer/final")
     
     controlFile = 'UNLI2201.MZX'
-    file = open(controlFile, 'r')
-    text = file.readlines()
-    file.close()
+    try:
+        file = open(controlFile, 'r')
+        text = file.readlines()
+        file.close()
+    except Exception as error:
+        print("error:", error)
 
     start_date = str(int(getDate(text)))
     date = str(int(start_date) + (((user.week)-1) * 7))
@@ -89,9 +95,12 @@ def weeklySelection(request):
         user.save()
 
         date = str(int(start_date) + (((user.week)-1) * 7))
-        file = open(controlFile, 'r')
-        text = file.readlines()
-        file.close()
+        try:
+            file = open(controlFile, 'r')
+            text = file.readlines()
+            file.close()
+        except Exception as error:
+            print("error:", error)
 
         fertilizerQuantity = request.POST.get('fertilizer')
         irrigationQuantity = getIrrigation(request)
@@ -100,10 +109,12 @@ def weeklySelection(request):
         text = addIrrigation(text, irrigationQuantity, int(date)-7)
 
         newText = "".join(text)
-
-        file2 = open(controlFile, 'w')
-        file2.write(newText)
-        file2.close()
+        try:
+            file2 = open(controlFile, 'w')
+            file2.write(newText)
+            file2.close()
+        except Exception as error:
+            print("error:", error)
 
         computeDSSAT(user_id, user.hybrid, controlFile)
 
@@ -329,7 +340,7 @@ def compileWeather():
     try:
         forecast_file = open("forecast.txt", 'w')
     except Exception as error:
-        print("error:", error)
+        print("compileWeather error:", error)
 
     for line in weather_text:
         items = list(filter(None, line.split(" ")))
@@ -541,9 +552,12 @@ def plotRoots(date, start_day):
     return data
 
 def plotSoilWater(date, start_day):
-    file = open('SoilWat.OUT', 'r')
-    text = file.readlines()
-    file.close()
+    try:
+        file = open('SoilWat.OUT', 'r')
+        text = file.readlines()
+        file.close()
+    except Exception as error:
+        print("error:", error)
 
     day = int(date[len(date) - 3:])
     
@@ -601,9 +615,12 @@ def plotSoilWater(date, start_day):
 
 
 def plotOneAttribute(date, start_day, filename, attribute, yaxis, title):
-    file = open(filename, 'r')
-    text = file.readlines()
-    file.close()
+    try:
+        file = open(filename, 'r')
+        text = file.readlines()
+        file.close()
+    except Exception as error:
+        print("error:", error)
 
     day = int(date[len(date) - 3:])
     
@@ -645,10 +662,12 @@ def plotOneAttribute(date, start_day, filename, attribute, yaxis, title):
 
 def plotAquaSpy(date, start_day):
     day = int(date[len(date) - 3:])
-
-    file = open("NE.SOL", 'r')
-    text = file.readlines()
-    file.close()
+    try:
+        file = open("NE.SOL", 'r')
+        text = file.readlines()
+        file.close()
+    except Exception as error:
+        print("error:", error)
 
     rootDepth = getRootDepth(date) * 100
 
@@ -668,10 +687,12 @@ def plotAquaSpy(date, start_day):
             soilArray.append(float(items[index]))
             if int(items[0]) > rootDepth:
                 break
-
-    file2 = open("UNLI2201.OSW", "r")
-    text2 = file2.readlines()
-    file2.close()
+    try:
+        file2 = open("UNLI2201.OSW", "r")
+        text2 = file2.readlines()
+        file2.close()
+    except Exception as error:
+        print("error:", error)
 
     readingWater = False
     index2 = -1
@@ -712,9 +733,12 @@ def plotAquaSpy(date, start_day):
     return data
 
 def getRootDepth(date):
-    file = open("UNLI2201.OPG", 'r')
-    text = file.readlines()
-    file.close()
+    try:
+        file = open("UNLI2201.OPG", 'r')
+        text = file.readlines()
+        file.close()
+    except Exception as error:
+        print("error:", error)
 
     day = int(date[len(date) - 3:])
     reading = False
@@ -761,10 +785,12 @@ def getRootDepth(date):
 #     return [waterTotal, fertTotal]
 
 def computeDSSAT(user_id, hybrid, controlFile):
-
-    commandFile = open("command.ps1", "w")
-    commandFile.write("../../DSCSM048 %s A %s" % (hybrid, controlFile))
-    commandFile.close()
+    try:
+        commandFile = open("command.ps1", "w")
+        commandFile.write("../../DSCSM048 %s A %s" % (hybrid, controlFile))
+        commandFile.close()
+    except Exception as error:
+        print("error:", error)
         
     zip = zipfile.ZipFile("id-%s.zip" % (user_id), "w", zipfile.ZIP_DEFLATED)
     zip.write("command.ps1")
