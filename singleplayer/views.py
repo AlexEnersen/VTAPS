@@ -22,14 +22,12 @@ import sys
 environment = os.environ['ENV']
 
 def startGame(request):
-    print("START GAME")
     user = SingleplayerProfile()
     user.save()
     request.session['user_id'] = user.id
     return render(request, "singleplayer/home.html", {})
 
 def pickHybrid(request):
-    print("HYBRID")
     context = {}
     hybrid_form = SingleplayerProfileForm()
     fert_form = FertilizerInitForm()
@@ -74,6 +72,7 @@ def weeklySelection(request):
         os.chdir("id-%s" % user_id)
 
     if (request.POST.get('hybrid') != None):
+        request.session['start_date'] = start_date
         user.hybrid = request.POST['hybrid']
         user.seeding_rate = request.POST['seeding_rate']
         user.week = 1
@@ -162,9 +161,9 @@ def weeklySelection(request):
     # context['graph'] = plotRoots(date, start_day, user_id)
     # context['SWgraph'] = plotSoilWater(date, start_day)
 
-    # context['water_stress_graph1'] = plotOneAttribute(date, start_day, 'PlantGro.OUT', 'WSPD', 'Percent stress', 'Water Stress Photosynthesis')
-    # context['water_stress_graph2'] = plotOneAttribute(date, start_day, 'PlantGro.OUT', 'WSGD', 'Percent stress', 'Water Stress Expansion')
-    # context['nitrogen_stress_graph'] = plotOneAttribute(date, start_day, 'PlantGro.OUT', 'NSTD', 'Percent stress', 'Nitrogen Stress')
+    # context['water_stress_graph1'] = plotOneAttribute(date, start_day, 'UNLI2201.OPG', 'WSPD', 'Percent stress', 'Water Stress Photosynthesis')
+    # context['water_stress_graph2'] = plotOneAttribute(date, start_day, 'UNLI2201.OPG', 'WSGD', 'Percent stress', 'Water Stress Expansion')
+    # context['nitrogen_stress_graph'] = plotOneAttribute(date, start_day, 'UNLI2201.OPG', 'NSTD', 'Percent stress', 'Nitrogen Stress')
 
     
     # context['cum_precip_graph'] = plotOneAttribute(date, start_day, 'SoilWat.OUT', 'PREC', 'mm', 'Cumulative Precipitation')
@@ -174,12 +173,15 @@ def weeklySelection(request):
     # context['leached_nitrogen_graph'] = plotOneAttribute(date, start_day, 'SoilNi.OUT', 'NLCC', 'kg [N] / ha', 'Cumulative Nitrogen Leached')
 
     matplotlib.pyplot.close()
-    os.chdir("..")
+    
+    if os.getcwd().split("/")[-1] == "id-%s" % user_id:
+        os.chdir("..")
     
     return render(request, "singleplayer/weekly.html", context)
 
 def finalResults(request):
     context = {}
+
     start_date = int(request.session.get('start_date', None))
     start_date_str = str(start_date)
     start_day = int(start_date_str[len(start_date_str) - 3:])
@@ -187,16 +189,22 @@ def finalResults(request):
     user_id = request.session.get('user_id', None) 
     user = SingleplayerProfile.objects.get(id=user_id)
     date = str(start_date + (user.week * 7))
+
+    if not os.getcwd().split("/")[-1] == "id-%s" % user_id:
+        os.chdir("id-%s" % user_id)
     
-    context['leaf_weight_graph'] = plotOneAttribute(date, start_day, 'PlantGro.OUT', 'LWAD', 'kg [dm] / ha', 'Leaf Weight')
-    context['stem_weight_graph'] = plotOneAttribute(date, start_day, 'PlantGro.OUT', 'SWAD', 'kg [dm] / ha', 'Stem Weight')
-    context['grain_weight_graph'] = plotOneAttribute(date, start_day, 'PlantGro.OUT', 'GWAD', 'kg [dm] / ha', 'Grain Weight')
-    context['root_weight_graph'] = plotOneAttribute(date, start_day, 'PlantGro.OUT', 'RWAD', 'kg [dm] / ha', 'Root Weight')
-    context['tops_weight_graph'] = plotOneAttribute(date, start_day, 'PlantGro.OUT', 'CWAD', 'kg [dm] / ha', 'Tops Weight')
-    context['pod_weight_graph'] = plotOneAttribute(date, start_day, 'PlantGro.OUT', 'PWAD', 'kg [dm] / ha', 'Pod Weight')
+    context['leaf_weight_graph'] = plotOneAttribute(date, start_day, 'UNLI2201.OPG', 'LWAD', 'kg [dm] / ha', 'Leaf Weight')
+    context['stem_weight_graph'] = plotOneAttribute(date, start_day, 'UNLI2201.OPG', 'SWAD', 'kg [dm] / ha', 'Stem Weight')
+    context['grain_weight_graph'] = plotOneAttribute(date, start_day, 'UNLI2201.OPG', 'GWAD', 'kg [dm] / ha', 'Grain Weight')
+    context['root_weight_graph'] = plotOneAttribute(date, start_day, 'UNLI2201.OPG', 'RWAD', 'kg [dm] / ha', 'Root Weight')
+    context['tops_weight_graph'] = plotOneAttribute(date, start_day, 'UNLI2201.OPG', 'CWAD', 'kg [dm] / ha', 'Tops Weight')
+    context['pod_weight_graph'] = plotOneAttribute(date, start_day, 'UNLI2201.OPG', 'PWAD', 'kg [dm] / ha', 'Pod Weight')
+
+    if os.getcwd().split("/")[-1] == "id-%s" % user_id:
+        os.chdir("..")
 
     request.session.clear()
-
+    
     return render(request, "singleplayer/final.html", context)
     
 def getDate(text):
@@ -337,10 +345,11 @@ def compileWeather():
     print(os.path.dirname(os.path.realpath(__file__)))
     print(os.listdir(os.path.dirname(os.path.realpath(__file__))))
 
-    try:
-        forecast_file = open("forecast.txt", 'w')
-    except Exception as error:
-        print("compileWeather error:", error)
+    # try:
+    #     forecast_file = open("forecast.txt", 'w')
+    # except Exception as error:
+    #     print("compileWeather error:", error)
+    forecast_file = open("forecast.txt", 'w')
 
     for line in weather_text:
         items = list(filter(None, line.split(" ")))
@@ -385,12 +394,16 @@ def getWeather(date):
     print(os.path.dirname(os.path.realpath(__file__)))
     print(os.listdir(os.path.dirname(os.path.realpath(__file__))))
 
-    try:
-        file = open("forecast.txt", 'r')
-        text = file.readlines()
-        file.close()
-    except Exception as error:
-        print("getWeather error:", error)
+    # try:
+    #     file = open("forecast.txt", 'r')
+    #     text = file.readlines()
+    #     file.close()
+    # except Exception as error:
+    #     print("getWeather error:", error)
+    
+    file = open("forecast.txt", 'r')
+    text = file.readlines()
+    file.close()
 
     for line in text:
         items = list(filter(None, line.split(" ")))
@@ -491,7 +504,7 @@ def inchesToMM(inches):
 
 def plotRoots(date, start_day):
     try:
-        file = open('PlantGro.OUT', 'r')
+        file = open('UNLI2201.OPG', 'r')
         text = file.readlines()
         file.close()
     except Exception as error:
@@ -631,12 +644,13 @@ def plotOneAttribute(date, start_day, filename, attribute, yaxis, title):
     index = -1
 
     for line in text:
+        print("Line:", line)
         items = list(filter(None, line.split(" ")))
-        if len(items) == 0 and not readingStress:
+        if len(items) <= 3 and not readingStress:
             continue
         elif (readingStress and len(items) == 0) or (readingStress and int(items[1]) > day):
             break
-        elif len(items) > 0 and not readingStress:
+        elif len(items) > 3 and not readingStress:
             if (items[0] == "@YEAR"):
                 index = items.index(attribute)
                 readingStress = True
@@ -661,6 +675,8 @@ def plotOneAttribute(date, start_day, filename, attribute, yaxis, title):
     return data
 
 def plotAquaSpy(date, start_day):
+    print(date)
+    print(start_day)
     day = int(date[len(date) - 3:])
     try:
         file = open("NE.SOL", 'r')
@@ -733,6 +749,7 @@ def plotAquaSpy(date, start_day):
     return data
 
 def getRootDepth(date):
+    print(date)
     try:
         file = open("UNLI2201.OPG", 'r')
         text = file.readlines()
@@ -744,11 +761,16 @@ def getRootDepth(date):
     reading = False
 
     for line in text:
+        print('line', line)
         items = list(filter(None, line.split(" ")))
-        if len(items) > 0 and items[0] == "@YEAR":
+        if len(items) <= 33:
+            continue 
+        elif not reading and items[0] == "@YEAR":
             reading = True
         elif reading == True and int(items[1]) == day:
             return float(items[33])
+        
+    return 0
         
 # def getEconomics(date):
 #     file = open("UNLI2201.MZX")
