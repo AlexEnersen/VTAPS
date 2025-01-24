@@ -462,7 +462,7 @@ def getWeather(date):
     
     except Exception as error:
         if environment == 'prod':
-            logger.info("getWeather error:", error)
+            logger.info(error)
         else:
             print("getWeather error:", error)
 
