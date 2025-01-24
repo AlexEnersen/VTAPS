@@ -50,8 +50,8 @@ def pickHybrid(request):
 def weeklySelection(request):
     matplotlib.pyplot.close()
     if environment == 'prod':
-        print(os.path.dirname(os.path.realpath(__file__)))
-        print(os.listdir(os.path.dirname(os.path.realpath(__file__))))
+        logger.info(os.path.dirname(os.path.realpath(__file__)))
+        logger.info(os.listdir(os.path.dirname(os.path.realpath(__file__))))
 
     user_id = request.session.get('user_id', None) 
     user = SingleplayerProfile.objects.get(id=user_id)
@@ -64,7 +64,10 @@ def weeklySelection(request):
         text = file.readlines()
         file.close()
     except Exception as error:
-        print("error:", error)
+        if environment == 'prod':
+            logger.info('error:', error)
+        else:
+            print("error:", error)
 
     start_date = str(int(getDate(text)))
     date = str(int(start_date) + (((user.week)-1) * 7))
@@ -106,7 +109,10 @@ def weeklySelection(request):
             text = file.readlines()
             file.close()
         except Exception as error:
-            print("error:", error)
+            if environment == 'prod':
+                logger.info('error:', error)
+            else:
+                print("error:", error)
 
         fertilizerQuantity = request.POST.get('fertilizer')
         irrigationQuantity = getIrrigation(request)
@@ -120,7 +126,10 @@ def weeklySelection(request):
             file2.write(newText)
             file2.close()
         except Exception as error:
-            print("error:", error)
+            if environment == 'prod':
+                logger.info('error:', error)
+            else:
+                print("error:", error)
 
         computeDSSAT(user_id, user.hybrid, controlFile)
 
@@ -347,16 +356,22 @@ def compileWeather():
         weather_text = weather_file.readlines()
         weather_file.close()
     except Exception as error:
-        print("error:", error)
+        if environment == 'prod':
+            logger.info('error', error)
+        else:
+            print("error:", error)
 
     if environment == 'prod':
-        print(os.path.dirname(os.path.realpath(__file__)))
-        print(os.listdir(os.path.dirname(os.path.realpath(__file__))))
+        logger.info(os.path.dirname(os.path.realpath(__file__)))
+        logger.info(os.listdir(os.path.dirname(os.path.realpath(__file__))))
 
     try:
         forecast_file = open("forecast.txt", 'w')
     except Exception as error:
-        print("compileWeather error:", error)
+        if environment == 'prod':
+            logger.info('error', error)
+        else:
+            print("compileWeather error:", error)
 
     for line in weather_text:
         items = list(filter(None, line.split(" ")))
@@ -399,8 +414,8 @@ def getWeather(date):
     day = date[len(date) - 3:]
 
     if environment == 'prod':
-        print(os.path.dirname(os.path.realpath(__file__)))
-        print(os.listdir(os.path.dirname(os.path.realpath(__file__))))
+        logger.info(os.path.dirname(os.path.realpath(__file__)))
+        logger.info(os.listdir(os.path.dirname(os.path.realpath(__file__))))
 
     try:
         file = open("forecast.txt", 'r')
@@ -446,7 +461,10 @@ def getWeather(date):
                     return weatherInfo
     
     except Exception as error:
-        print("getWeather error:", error)
+        if environment == 'prod':
+            logger.info("getWeather error:", error)
+        else:
+            print("getWeather error:", error)
 
 def forecastData(previousArray):
     mean = np.mean(previousArray)
@@ -513,7 +531,10 @@ def plotRoots(date, start_day):
         text = file.readlines()
         file.close()
     except Exception as error:
-        print("error:", error)
+        if environment == 'prod':
+            logger.info('error:', error)
+        else:
+            print("error:", error)
 
     day = int(date[len(date) - 3:])
     
@@ -575,7 +596,10 @@ def plotSoilWater(date, start_day):
         text = file.readlines()
         file.close()
     except Exception as error:
-        print("error:", error)
+        if environment == 'prod':
+            logger.info('error:', error)
+        else:
+            print("error:", error)
 
     day = int(date[len(date) - 3:])
     
@@ -638,7 +662,10 @@ def plotOneAttribute(date, start_day, filename, attribute, yaxis, title):
         text = file.readlines()
         file.close()
     except Exception as error:
-        print("error:", error)
+        if environment == 'prod':
+            logger.info('error:', error)
+        else:
+            print("error:", error)
 
     day = int(date[len(date) - 3:])
     
@@ -685,7 +712,10 @@ def plotAquaSpy(date, start_day):
         text = file.readlines()
         file.close()
     except Exception as error:
-        print("error:", error)
+        if environment == 'prod':
+            logger.info('error:', error)
+        else:
+            print("error:", error)
 
     rootDepth = getRootDepth(date) * 100
 
@@ -710,7 +740,10 @@ def plotAquaSpy(date, start_day):
         text2 = file2.readlines()
         file2.close()
     except Exception as error:
-        print("error:", error)
+        if environment == 'prod':
+            logger.info('error:', error)
+        else:
+            print("error:", error)
 
     readingWater = False
     index2 = -1
@@ -756,7 +789,10 @@ def getRootDepth(date):
         text = file.readlines()
         file.close()
     except Exception as error:
-        print("error:", error)
+        if environment == 'prod':
+            logger.info('error:', error)
+        else:
+            print("error:", error)
 
     day = int(date[len(date) - 3:])
     reading = False
@@ -812,8 +848,11 @@ def computeDSSAT(user_id, hybrid, controlFile):
         commandFile.write("../../DSCSM048 %s A %s" % (hybrid, controlFile))
         commandFile.close()
     except Exception as error:
-        print("error:", error)
-        
+        if environment == 'prod':
+            logger.info('error:', error)
+        else:
+            print("error:", error)
+            
     zip = zipfile.ZipFile("id-%s.zip" % (user_id), "w", zipfile.ZIP_DEFLATED)
     zip.write("command.ps1")
     zip.write("NE.SOL")
@@ -863,8 +902,11 @@ def computeDSSAT(user_id, hybrid, controlFile):
                     Prefix ='id-%s/' % (user_id),
                     MaxKeys=100 )
             except Exception as error:
-                print('e:', error)
-            
+                if environment == 'prod':
+                    logger.info('error:', error)
+                else:
+                    print('error:', error)
+                
             if time.time() > timeout:
                 break
             elif bucket['KeyCount'] > 0:
@@ -885,7 +927,10 @@ def computeDSSAT(user_id, hybrid, controlFile):
 
         os.remove("id-%s.zip" % user_id)
     except Exception as error:
-        print("Error:", error)
+        if environment == 'prod':
+            logger.info('error:', error)
+        else:
+            print("Error:", error)
 
 def createDirectory(user_id):
     if not os.path.isdir("id-%s" % (user_id)):
