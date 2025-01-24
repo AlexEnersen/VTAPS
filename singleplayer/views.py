@@ -52,6 +52,7 @@ def weeklySelection(request):
     if environment == 'prod':
         logger.info(os.path.dirname(os.path.realpath(__file__)))
         logger.info(os.listdir(os.path.dirname(os.path.realpath(__file__))))
+        logger.info(os.getcwd())
 
     user_id = request.session.get('user_id', None) 
     user = SingleplayerProfile.objects.get(id=user_id)
@@ -83,8 +84,8 @@ def weeklySelection(request):
 
         
     if environment == 'prod':
-        logger.info(os.path.dirname(os.path.realpath(__file__)))
-        logger.info(os.listdir(os.path.dirname(os.path.realpath(__file__))))
+        logger.info(os.getcwd())
+        logger.info(os.listdir(os.getcwd()))
 
     if (request.POST.get('hybrid') != None):
         request.session['start_date'] = start_date
