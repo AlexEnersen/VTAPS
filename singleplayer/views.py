@@ -28,10 +28,6 @@ if environment == 'prod':
     logger.addHandler(watchtower.CloudWatchLogHandler())
 
 def startGame(request):
-    
-    if environment == 'prod':
-        logger.info("Hi")
-        logger.info(dict(foo="bar", details={}))
 
     user = SingleplayerProfile()
     user.save()
@@ -52,11 +48,11 @@ def pickHybrid(request):
     return render(request, "singleplayer/hybrid.html", context)
 
 def weeklySelection(request):
-    print('WEEKLY')
     matplotlib.pyplot.close()
-    
-    print(os.path.dirname(os.path.realpath(__file__)))
-    print(os.listdir(os.path.dirname(os.path.realpath(__file__))))
+    if environment == 'prod':
+        print(os.path.dirname(os.path.realpath(__file__)))
+        print(os.listdir(os.path.dirname(os.path.realpath(__file__))))
+
     user_id = request.session.get('user_id', None) 
     user = SingleplayerProfile.objects.get(id=user_id)
     if (user.week >= 24):
@@ -353,8 +349,9 @@ def compileWeather():
     except Exception as error:
         print("error:", error)
 
-    print(os.path.dirname(os.path.realpath(__file__)))
-    print(os.listdir(os.path.dirname(os.path.realpath(__file__))))
+    if environment == 'prod':
+        print(os.path.dirname(os.path.realpath(__file__)))
+        print(os.listdir(os.path.dirname(os.path.realpath(__file__))))
 
     try:
         forecast_file = open("forecast.txt", 'w')
@@ -401,8 +398,9 @@ def getWeather(date):
 
     day = date[len(date) - 3:]
 
-    print(os.path.dirname(os.path.realpath(__file__)))
-    print(os.listdir(os.path.dirname(os.path.realpath(__file__))))
+    if environment == 'prod':
+        print(os.path.dirname(os.path.realpath(__file__)))
+        print(os.listdir(os.path.dirname(os.path.realpath(__file__))))
 
     try:
         file = open("forecast.txt", 'r')
@@ -650,7 +648,6 @@ def plotOneAttribute(date, start_day, filename, attribute, yaxis, title):
     index = -1
 
     for line in text:
-        print("Line:", line)
         items = list(filter(None, line.split(" ")))
         if len(items) <= 3 and not readingStress:
             continue
@@ -681,8 +678,6 @@ def plotOneAttribute(date, start_day, filename, attribute, yaxis, title):
     return data
 
 def plotAquaSpy(date, start_day):
-    print(date)
-    print(start_day)
     day = int(date[len(date) - 3:])
     try:
         file = open("NE.SOL", 'r')
@@ -755,7 +750,6 @@ def plotAquaSpy(date, start_day):
     return data
 
 def getRootDepth(date):
-    print(date)
     try:
         file = open("UNLI2201.OPG", 'r')
         text = file.readlines()
@@ -767,7 +761,6 @@ def getRootDepth(date):
     reading = False
 
     for line in text:
-        print('line', line)
         items = list(filter(None, line.split(" ")))
         if len(items) <= 33:
             continue 
