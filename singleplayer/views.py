@@ -81,6 +81,11 @@ def weeklySelection(request):
     if not os.getcwd().split("/")[-1] == "id-%s" % user_id:
         os.chdir("id-%s" % user_id)
 
+        
+    if environment == 'prod':
+        logger.info(os.path.dirname(os.path.realpath(__file__)))
+        logger.info(os.listdir(os.path.dirname(os.path.realpath(__file__))))
+
     if (request.POST.get('hybrid') != None):
         request.session['start_date'] = start_date
         user.hybrid = request.POST['hybrid']
