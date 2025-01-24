@@ -49,10 +49,6 @@ def pickHybrid(request):
 
 def weeklySelection(request):
     matplotlib.pyplot.close()
-    if environment == 'prod':
-        logger.info(os.path.dirname(os.path.realpath(__file__)))
-        logger.info(os.listdir(os.path.dirname(os.path.realpath(__file__))))
-        logger.info(os.getcwd())
 
     user_id = request.session.get('user_id', None) 
     user = SingleplayerProfile.objects.get(id=user_id)
@@ -78,12 +74,18 @@ def weeklySelection(request):
 
     if not os.path.exists("id-%s" % user_id):
         createDirectory(user_id)
+
+    if environment == 'prod':
+        logger.info(os.path)
+        logger.info(os.getcwd())
+        logger.info(os.listdir(os.getcwd()))
     
     if not os.getcwd().split("/")[-1] == "id-%s" % user_id:
         os.chdir("id-%s" % user_id)
 
         
     if environment == 'prod':
+        logger.info(os.path)
         logger.info(os.getcwd())
         logger.info(os.listdir(os.getcwd()))
 
@@ -944,3 +946,4 @@ def createDirectory(user_id):
         shutil.copy2("UNLI2201.MZX", "id-%s/" % (user_id))
         shutil.copy2("NE.SOL", "id-%s/" % (user_id))
         shutil.copy2("NENP2201.WTH", "id-%s/" % (user_id))
+
