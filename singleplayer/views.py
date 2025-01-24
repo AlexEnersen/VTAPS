@@ -18,10 +18,21 @@ import boto3
 from django.contrib.sessions.models import Session
 import environ
 import sys
+import watchtower, logging
 
 environment = os.environ['ENV']
 
+if environment == 'prod':
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
+    logger.addHandler(watchtower.CloudWatchLogHandler())
+
 def startGame(request):
+    
+    if environment == 'prod':
+        logger.info("Hi")
+        logger.info(dict(foo="bar", details={}))
+
     user = SingleplayerProfile()
     user.save()
     request.session['user_id'] = user.id
