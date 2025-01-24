@@ -41,58 +41,6 @@ if env == 'prod':
         )
         db_pass = eval(get_db_pass_response['SecretString'])['DB_PASS']
 
-
-
-
-        
-
-        logger_boto3_client = boto3.client(
-            "logs",
-        )
-
-        LOGGING = {
-            'version': 1,
-            'disable_existing_loggers': False,
-            'formatters': {
-                'simple': {
-                    'format': "[cid: %(cid)s] [%(asctime)s.%(msecs)03d] %(levelname)s [%(name)s:%(lineno)s] [%(funcName)s] %(message)s",
-                    'datefmt': '%Y-%m-%d %H:%M:%S',
-                },
-            },
-            'handlers': {
-                'logger': {
-                    'level': 'DEBUG',
-                    'class': 'logging.handlers.RotatingFileHandler',
-                    'filename': str(BASE_DIR) + '/logs/test.log',
-                    'formatter': 'simple',
-                    'filters': ['correlation'],
-                },
-                'watchtower': {
-                    "level": "DEBUG",
-                    "class": "watchtower.CloudWatchLogHandler",
-                    "boto3_client": logger_boto3_client,
-                    "log_group": "DemoLogs2",
-                    # Different stream for each environment
-                    "stream_name": "logs",
-                    "formatter": "simple",
-                    'filters': ['correlation'],
-                }
-            },
-            'filters': {
-                'correlation': {
-                    '()': 'cid.log.CidContextFilter'
-                },
-            },
-            'loggers': {
-                'root': {
-                    'handlers': ['logger', 'watchtower'],
-                    'level': 'DEBUG',
-                    'filters': ['correlation'],
-                    'propagate': True,
-                }
-            }
-        }
-
     except ClientError as e:
         raise e
 else:
