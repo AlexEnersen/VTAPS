@@ -406,46 +406,47 @@ def getWeather(date):
         file = open("forecast.txt", 'r')
         text = file.readlines()
         file.close()
+
+        for line in text:
+            items = list(filter(None, line.split(" ")))
+            weatherDay = items[0]
+
+            # converted_day = datetime.strptime("2022-" + day, "%Y-%j").strftime("%m-%d-%Y")
+
+            if int(day) - int(weatherDay) <= 20 and len(lowArray) < 20:
+                highArray.append(float(items[2]))
+                lowArray.append(float(items[3]))
+
+            if weatherDay == day:
+                dateFound = True
+
+            if dateFound:
+                weatherDateConversion = datetime.strptime("2022-" + weatherDay, "%Y-%j").strftime("%m-%d-%Y")
+                if (int(weatherDay) - int(day)) == 0:
+                    weatherDateConversion = "Monday: " + weatherDateConversion
+                elif (int(weatherDay) - int(day)) == 1:
+                    weatherDateConversion = "Tuesday: " + weatherDateConversion
+                elif (int(weatherDay) - int(day)) == 2:
+                    weatherDateConversion = "Wednesday: " + weatherDateConversion
+                elif (int(weatherDay) - int(day)) == 3:
+                    weatherDateConversion = "Thursday: " + weatherDateConversion
+                elif (int(weatherDay) - int(day)) == 4:
+                    weatherDateConversion = "Friday: " + weatherDateConversion
+                elif (int(weatherDay) - int(day)) == 5:
+                    weatherDateConversion = "Saturday: " + weatherDateConversion
+                elif (int(weatherDay) - int(day)) == 6:
+                    weatherDateConversion = "Sunday: " + weatherDateConversion
+                
+                weatherData = {"day": weatherDateConversion, "tHigh": items[1], "tLow": items[2], "pRain": mmToInches(float(items[3]))}
+
+                weatherInfo.append(weatherData)
+
+                if int(weatherDay) - int(day) >= 6:
+                    dateFound = False
+                    return weatherInfo
+    
     except Exception as error:
         print("getWeather error:", error)
-
-    for line in text:
-        items = list(filter(None, line.split(" ")))
-        weatherDay = items[0]
-
-        # converted_day = datetime.strptime("2022-" + day, "%Y-%j").strftime("%m-%d-%Y")
-
-        if int(day) - int(weatherDay) <= 20 and len(lowArray) < 20:
-            highArray.append(float(items[2]))
-            lowArray.append(float(items[3]))
-
-        if weatherDay == day:
-            dateFound = True
-
-        if dateFound:
-            weatherDateConversion = datetime.strptime("2022-" + weatherDay, "%Y-%j").strftime("%m-%d-%Y")
-            if (int(weatherDay) - int(day)) == 0:
-                weatherDateConversion = "Monday: " + weatherDateConversion
-            elif (int(weatherDay) - int(day)) == 1:
-                weatherDateConversion = "Tuesday: " + weatherDateConversion
-            elif (int(weatherDay) - int(day)) == 2:
-                weatherDateConversion = "Wednesday: " + weatherDateConversion
-            elif (int(weatherDay) - int(day)) == 3:
-                weatherDateConversion = "Thursday: " + weatherDateConversion
-            elif (int(weatherDay) - int(day)) == 4:
-                weatherDateConversion = "Friday: " + weatherDateConversion
-            elif (int(weatherDay) - int(day)) == 5:
-                weatherDateConversion = "Saturday: " + weatherDateConversion
-            elif (int(weatherDay) - int(day)) == 6:
-                weatherDateConversion = "Sunday: " + weatherDateConversion
-            
-            weatherData = {"day": weatherDateConversion, "tHigh": items[1], "tLow": items[2], "pRain": mmToInches(float(items[3]))}
-
-            weatherInfo.append(weatherData)
-
-            if int(weatherDay) - int(day) >= 6:
-                dateFound = False
-                return weatherInfo
 
 def forecastData(previousArray):
     mean = np.mean(previousArray)
