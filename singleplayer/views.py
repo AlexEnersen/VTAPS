@@ -204,7 +204,7 @@ def finalResults(request):
         os.chdir("..")
 
     request.session.clear()
-    
+
     return render(request, "singleplayer/final.html", context)
     
 def getDate(text):
@@ -345,11 +345,10 @@ def compileWeather():
     print(os.path.dirname(os.path.realpath(__file__)))
     print(os.listdir(os.path.dirname(os.path.realpath(__file__))))
 
-    # try:
-    #     forecast_file = open("forecast.txt", 'w')
-    # except Exception as error:
-    #     print("compileWeather error:", error)
-    forecast_file = open("forecast.txt", 'w')
+    try:
+        forecast_file = open("forecast.txt", 'w')
+    except Exception as error:
+        print("compileWeather error:", error)
 
     for line in weather_text:
         items = list(filter(None, line.split(" ")))
@@ -394,16 +393,12 @@ def getWeather(date):
     print(os.path.dirname(os.path.realpath(__file__)))
     print(os.listdir(os.path.dirname(os.path.realpath(__file__))))
 
-    # try:
-    #     file = open("forecast.txt", 'r')
-    #     text = file.readlines()
-    #     file.close()
-    # except Exception as error:
-    #     print("getWeather error:", error)
-    
-    file = open("forecast.txt", 'r')
-    text = file.readlines()
-    file.close()
+    try:
+        file = open("forecast.txt", 'r')
+        text = file.readlines()
+        file.close()
+    except Exception as error:
+        print("getWeather error:", error)
 
     for line in text:
         items = list(filter(None, line.split(" ")))
