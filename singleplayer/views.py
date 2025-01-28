@@ -18,6 +18,7 @@ import boto3
 from django.contrib.sessions.models import Session
 import environ
 import sys
+import math
 import watchtower, logging
 
 environment = os.environ['ENV']
@@ -401,7 +402,7 @@ def compileWeather():
             
         high_forecast = str(round(forecastData(highArray), 0))
         low_forecast = str(round(forecastData(lowArray), 0))
-        rain_forecast = str(round(forecastData(rainArray), 0))
+        rain_forecast = math.abs(str(round(forecastData(rainArray), 0)))
         
         if high_forecast < low_forecast:
             low_forecast = str(round(float(high_forecast) - 1, 1))
