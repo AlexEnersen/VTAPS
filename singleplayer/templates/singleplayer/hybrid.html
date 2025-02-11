@@ -1,45 +1,38 @@
-{% extends "singleplayer/base.html" %}
-
-{% block content %}
+{% extends "singleplayer/base.html" %} {% block content %}
 <div>
-    <style type="text/css">
-        .formContainer {
-            display: flex;
-            flex-direction: row;
-            width: 70%;
-            justify-content: space-between;
-        }
-        .hybridForm {
-            width: 40%;
-            display: flex;
-            flex-direction: column;
-        }
-        .fertForm {
-            width: 40%;
-            display: flex;
-            flex-direction: column;
-        }
-    </style>
-    <form action="weekly" method="post">
-        {% csrf_token %}
-        <div class="formContainer">
-            <div class="hybridForm">
-            <p>Select your hybrid</p>
-                {{ hybrid_form }}
-            </div>
-            <div class="fertForm">
-                <p>Enter Fertilizer Choices</p>
-                <p>These can be changed later</p>
-                {{ fert_form }}
-                <!-- <p>Total: {% if fert_form.instance.week1 %}
-                            Hi{{fert_form.instance.week1}}
-                        {% else %}
-                            {{fert_form.week1.data}}
-                        {% endif %}</p> -->
-            </div>
-        </div>
-        <input type="submit" value="Continue" />
-    </form>
+  <style type="text/css">
+    .formContainer {
+      display: flex;
+      flex-direction: row;
+      width: 70%;
+      justify-content: space-between;
+    }
+    .hybridForm {
+      width: 40%;
+      display: flex;
+      flex-direction: column;
+    }
+    .fertForm {
+      width: 40%;
+      display: flex;
+      flex-direction: column;
+    }
+  </style>
+  <form action="weekly" method="post">
+    {% csrf_token %}
+    <div class="formContainer">
+      <div class="hybridForm">
+        <p>Select your hybrid</p>
+        {{ hybrid_form }}
+      </div>
+      <div class="fertForm">
+        <p>Enter Fertilizer Choices</p>
+        <p>These can be changed later</p>
+        {{ fert_form }}
+      </div>
+    </div>
+    <input type="submit" value="Continue" />
+  </form>
 </div>
 
 {% endblock %}

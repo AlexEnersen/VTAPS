@@ -1,4 +1,6 @@
-{% extends "singleplayer/base.html" %} {% block content %}
+{% extends "singleplayer/base.html" %} 
+
+{% block content %}
 <div>
   <style type="text/css">
     .row {
@@ -64,7 +66,8 @@
 
   <h1>WEEK {{week}}</h1>
   <div class="weeklySection">
-    <form action="weekly" method="post">{% csrf_token %}      
+    <form action="weekly" method="post">
+      {% csrf_token %}
       <div class="row selectionRow">
         <p class="irrigationLabel">Fertilizer:</p>
         <p class="irrigationField">{{fform.fertilizer}} lbs</p>
@@ -247,7 +250,7 @@
             <div>
                 {{ total_soil_water_graph | safe }}
             </div> -->
-    </div>
+    <!-- </div> -->
   </div>
 </div>
 {% endblock %}

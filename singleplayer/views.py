@@ -21,7 +21,12 @@ import sys
 import math
 import watchtower, logging
 
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.csrf import csrf_exempt
+
 environment = os.environ['ENV']
+
 
 if environment == 'prod':
     logging.basicConfig(level=logging.INFO)
@@ -35,6 +40,8 @@ def startGame(request):
     request.session['user_id'] = user.id
     return render(request, "singleplayer/home.html", {})
 
+@ensure_csrf_cookie
+@csrf_protect
 def pickHybrid(request):
     context = {}
     hybrid_form = SingleplayerProfileForm()
@@ -46,9 +53,14 @@ def pickHybrid(request):
     context['hybrid_form'] = hybrid_form
     context['fert_form'] = fert_form
 
+    print("HI?")
     return render(request, "singleplayer/hybrid.html", context)
 
+@ensure_csrf_cookie
+@csrf_protect
 def weeklySelection(request):
+    print("HELLO?")
+    context = {}
     matplotlib.pyplot.close()
 
     user_id = request.session.get('user_id', None) 
@@ -402,7 +414,7 @@ def compileWeather():
             
         high_forecast = str(round(forecastData(highArray), 0))
         low_forecast = str(round(forecastData(lowArray), 0))
-        rain_forecast = math.abs(str(round(forecastData(rainArray), 0)))
+        rain_forecast = str(abs(round(forecastData(rainArray), 0)))
         
         if high_forecast < low_forecast:
             low_forecast = str(round(float(high_forecast) - 1, 1))

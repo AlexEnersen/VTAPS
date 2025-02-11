@@ -17,12 +17,12 @@ import environ
 import os
 import sys
 
-env = 'dev' if (len(sys.argv) == 2 and sys.argv[0] == 'manage.py' and sys.argv[1] == 'runserver') else 'prod'
-os.environ['ENV'] = env
+env_var = 'dev' if (len(sys.argv) == 2 and sys.argv[0] == 'manage.py' and sys.argv[1] == 'runserver') else 'prod'
+os.environ['ENV'] = env_var
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-if env == 'prod':
+if env_var == 'prod':
     try:
         region_name = "us-east-1"
         session = boto3.session.Session()
@@ -61,13 +61,16 @@ SECRET_KEY = secret_key
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
 
-ALLOWED_HOSTS = ['129.93.1.31', 'localhost', ".awsapprunner.com", "vtaps.org"]
+DEBUG = env_var == 'dev'
+
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', ".awsapprunner.com", "vtaps.org"]
 
 CSRF_COOKIE_DOMAIN = 'vtaps.org'
 
-CSRF_TRUSTED_ORIGINS=['https://vtaps.org']
+CSRF_TRUSTED_ORIGINS=['http://127.0.0.1', 'http://localhost', 'https://vtaps.org']
+
+CSRF_COOKIE_SECURE = False
 
 
 # Application definition
