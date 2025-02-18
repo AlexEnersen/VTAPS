@@ -53,13 +53,11 @@ def pickHybrid(request):
     context['hybrid_form'] = hybrid_form
     context['fert_form'] = fert_form
 
-    print("HI?")
     return render(request, "singleplayer/hybrid.html", context)
 
 @ensure_csrf_cookie
 @csrf_protect
 def weeklySelection(request):
-    print("HELLO?")
     context = {}
     matplotlib.pyplot.close()
 
@@ -117,8 +115,6 @@ def weeklySelection(request):
 
         compileWeather()
 
-        fert_entry = request.POST['week1']
-
     elif len(request.POST.keys()) > 0:
 
         user.week += 1
@@ -155,17 +151,16 @@ def weeklySelection(request):
         computeDSSAT(user_id, user.hybrid, controlFile)
 
     context['week'] = user.week
-    
-    fert_init = FertilizerInit.objects.get(id=user.fert_id)
-    fert_entry = fert_init.week6 if user.week == 6 else fert_init.week9 if user.week == 9 else fert_init.week10
-    context['fert_entry'] = fert_entry
 
     iform = IrrigationEntriesForm()
     if iform.is_valid():
         iform.save()
-
     context['iform'] = iform
 
+    fert_init = FertilizerInit.objects.get(id=user.fert_id)
+    fert_entry = fert_init.week1 if user.week == 1 else fert_init.week6 if user.week == 6 else fert_init.week9 if user.week == 9 else fert_init.week10 if user.week == 10 else fert_init.week12 if user.week == 12 else fert_init.week14 if user.week == 14 else fert_init.week15 if user.week == 15 else 0
+    context['fert_entry'] = fert_entry
+    
     fform = FertilizerEntriesForm(initial = {'fertilizer': fert_entry})
     if fform.is_valid():
         fform.save()
@@ -189,6 +184,8 @@ def weeklySelection(request):
         
     if (user.week > 1):
         context['aquaspy'] = plotAquaSpy(date, start_day)
+        context['pod_weight_graph'] = plotOneAttribute(date, start_day, 'UNLI2201.OPG', 'PWAD', 'kg [dm] / ha', 'Pod Weight')
+
 
 
     # totals = getEconomics(date)
@@ -210,6 +207,7 @@ def weeklySelection(request):
     # context['leached_nitrogen_graph'] = plotOneAttribute(date, start_day, 'SoilNi.OUT', 'NLCC', 'kg [N] / ha', 'Cumulative Nitrogen Leached')
 
     matplotlib.pyplot.close()
+
     
     if os.getcwd().split("/")[-1] == "id-%s" % user_id:
         os.chdir("..")
@@ -349,10 +347,13 @@ def getTotalFertilizerCost(text, date):
             else:
                 continue
 
-        if (onFertilizer):
+        elif (onFertilizer):
             if (lines[0].startswith("*") or lines[0].startswith("@")):
                 break
             elif (int(lines[1]) < int(date)):
+                if float(lines[5]) == 0:
+                    startIndex += 1
+                    continue
                 if (i - startIndex < 3):
                     totalFertilizerCost += (float(lines[5]) * 0.6) + 8.50
                 else:
@@ -360,7 +361,7 @@ def getTotalFertilizerCost(text, date):
             else:
                 break
 
-        if (lines[5] == "FAMN"):
+        elif (lines[5] == "FAMN"):
             onFertilizer = True
             startIndex = i
 
@@ -412,9 +413,9 @@ def compileWeather():
             lowArray.pop(0)
             rainArray.pop(0)
             
-        high_forecast = str(round(forecastData(highArray), 0))
-        low_forecast = str(round(forecastData(lowArray), 0))
-        rain_forecast = str(abs(round(forecastData(rainArray), 0)))
+        high_forecast = str(round(forecastData(highArray), 1))
+        low_forecast = str(round(forecastData(lowArray), 1 ))
+        rain_forecast = str(abs(round(forecastData(rainArray), 2)))
         
         if high_forecast < low_forecast:
             low_forecast = str(round(float(high_forecast) - 1, 1))
@@ -678,6 +679,8 @@ def plotSoilWater(date, start_day):
 
 
 def plotOneAttribute(date, start_day, filename, attribute, yaxis, title):
+    print(os.path.dirname(os.path.realpath(__file__)))
+
     try:
         file = open(filename, 'r')
         text = file.readlines()
@@ -724,6 +727,7 @@ def plotOneAttribute(date, start_day, filename, attribute, yaxis, title):
     fig.savefig(imgdata, format='svg')
     imgdata.seek(0)
     data = imgdata.getvalue()
+    
     return data
 
 def plotAquaSpy(date, start_day):
@@ -739,6 +743,9 @@ def plotAquaSpy(date, start_day):
             print("error:", error)
 
     rootDepth = getRootDepth(date) * 100
+    print(date)
+    print(start_day)
+    print(rootDepth)
 
     readingSoil = False
     index = -1

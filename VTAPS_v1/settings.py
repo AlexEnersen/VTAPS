@@ -17,7 +17,7 @@ import environ
 import os
 import sys
 
-env_var = 'dev' if (len(sys.argv) == 2 and sys.argv[0] == 'manage.py' and sys.argv[1] == 'runserver') else 'prod'
+env_var = 'dev' if (len(sys.argv) == 2 and sys.argv[0] == 'manage.py' and (sys.argv[1] == 'runserver' or sys.argv[1] == 'makemigrations' or sys.argv[1] == 'migrate')) else 'prod'
 os.environ['ENV'] = env_var
 
 BASE_DIR = Path(__file__).resolve().parent.parent
