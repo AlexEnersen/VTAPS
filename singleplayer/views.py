@@ -679,7 +679,6 @@ def plotSoilWater(date, start_day):
 
 
 def plotOneAttribute(date, start_day, filename, attribute, yaxis, title):
-    print(os.path.dirname(os.path.realpath(__file__)))
 
     try:
         file = open(filename, 'r')
@@ -742,10 +741,7 @@ def plotAquaSpy(date, start_day):
         else:
             print("error:", error)
 
-    rootDepth = getRootDepth(date) * 100
-    print(date)
-    print(start_day)
-    print(rootDepth)
+    rootArray = getRootDepth(date)
 
     readingSoil = False
     index = -1
@@ -758,11 +754,13 @@ def plotAquaSpy(date, start_day):
         elif len(items) > 0 and not readingSoil:
             if (items[0] == "@" and items[1] == "SLB"):
                 index = items.index("SDUL") - 1
+                index2 = items.index("SLLL") - 1
                 readingSoil = True
         elif len(items) > 1 and readingSoil:
-            soilArray.append(float(items[index]))
-            if int(items[0]) > rootDepth:
+            soilArray.append({'upperLimit': float(items[index]), 'lowerLimit': float(items[index2]), "depth": int(items[0])})
+            if int(items[0]) > rootArray[-1]:
                 break
+    print("Soil array:", soilArray)
     try:
         file2 = open("UNLI2201.OSW", "r")
         text2 = file2.readlines()
@@ -776,9 +774,14 @@ def plotAquaSpy(date, start_day):
     readingWater = False
     index2 = -1
     waterArray = []
+    ulimitArray = []
+    llimitArray = []
+    rootDay = 0
 
     for line in text2:
         currentArray = []
+        ulimitTempArray = []
+        llimitTempArray = []
         items = list(filter(None, line.strip("\n").split(" ")))
         if len(items) == 0 and not readingWater:
             continue
@@ -792,20 +795,42 @@ def plotAquaSpy(date, start_day):
             elif int(items[1]) > day:
                 break
             else:
-                for i in range(len(soilArray)):
-                    currentArray.append(float(items[index2 + i]) / soilArray[i])
-                waterArray.append(statistics.mean(currentArray) * 100)
+                depthTracker = 0
+                for index, soilLayer in enumerate(soilArray):
+                    waterLayer = float(items[index2 + index])
+                    soilDepth = soilLayer['depth'] - depthTracker
+                    rootDepth = rootArray[rootDay] - depthTracker
+                    if rootDepth < soilDepth:
+                        currentArray.append(round(waterLayer * (rootDepth / soilDepth), 3))
+                        ulimitTempArray.append(round(soilLayer['upperLimit'] * (rootDepth / soilDepth), 3))
+                        llimitTempArray.append(round(soilLayer['lowerLimit'] * (rootDepth / soilDepth), 3))
+                        break
+                    else:
+                        currentArray.append(round(waterLayer, 3))
+                        ulimitTempArray.append(round(soilLayer["upperLimit"], 3))
+                        llimitTempArray.append(round(soilLayer["lowerLimit"], 3))
+                    depthTracker += soilDepth
+                rootDay += 1
+                waterArray.append(round(sum(currentArray), 3))
+                ulimitArray.append(round(sum(ulimitTempArray), 3))
+                llimitArray.append(round(sum(llimitTempArray), 3))
 
+    print("waterArray:", waterArray)
+    print("ulimitArray:", ulimitArray)
+    print("llimitArray:", llimitArray)
+
+    limitRange = range(1, len(ulimitArray)+1)
     waterRange = range(1, len(waterArray)+1)
+    
+    alpha=0.7
 
-    fig, ax = plt.subplots()
-    ax.stackplot(waterRange, waterArray, labels=["Soil Water"])
-    # ax.legend(loc='upper left')
-    ax.set_xlabel('Days since planting')
-    ax.set_ylabel("Soil Water")
-    fig.suptitle("Soil Water", fontsize=16)
+    plt.fill_between(limitRange, ulimitArray, llimitArray, alpha=alpha)
+    plt.plot(waterRange, waterArray, color="black")
+    plt.xlabel('Days since planting')
+    plt.ylabel("Soil Water Limits")
+    plt.title("Soil Water", fontsize=16)
     imgdata = StringIO()
-    fig.savefig(imgdata, format='svg')
+    plt.savefig(imgdata, format='svg')
     imgdata.seek(0)
     data = imgdata.getvalue()
 
@@ -824,6 +849,8 @@ def getRootDepth(date):
 
     day = int(date[len(date) - 3:])
     reading = False
+    day = 0
+    rootArray = []
 
     for line in text:
         items = list(filter(None, line.split(" ")))
@@ -831,10 +858,12 @@ def getRootDepth(date):
             continue 
         elif not reading and items[0] == "@YEAR":
             reading = True
-        elif reading == True and int(items[1]) == day:
-            return float(items[33])
+        elif reading:
+            rootArray.append(float(items[33]) * 100)
+            if int(items[1]) == day:
+                return rootArray
         
-    return 0
+    return rootArray
         
 # def getEconomics(date):
 #     file = open("UNLI2201.MZX")
