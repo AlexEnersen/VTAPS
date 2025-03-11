@@ -183,28 +183,10 @@ def weeklySelection(request):
     context['other_costs'] = round(11.68 + 11 + 120.4, 2)
         
     if (user.week > 1):
-        context['aquaspy'] = plotAquaSpy(date, start_day)
+        context['aquaspy_graph'] = plotAquaSpy(date, start_day)
         context['pod_weight_graph'] = plotOneAttribute(date, start_day, 'UNLI2201.OPG', 'PWAD', 'kg [dm] / ha', 'Pod Weight')
-
-
-
-    # totals = getEconomics(date)
-    # context['waterTotal'] = totals[0]
-    # context['fertTotal'] = totals[1]
-
-    # context['graph'] = plotRoots(date, start_day, user_id)
-    # context['SWgraph'] = plotSoilWater(date, start_day)
-
-    # context['water_stress_graph1'] = plotOneAttribute(date, start_day, 'UNLI2201.OPG', 'WSPD', 'Percent stress', 'Water Stress Photosynthesis')
-    # context['water_stress_graph2'] = plotOneAttribute(date, start_day, 'UNLI2201.OPG', 'WSGD', 'Percent stress', 'Water Stress Expansion')
-    # context['nitrogen_stress_graph'] = plotOneAttribute(date, start_day, 'UNLI2201.OPG', 'NSTD', 'Percent stress', 'Nitrogen Stress')
-
-    
-    # context['cum_precip_graph'] = plotOneAttribute(date, start_day, 'SoilWat.OUT', 'PREC', 'mm', 'Cumulative Precipitation')
-    # context['cum_irrigation_graph'] = plotOneAttribute(date, start_day, 'SoilWat.OUT', 'IRRC', 'mm', 'Cumulative Irrigation')
-    # context['total_soil_water_graph'] = plotOneAttribute(date, start_day, 'SoilWat.OUT', 'SWTD', 'mm', 'Total Soil Water')
-
-    # context['leached_nitrogen_graph'] = plotOneAttribute(date, start_day, 'SoilNi.OUT', 'NLCC', 'kg [N] / ha', 'Cumulative Nitrogen Leached')
+        context['root_depth_graph'] = plotOneAttribute(date, start_day, 'UNLI2201.OPG', 'RDPD', 'cm', 'Root Depth')
+        context['water_layer_graph'] = plotWaterLayers(date, start_day)
 
     matplotlib.pyplot.close()
 
@@ -227,13 +209,6 @@ def finalResults(request):
 
     if not os.getcwd().split("/")[-1] == "id-%s" % user_id:
         os.chdir("id-%s" % user_id)
-    
-    context['leaf_weight_graph'] = plotOneAttribute(date, start_day, 'UNLI2201.OPG', 'LWAD', 'kg [dm] / ha', 'Leaf Weight')
-    context['stem_weight_graph'] = plotOneAttribute(date, start_day, 'UNLI2201.OPG', 'SWAD', 'kg [dm] / ha', 'Stem Weight')
-    context['grain_weight_graph'] = plotOneAttribute(date, start_day, 'UNLI2201.OPG', 'GWAD', 'kg [dm] / ha', 'Grain Weight')
-    context['root_weight_graph'] = plotOneAttribute(date, start_day, 'UNLI2201.OPG', 'RWAD', 'kg [dm] / ha', 'Root Weight')
-    context['tops_weight_graph'] = plotOneAttribute(date, start_day, 'UNLI2201.OPG', 'CWAD', 'kg [dm] / ha', 'Tops Weight')
-    context['pod_weight_graph'] = plotOneAttribute(date, start_day, 'UNLI2201.OPG', 'PWAD', 'kg [dm] / ha', 'Pod Weight')
 
     if os.getcwd().split("/")[-1] == "id-%s" % user_id:
         os.chdir("..")
@@ -494,51 +469,6 @@ def forecastData(previousArray):
     value = np.random.normal(mean, std/2, 1)
     return(value[0])
 
-# def forecastRain(day):
-#     total = 0
-#     zeroes = 0
-
-
-#     forecastArray = []
-#     directory = os.fsencode("weather_files")
-
-#     for file in os.listdir(directory):
-#         filename = "weather_files/" + os.fsdecode(file)
-#         file = open(filename, 'r')
-#         text = file.readlines()
-#         file.close()
-
-#         for line in text:
-#             items = list(filter(None, line.split(" ")))
-
-#             if len(items) > 0:
-#                 weatherDate = items[0]
-
-#                 if not weatherDate.isnumeric():
-#                     continue
-
-#                 weatherDay = weatherDate[len(weatherDate) - 3:]
-#                 if weatherDay == day and len(items) > 4:
-#                     rainValue = float(items[4].strip())
-#                     forecastArray.append(rainValue)
-#                     total += 1
-#                     if rainValue == 0.0:
-#                         zeroes += 1
-#                     else:
-#                         forecastArray.append(rainValue)
-#                     break
-    
-
-#     prediction = -1
-#     if zeroes / total >= 0.75:
-#         prediction = 0.0
-#     else:
-#         while np.sign(prediction) == -1:
-#             mean = np.mean(forecastArray)
-#             std = np.std(forecastArray)
-#             prediction = mmToInches(np.random.normal(mean, std/2, 1))
-#     return prediction + 0.0
-
 def mmToInches(mm):
     inches = round(float(0.0393701 * mm), 1)
     return inches
@@ -610,6 +540,9 @@ def plotRoots(date, start_day):
     fig.savefig(imgdata, format='svg')
     imgdata.seek(0)
     data = imgdata.getvalue()
+
+    plt.close()
+
     return data
 
 def plotSoilWater(date, start_day):
@@ -675,6 +608,9 @@ def plotSoilWater(date, start_day):
     fig.savefig(imgdata, format='svg')
     imgdata.seek(0)
     data = imgdata.getvalue()
+    
+    plt.close()
+
     return data
 
 
@@ -717,7 +653,7 @@ def plotOneAttribute(date, start_day, filename, attribute, yaxis, title):
 
     #REFERENCE FOR CODE TO DISPLAY GRAPH IN TEMPLATE: https://stackoverflow.com/questions/40534715/how-to-embed-matplotlib-graph-in-django-webpage
     fig, ax = plt.subplots()
-    ax.stackplot(stackRange, waterStress_Values, labels=[title])
+    ax.plot(waterStress_Values)
     # ax.legend(loc='upper left')
     ax.set_xlabel('Days since planting')
     ax.set_ylabel(yaxis)
@@ -726,6 +662,8 @@ def plotOneAttribute(date, start_day, filename, attribute, yaxis, title):
     fig.savefig(imgdata, format='svg')
     imgdata.seek(0)
     data = imgdata.getvalue()
+
+    plt.close()
     
     return data
 
@@ -760,7 +698,6 @@ def plotAquaSpy(date, start_day):
             soilArray.append({'upperLimit': float(items[index]), 'lowerLimit': float(items[index2]), "depth": int(items[0])})
             if int(items[0]) > rootArray[-1]:
                 break
-    print("Soil array:", soilArray)
     try:
         file2 = open("UNLI2201.OSW", "r")
         text2 = file2.readlines()
@@ -815,10 +752,6 @@ def plotAquaSpy(date, start_day):
                 ulimitArray.append(round(sum(ulimitTempArray), 3))
                 llimitArray.append(round(sum(llimitTempArray), 3))
 
-    print("waterArray:", waterArray)
-    print("ulimitArray:", ulimitArray)
-    print("llimitArray:", llimitArray)
-
     limitRange = range(1, len(ulimitArray)+1)
     waterRange = range(1, len(waterArray)+1)
     
@@ -833,6 +766,8 @@ def plotAquaSpy(date, start_day):
     plt.savefig(imgdata, format='svg')
     imgdata.seek(0)
     data = imgdata.getvalue()
+
+    plt.close()
 
     return data
 
@@ -864,6 +799,68 @@ def getRootDepth(date):
                 return rootArray
         
     return rootArray
+
+def plotWaterLayers(date, start_day):
+    day = int(date[len(date) - 3:])
+    try:
+        file = open("UNLI2201.OSW", 'r')
+        text = file.readlines()
+        file.close()
+    except Exception as error:
+        if environment == 'prod':
+            logger.info('error:', error)
+        else:
+            print("error:", error)
+
+    readingWater = False
+    waterLayers = [[] for i in range(13)]
+
+    for line in text:
+        items = list(filter(None, line.strip("\n").split(" ")))
+        if len(items) == 0 and not readingWater:
+            continue
+        elif len(items) > 0 and not readingWater:
+            if (items[0] == "@YEAR"):
+                index = items.index("SW1D")
+                readingWater = True
+        elif len(items) > 1 and readingWater:
+            if int(items[1]) < int(start_day):
+                continue
+            elif int(items[1]) > day:
+                break
+            else:
+                print("items:", items)
+                for index2 in range(13):
+                    print("items[index+index2]:", items[index+index2])
+                    waterLayers[index2].append(float(items[index+index2]) + 0.5*index2)
+                
+    x_values = range(len(waterLayers[0]))
+    print("waterLayers:", waterLayers)
+    print("x_values:", x_values)
+    plt.plot(waterLayers[0])
+    plt.plot(waterLayers[1])
+    plt.plot(waterLayers[2])
+    plt.plot(waterLayers[3])
+    plt.plot(waterLayers[4])
+    plt.plot(waterLayers[5])
+    plt.plot(waterLayers[6])
+    plt.plot(waterLayers[7])
+    plt.plot(waterLayers[8])
+    plt.plot(waterLayers[9])
+    plt.plot(waterLayers[10])
+    plt.plot(waterLayers[11])
+    plt.plot(waterLayers[12])
+    # plt.plot(waterLayers[0], waterLayers[1], waterLayers[2], waterLayers[3], waterLayers[4], waterLayers[5], waterLayers[6], waterLayers[7], waterLayers[8], waterLayers[9], waterLayers[10], waterLayers[11], waterLayers[12])
+    plt.xlabel('Days since planting')
+    plt.ylabel("Soil Water Amount")
+    plt.title("Soil Water", fontsize=16)
+    imgdata = StringIO()
+    plt.savefig(imgdata, format='svg')
+    imgdata.seek(0)
+    data = imgdata.getvalue()
+    plt.close()
+
+    return data
         
 # def getEconomics(date):
 #     file = open("UNLI2201.MZX")

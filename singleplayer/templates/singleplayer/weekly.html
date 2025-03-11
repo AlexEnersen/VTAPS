@@ -227,33 +227,10 @@
       <input type="submit" value="Continue" />
     </form>
     <div class="graphs">
-      <div>{{ aquaspy|safe }}</div>
-      <div>{{pod_weight_graph|safe}}</div>
-      <!-- <div>
-                {{ SWgraph | safe}}
-            </div>
-            <div>
-                {{ nitrogen_stress_graph | safe }}
-            </div>
-            <div>
-                {{ leached_nitrogen_graph | safe}}
-            </div>
-            <div>
-                {{ water_stress_graph1 | safe }}
-            </div>
-            <div>
-                {{ water_stress_graph2 | safe }}
-            </div>
-            <div>
-                {{ cum_precip_graph | safe }}
-            </div>
-            <div>
-                {{ cum_irrigation_graph | safe }}
-            </div>
-            <div>
-                {{ total_soil_water_graph | safe }}
-            </div> -->
-    <!-- </div> -->
+      <div>{{ aquaspy_graph | safe }}</div>
+      <div>{{ water_layer_graph | safe }}</div>
+      <div>{{ root_depth_graph | safe }}</div>
+      <div>{{ pod_weight_graph | safe }}</div>
   </div>
 </div>
 {% endblock %}
