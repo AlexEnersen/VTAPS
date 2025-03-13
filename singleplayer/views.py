@@ -184,7 +184,6 @@ def weeklySelection(request):
         
     if (user.week > 1):
         context['aquaspy_graph'] = plotAquaSpy(date, start_day)
-        context['pod_weight_graph'] = plotOneAttribute(date, start_day, 'UNLI2201.OPG', 'PWAD', 'kg [dm] / ha', 'Pod Weight')
         context['root_depth_graph'] = plotOneAttribute(date, start_day, 'UNLI2201.OPG', 'RDPD', 'cm', 'Root Depth')
         context['water_layer_graph'] = plotWaterLayers(date, start_day)
 
@@ -477,143 +476,6 @@ def inchesToMM(inches):
     mm = round(float(25.4 * inches), 1)
     return str(mm)
 
-def plotRoots(date, start_day):
-    try:
-        file = open('UNLI2201.OPG', 'r')
-        text = file.readlines()
-        file.close()
-    except Exception as error:
-        if environment == 'prod':
-            logger.info('error:', error)
-        else:
-            print("error:", error)
-
-    day = int(date[len(date) - 3:])
-    
-    readingRoots = False
-
-    rootData_Days = []
-    rootData_RL1D = []
-    rootData_RL2D = []
-    rootData_RL3D = []
-    rootData_RL4D = []
-    rootData_RL5D = []
-    rootData_RL6D = []
-    rootData_RL7D = []
-    rootData_RL8D = []
-    rootData_RL9D = []
-    rootData_RL10D = []
-
-    for line in text:
-        items = list(filter(None, line.split(" ")))
-        if len(items) == 0 and not readingRoots:
-            continue
-        elif readingRoots and len(items) == 0 or readingRoots and int(items[1]) > day:
-            break
-        elif len(items) > 0 and not readingRoots:
-            if (items[0] == "@YEAR"):
-                readingRoots = True
-        elif len(items) > 1 and readingRoots:
-            adjusted_day = int(items[1]) - start_day
-            rootData_Days.append(adjusted_day)
-            rootData_RL1D.append(float(items[34]))
-            rootData_RL2D.append(float(items[35]))
-            rootData_RL3D.append(float(items[36]))
-            rootData_RL4D.append(float(items[37]))
-            rootData_RL5D.append(float(items[38]))
-            rootData_RL6D.append(float(items[39]))
-            rootData_RL7D.append(float(items[40]))
-            rootData_RL8D.append(float(items[41]))
-            rootData_RL9D.append(float(items[42]))
-            rootData_RL10D.append(float(items[43]))
-    
-    stackRange = range(int(rootData_Days[0]), int(rootData_Days[-1])+1)
-
-    #REFERENCE FOR CODE TO DISPLAY GRAPH IN TEMPLATE: https://stackoverflow.com/questions/40534715/how-to-embed-matplotlib-graph-in-django-webpage
-    fig, ax = plt.subplots()
-    ax.stackplot(stackRange, rootData_RL1D, rootData_RL2D, rootData_RL3D, rootData_RL4D, rootData_RL5D, rootData_RL6D, rootData_RL7D, rootData_RL8D, rootData_RL9D, rootData_RL10D, labels=['0-5cm', '5-15cm', '15-23cm', '23-38cm', '38-53cm', '53-61cm', '61-69cm', '69-84cm', '84-99cm', '99-160cm'])
-    ax.legend(loc='upper left')
-    ax.set_xlabel('Days since planting')
-    ax.set_ylabel('Root density cm^3')
-    fig.suptitle('Root Density by Depth', fontsize=16)
-    imgdata = StringIO()
-    fig.savefig(imgdata, format='svg')
-    imgdata.seek(0)
-    data = imgdata.getvalue()
-
-    plt.close()
-
-    return data
-
-def plotSoilWater(date, start_day):
-    try:
-        file = open('SoilWat.OUT', 'r')
-        text = file.readlines()
-        file.close()
-    except Exception as error:
-        if environment == 'prod':
-            logger.info('error:', error)
-        else:
-            print("error:", error)
-
-    day = int(date[len(date) - 3:])
-    
-    readingRoots = False
-
-    rootData_Days = []
-    rootData_RL1D = []
-    rootData_RL2D = []
-    rootData_RL3D = []
-    rootData_RL4D = []
-    rootData_RL5D = []
-    rootData_RL6D = []
-    rootData_RL7D = []
-    rootData_RL8D = []
-    rootData_RL9D = []
-    rootData_RL10D = []
-
-    for line in text:
-        items = list(filter(None, line.split(" ")))
-        if len(items) == 0 and not readingRoots:
-            continue
-        elif readingRoots and len(items) == 0 or readingRoots and int(items[1]) > day:
-            break
-        elif len(items) > 0 and not readingRoots:
-            if (items[0] == "@YEAR"):
-                readingRoots = True
-        elif len(items) > 1 and readingRoots and start_day <= int(items[1]):
-            adjusted_day = int(items[1]) - start_day
-            rootData_Days.append(adjusted_day)
-            rootData_RL1D.append(float(items[17]))
-            rootData_RL2D.append(float(items[18]))
-            rootData_RL3D.append(float(items[19]))
-            rootData_RL4D.append(float(items[20]))
-            rootData_RL5D.append(float(items[21]))
-            rootData_RL6D.append(float(items[22]))
-            rootData_RL7D.append(float(items[23]))
-            rootData_RL8D.append(float(items[24]))
-            rootData_RL9D.append(float(items[25]))
-            # rootData_RL10D.append(float(items[27]))
-    
-    stackRange = range(int(rootData_Days[0]), int(rootData_Days[-1])+1)
-
-    #REFERENCE FOR CODE TO DISPLAY GRAPH IN TEMPLATE: https://stackoverflow.com/questions/40534715/how-to-embed-matplotlib-graph-in-django-webpage
-    fig, ax = plt.subplots()
-    ax.stackplot(stackRange, rootData_RL1D, rootData_RL2D, rootData_RL3D, rootData_RL4D, rootData_RL5D, rootData_RL6D, rootData_RL7D, rootData_RL8D, rootData_RL9D, labels=['0-5cm', '5-15cm', '15-23cm', '23-38cm', '38-53cm', '53-61cm', '61-69cm', '69-84cm', '84-99cm'])
-    ax.legend(loc='upper left')
-    ax.set_xlabel('Days since planting')
-    ax.set_ylabel('Soil Water')
-    fig.suptitle('Soil Water by Layer', fontsize=16)
-    imgdata = StringIO()
-    fig.savefig(imgdata, format='svg')
-    imgdata.seek(0)
-    data = imgdata.getvalue()
-    
-    plt.close()
-
-    return data
-
-
 def plotOneAttribute(date, start_day, filename, attribute, yaxis, title):
 
     try:
@@ -648,8 +510,6 @@ def plotOneAttribute(date, start_day, filename, attribute, yaxis, title):
             adjusted_day = int(items[1]) - start_day
             waterStress_Days.append(int(adjusted_day))
             waterStress_Values.append(float(items[index]))
-    
-    stackRange = range(int(waterStress_Days[0]), int(waterStress_Days[-1])+1)
 
     #REFERENCE FOR CODE TO DISPLAY GRAPH IN TEMPLATE: https://stackoverflow.com/questions/40534715/how-to-embed-matplotlib-graph-in-django-webpage
     fig, ax = plt.subplots()
@@ -733,6 +593,7 @@ def plotAquaSpy(date, start_day):
                 break
             else:
                 depthTracker = 0
+                modifier = 12
                 for index, soilLayer in enumerate(soilArray):
                     waterLayer = float(items[index2 + index])
                     soilDepth = soilLayer['depth'] - depthTracker
@@ -748,9 +609,9 @@ def plotAquaSpy(date, start_day):
                         llimitTempArray.append(round(soilLayer["lowerLimit"], 3))
                     depthTracker += soilDepth
                 rootDay += 1
-                waterArray.append(round(sum(currentArray), 3))
-                ulimitArray.append(round(sum(ulimitTempArray), 3))
-                llimitArray.append(round(sum(llimitTempArray), 3))
+                waterArray.append(round(sum(currentArray), 3) * modifier)
+                ulimitArray.append(round(sum(ulimitTempArray), 3) * modifier)
+                llimitArray.append(round(sum(llimitTempArray), 3) * modifier)
 
     limitRange = range(1, len(ulimitArray)+1)
     waterRange = range(1, len(waterArray)+1)
@@ -767,6 +628,73 @@ def plotAquaSpy(date, start_day):
     imgdata.seek(0)
     data = imgdata.getvalue()
 
+    plt.close()
+
+    return data
+
+def plotWaterLayers(date, start_day):
+    day = int(date[len(date) - 3:])
+    try:
+        file = open("UNLI2201.OSW", 'r')
+        text = file.readlines()
+        file.close()
+    except Exception as error:
+        if environment == 'prod':
+            logger.info('error:', error)
+        else:
+            print("error:", error)
+
+    readingWater = False
+    layerNum = 13
+    waterLayers = [[] for i in range(layerNum)]
+    soilVolumes = []
+
+    for textIndex, line in enumerate(text):
+        items = list(filter(None, line.strip("\n").split(" ")))
+        if len(items) == 0 and not readingWater:
+            continue
+        elif len(items) > 0 and not readingWater:
+            if (items[0] == "!" and items[1].startswith("0-")):
+                soilVolumes = [item for item in items]
+                soilVolumes.pop(0)
+            if (items[0] == "@YEAR"):
+                index = items.index("SW1D")
+                readingWater = True
+        elif len(items) > 1 and readingWater:
+            if int(items[1]) < int(start_day):
+                continue
+            elif int(items[1]) > day:
+                break
+            else:
+                for index2, layer in enumerate(waterLayers):
+                    layer.append(float(items[index+index2]) + (layerNum - index2))
+
+    fig, ax = plt.subplots()
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0, box.width * 0.75, box.height])           
+    plt.plot(waterLayers[0])
+    plt.plot(waterLayers[1])
+    plt.plot(waterLayers[2])
+    plt.plot(waterLayers[3])
+    plt.plot(waterLayers[4])
+    plt.plot(waterLayers[5])
+    plt.plot(waterLayers[6])
+    plt.plot(waterLayers[7])
+    plt.plot(waterLayers[8])
+    plt.plot(waterLayers[9])
+    plt.plot(waterLayers[10])
+    plt.plot(waterLayers[11])
+    plt.plot(waterLayers[12])
+    plt.xlabel('Days since planting')
+    plt.ylabel("Soil Water Amount")
+    plt.yticks([])
+    plt.legend(soilVolumes, loc="upper right", bbox_to_anchor = (1.35, 1))
+    # plt.yticks(range(1, layerNum+1), soilVolumes)
+    plt.title("Soil Water", fontsize=16)
+    imgdata = StringIO()
+    plt.savefig(imgdata, format='svg')
+    imgdata.seek(0)
+    data = imgdata.getvalue()
     plt.close()
 
     return data
@@ -799,68 +727,6 @@ def getRootDepth(date):
                 return rootArray
         
     return rootArray
-
-def plotWaterLayers(date, start_day):
-    day = int(date[len(date) - 3:])
-    try:
-        file = open("UNLI2201.OSW", 'r')
-        text = file.readlines()
-        file.close()
-    except Exception as error:
-        if environment == 'prod':
-            logger.info('error:', error)
-        else:
-            print("error:", error)
-
-    readingWater = False
-    waterLayers = [[] for i in range(13)]
-
-    for line in text:
-        items = list(filter(None, line.strip("\n").split(" ")))
-        if len(items) == 0 and not readingWater:
-            continue
-        elif len(items) > 0 and not readingWater:
-            if (items[0] == "@YEAR"):
-                index = items.index("SW1D")
-                readingWater = True
-        elif len(items) > 1 and readingWater:
-            if int(items[1]) < int(start_day):
-                continue
-            elif int(items[1]) > day:
-                break
-            else:
-                print("items:", items)
-                for index2 in range(13):
-                    print("items[index+index2]:", items[index+index2])
-                    waterLayers[index2].append(float(items[index+index2]) + 0.5*index2)
-                
-    x_values = range(len(waterLayers[0]))
-    print("waterLayers:", waterLayers)
-    print("x_values:", x_values)
-    plt.plot(waterLayers[0])
-    plt.plot(waterLayers[1])
-    plt.plot(waterLayers[2])
-    plt.plot(waterLayers[3])
-    plt.plot(waterLayers[4])
-    plt.plot(waterLayers[5])
-    plt.plot(waterLayers[6])
-    plt.plot(waterLayers[7])
-    plt.plot(waterLayers[8])
-    plt.plot(waterLayers[9])
-    plt.plot(waterLayers[10])
-    plt.plot(waterLayers[11])
-    plt.plot(waterLayers[12])
-    # plt.plot(waterLayers[0], waterLayers[1], waterLayers[2], waterLayers[3], waterLayers[4], waterLayers[5], waterLayers[6], waterLayers[7], waterLayers[8], waterLayers[9], waterLayers[10], waterLayers[11], waterLayers[12])
-    plt.xlabel('Days since planting')
-    plt.ylabel("Soil Water Amount")
-    plt.title("Soil Water", fontsize=16)
-    imgdata = StringIO()
-    plt.savefig(imgdata, format='svg')
-    imgdata.seek(0)
-    data = imgdata.getvalue()
-    plt.close()
-
-    return data
         
 # def getEconomics(date):
 #     file = open("UNLI2201.MZX")
