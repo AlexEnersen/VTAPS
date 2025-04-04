@@ -27,6 +27,20 @@ SEEDING_CHOICES = [
     (42000, 42000)
 ]
 
+IRRIGATION_CHOICES = [
+    (0, 0),
+    (0.10, 0.10),
+    (0.20, 0.20),
+    (0.30, 0.30),
+    (0.40, 0.40),
+    (0.50, 0.50),
+    (0.60, 0.60),
+    (0.70, 0.70),
+    (0.80, 0.80),
+    (0.90, 0.90),
+    (1, 1),
+]
+
 FERT_CHOICES_1 = [
     (0, 0),
     (5, 5),
@@ -94,13 +108,8 @@ class FertilizerEntries(models.Model):
     fertilizer = models.IntegerField(blank=False)
 
 class IrrigationEntries(models.Model):
-    monday = models.FloatField(blank=False, validators=[MinValueValidator('0.0')], default=0)
-    tuesday = models.FloatField(blank=False, validators=[MinValueValidator('0.0')], default=0)
-    wednesday = models.FloatField(blank=False, validators=[MinValueValidator('0.0')], default=0)
-    thursday = models.FloatField(blank=False, validators=[MinValueValidator('0.0')], default=0)
-    friday = models.FloatField(blank=False, validators=[MinValueValidator('0.0')], default=0)
-    saturday = models.FloatField(blank=False, validators=[MinValueValidator('0.0')], default=0)
-    sunday = models.FloatField(blank=False, validators=[MinValueValidator('0.0')], default=0)
+    monday = models.FloatField(choices=IRRIGATION_CHOICES, default=0)
+    thursday = models.FloatField(choices=IRRIGATION_CHOICES, default=0)
 
 class FertilizerInit(models.Model):
     week1 = models.IntegerField("Pre-plant Nitrogen, Week 1 (lbs/acre)", blank=False, default=0, choices=FERT_CHOICES_1)

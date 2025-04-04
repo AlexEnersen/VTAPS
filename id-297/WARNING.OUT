@@ -1,0 +1,24 @@
+*WARNING DETAIL FILE
+
+******************************************************************************
+
+*DSSAT Cropping System Model Ver. 4.8.2.000 -release  APR 04, 2025 02:50:18
+
+*RUN   1        : farm_23                   MZCER048 UNLI2309    1
+ MODEL          : MZCER048 - Maize
+ EXPERIMENT     : UNLI2309 MZ PIO1366
+ DATA PATH      :
+ TREATMENT  1   : farm_23                   MZCER048
+  
+
+ IPRES   YEAR DOY =    0   0
+ Residue application   1                                                       
+ Neither residue incorporation percentage nor depth specified. Applied residues
+ will remain on surface until a tillage event is specified.                    
+
+ IPVAR   YEAR DOY =    0   0
+ Error in Cultivar entry.  Fix cultivar input file.                            
+ File: MZCER048.CUL                                                            
+    Line: 33018                                                                
+    Error key: IPVAR                                                           
+ Simulations terminated.                                                       

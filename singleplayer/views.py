@@ -11,19 +11,12 @@ import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('agg')
 from io import StringIO
-import statistics
 import shutil
 import zipfile
 import boto3
-from django.contrib.sessions.models import Session
 import environ
-import sys
-import math
 import watchtower, logging
-
-from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.csrf import csrf_protect
-from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import get_user_model
 
 environment = os.environ['ENV']
 
@@ -40,8 +33,6 @@ def startGame(request):
     request.session['user_id'] = user.id
     return render(request, "singleplayer/home.html", {})
 
-@ensure_csrf_cookie
-@csrf_protect
 def pickHybrid(request):
     context = {}
     hybrid_form = SingleplayerProfileForm()
@@ -55,8 +46,6 @@ def pickHybrid(request):
 
     return render(request, "singleplayer/hybrid.html", context)
 
-@ensure_csrf_cookie
-@csrf_protect
 def weeklySelection(request):
     context = {}
     matplotlib.pyplot.close()
@@ -66,7 +55,7 @@ def weeklySelection(request):
     if (user.week >= 24):
         return redirect("/singleplayer/final")
     
-    controlFile = 'UNLI2201.MZX'
+    controlFile = 'UNLI2309.MZX'
     try:
         file = open(controlFile, 'r')
         text = file.readlines()
@@ -184,7 +173,7 @@ def weeklySelection(request):
         
     if (user.week > 1):
         context['aquaspy_graph'] = plotAquaSpy(date, start_day)
-        context['root_depth_graph'] = plotOneAttribute(date, start_day, 'UNLI2201.OPG', 'RDPD', 'cm', 'Root Depth')
+        context['root_depth_graph'] = plotOneAttribute(date, start_day, 'UNLI2309.OPG', 'RDPD', 'cm', 'Root Depth')
         context['water_layer_graph'] = plotWaterLayers(date, start_day)
 
     matplotlib.pyplot.close()
@@ -228,28 +217,24 @@ def getDate(text):
         
 def getIrrigation(request):
     monday = request.POST.get('monday')
-    tuesday = request.POST.get('tuesday')
-    wednesday = request.POST.get('wednesday')
     thursday = request.POST.get('thursday')
-    friday = request.POST.get('friday')
-    saturday = request.POST.get('saturday')
-    sunday = request.POST.get('sunday')
 
-    return [monday, tuesday, wednesday, thursday, friday, saturday, sunday]
+    return [monday, thursday]
         
 def addIrrigation(text, irrigationQuantity, date):
     onIrrigation = False
-    dateOffset = 0
 
     irrigationLines = []
 
-    for quantity in irrigationQuantity:
+    for index, quantity in enumerate(irrigationQuantity):
         if float(quantity) > 0:
             quantity = inchesToMM(float(quantity))
             beforeSpaces = " " * (6 - len(quantity))
-            newString = " 1 %s IR001%s%s\n" % (date+dateOffset, beforeSpaces, quantity)
+            if index == 0:
+                newString = " 1 %s IR001%s%s\n" % (date, beforeSpaces, quantity)
+            elif index == 1:
+                newString = " 1 %s IR001%s%s\n" % (date+3, beforeSpaces, quantity)
             irrigationLines.append(newString)
-        dateOffset += 1
 
     for i, line in enumerate(text):
         if (line.startswith("@I")):
@@ -348,7 +333,7 @@ def compileWeather():
     rainArray = []
 
     try:
-        weather_file = open("NENP2201.WTH", 'r')
+        weather_file = open("NEME2301.WTH", 'r')
         weather_text = weather_file.readlines()
         weather_file.close()
     except Exception as error:
@@ -487,6 +472,7 @@ def plotOneAttribute(date, start_day, filename, attribute, yaxis, title):
             logger.info('error:', error)
         else:
             print("error:", error)
+        return None
 
     day = int(date[len(date) - 3:])
     
@@ -540,8 +526,11 @@ def plotAquaSpy(date, start_day):
             print("error:", error)
 
     rootArray = getRootDepth(date)
+    if not rootArray:
+        return None
 
     readingSoil = False
+    readingFile = False
     index = -1
     soilArray = []
 
@@ -550,7 +539,10 @@ def plotAquaSpy(date, start_day):
         if len(items) == 0 and not readingSoil:
             continue
         elif len(items) > 0 and not readingSoil:
-            if (items[0] == "@" and items[1] == "SLB"):
+            if (items[0] == '*NENP230018'):
+                readingFile = True
+                continue
+            elif (readingFile and items[0] == "@" and items[1] == "SLB"):
                 index = items.index("SDUL") - 1
                 index2 = items.index("SLLL") - 1
                 readingSoil = True
@@ -559,7 +551,7 @@ def plotAquaSpy(date, start_day):
             if int(items[0]) > rootArray[-1]:
                 break
     try:
-        file2 = open("UNLI2201.OSW", "r")
+        file2 = open("UNLI2309.OSW", "r")
         text2 = file2.readlines()
         file2.close()
     except Exception as error:
@@ -635,7 +627,7 @@ def plotAquaSpy(date, start_day):
 def plotWaterLayers(date, start_day):
     day = int(date[len(date) - 3:])
     try:
-        file = open("UNLI2201.OSW", 'r')
+        file = open("UNLI2309.OSW", 'r')
         text = file.readlines()
         file.close()
     except Exception as error:
@@ -643,10 +635,11 @@ def plotWaterLayers(date, start_day):
             logger.info('error:', error)
         else:
             print("error:", error)
+        return None
 
     readingWater = False
-    layerNum = 13
-    waterLayers = [[] for i in range(layerNum)]
+    layerNum = 12
+    waterLayers = [[] for i in range(1,layerNum)]
     soilVolumes = []
 
     for textIndex, line in enumerate(text):
@@ -671,20 +664,9 @@ def plotWaterLayers(date, start_day):
 
     fig, ax = plt.subplots()
     box = ax.get_position()
-    ax.set_position([box.x0, box.y0, box.width * 0.75, box.height])           
-    plt.plot(waterLayers[0])
-    plt.plot(waterLayers[1])
-    plt.plot(waterLayers[2])
-    plt.plot(waterLayers[3])
-    plt.plot(waterLayers[4])
-    plt.plot(waterLayers[5])
-    plt.plot(waterLayers[6])
-    plt.plot(waterLayers[7])
-    plt.plot(waterLayers[8])
-    plt.plot(waterLayers[9])
-    plt.plot(waterLayers[10])
-    plt.plot(waterLayers[11])
-    plt.plot(waterLayers[12])
+    ax.set_position([box.x0, box.y0, box.width * 0.75, box.height])
+    for layer in waterLayers:           
+        plt.plot(layer)
     plt.xlabel('Days since planting')
     plt.ylabel("Soil Water Amount")
     plt.yticks([])
@@ -701,7 +683,7 @@ def plotWaterLayers(date, start_day):
 
 def getRootDepth(date):
     try:
-        file = open("UNLI2201.OPG", 'r')
+        file = open("UNLI2309.OPG", 'r')
         text = file.readlines()
         file.close()
     except Exception as error:
@@ -709,6 +691,7 @@ def getRootDepth(date):
             logger.info('error:', error)
         else:
             print("error:", error)
+        return None
 
     day = int(date[len(date) - 3:])
     reading = False
@@ -727,40 +710,6 @@ def getRootDepth(date):
                 return rootArray
         
     return rootArray
-        
-# def getEconomics(date):
-#     file = open("UNLI2201.MZX")
-#     text = file.readlines()
-#     file.close()
-#     print(date)
-
-#     day = int(date[len(date) - 3:])
-#     readingWater = False
-#     readingFert = False
-    
-#     waterTotal = 0
-#     fertTotal = 0
-
-#     for line in text:
-#         items = list(filter(None, line.strip("\n").split(" ")))
-#         if len(items) > 0 and items[0] == "@I" and items[3] == "IRVAL":
-#             readingWater = True
-#             readingFert = False
-#         elif len(items) > 0 and items[0] == "@F":
-#             readingFert = True
-#             readingWater = False
-#         elif readingWater:
-#             if len(items) > 0 and int(items[1]) <= int(date):
-#                 waterTotal += float(items[3])
-#             else:
-#                 readingWater = False
-#         elif readingFert:
-#             if len(items) > 0 and int(items[1]) <= int(date):
-#                 fertTotal += float(items[5])
-#             else:
-#                 readingFert = False
-
-#     return [waterTotal, fertTotal]
 
 def computeDSSAT(user_id, hybrid, controlFile):
     try:
@@ -776,8 +725,8 @@ def computeDSSAT(user_id, hybrid, controlFile):
     zip = zipfile.ZipFile("id-%s.zip" % (user_id), "w", zipfile.ZIP_DEFLATED)
     zip.write("command.ps1")
     zip.write("NE.SOL")
-    zip.write("NENP2201.WTH")
-    zip.write("UNLI2201.MZX")
+    zip.write("NEME2301.WTH")
+    zip.write("UNLI2309.MZX")
     zip.close()
 
     secret_name = "S3_Keys"
@@ -855,7 +804,7 @@ def computeDSSAT(user_id, hybrid, controlFile):
 def createDirectory(user_id):
     if not os.path.isdir("id-%s" % (user_id)):
         os.mkdir("id-%s" % (user_id))
-        shutil.copy2("UNLI2201.MZX", "id-%s/" % (user_id))
+        shutil.copy2("UNLI2309.MZX", "id-%s/" % (user_id))
         shutil.copy2("NE.SOL", "id-%s/" % (user_id))
-        shutil.copy2("NENP2201.WTH", "id-%s/" % (user_id))
+        shutil.copy2("NEME2301.WTH", "id-%s/" % (user_id))
 

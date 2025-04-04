@@ -1,0 +1,44 @@
+*Summary of files opened during simulation
+
+Unit  File
+Num.  Variable Name
+*DSSAT Cropping System Model Ver. 4.8.2.000   -release    APR 04, 2025; 15:50:50
+
+ Unit  Filename
+  501  OPCLR
+   21  FILEIO
+  502  LUNMFW
+  503  SIMCDE
+   25  DSPRO
+   22  DTACDE
+  122  WARNING.OUT
+  504  RUNLST
+  118  OUTINFO
+   11  FILEW
+   95  OUTO
+   10  FILEC
+   39  OUTG
+   40  OUTPN
+  505  OUTS
+   91  SEVAL
+   52  OUTWTH
+  506  FILEF
+   13  FILESS
+   36  OUTM
+  507  OUTM2
+  100  SCBAL
+  508  SCBAL2
+   44  SoilOrg.OUT
+  106  SoilNoBal.OUT
+  103  SoilNBalSum.OUT
+   64  N2O.OUT   
+   63  GHG.OUT   
+  105  SoilNiBal.OUT
+   43  SoilNi.OUT
+   55  Mulch.OUT
+  110  SWBAL
+   48  OUTWAT
+   47  OUTT
+   32  OUTET
+    8  FILEA
+  121  OUTBAT

@@ -1,0 +1,19 @@
+*RUN-TIME ERRORS OUTPUT FILE
+
+
+
+*DSSAT Cropping System Model Ver. 4.8.2.000 -release  APR 04, 2025 02:49:02
+
+*RUN   1        : farm_23                   MZCER048 UNLI2309    1
+ MODEL          : MZCER048 - Maize
+ EXPERIMENT     : UNLI2309 MZ PIO1366
+ DATA PATH      :
+ TREATMENT  1   : farm_23                   MZCER048
+  
+UNLI2309.MZX, Trt    0
+ 
+ End of soil file.  Please add missing information to input file.               
+  
+File: NE.SOL   Line:  2298   Error key: IPSOIL
+
+Additional information may be available in WARNING.OUT file.

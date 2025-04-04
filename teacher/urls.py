@@ -8,4 +8,5 @@ urlpatterns = [
     path('login', views.teacherLogin, name="teacherLogin"),
     path('logout', views.teacherLogout, name="teacherLogout"),
     path('sendEmail', views.teacherSendEmail, name="teacherSendEmail"),
+    path('confirm/<str:activation_key>/', views.teacherConfirm, name='teacherConfirm')
 ]
