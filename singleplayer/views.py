@@ -550,6 +550,7 @@ def plotAquaSpy(date, start_day):
             soilArray.append({'upperLimit': float(items[index]), 'lowerLimit': float(items[index2]), "depth": int(items[0])})
             if int(items[0]) > rootArray[-1]:
                 break
+    print(soilArray)
     try:
         file2 = open("UNLI2309.OSW", "r")
         text2 = file2.readlines()
@@ -585,25 +586,26 @@ def plotAquaSpy(date, start_day):
                 break
             else:
                 depthTracker = 0
-                modifier = 12
+                modifier = 2.5
                 for index, soilLayer in enumerate(soilArray):
                     waterLayer = float(items[index2 + index])
                     soilDepth = soilLayer['depth'] - depthTracker
                     rootDepth = rootArray[rootDay] - depthTracker
                     if rootDepth < soilDepth:
-                        currentArray.append(round(waterLayer * (rootDepth / soilDepth), 3))
-                        ulimitTempArray.append(round(soilLayer['upperLimit'] * (rootDepth / soilDepth), 3))
-                        llimitTempArray.append(round(soilLayer['lowerLimit'] * (rootDepth / soilDepth), 3))
+                        currentArray.append(round(waterLayer * rootDepth, 3))
+                        ulimitTempArray.append(round(soilLayer['upperLimit'] * rootDepth, 3))
+                        llimitTempArray.append(round(((soilLayer['upperLimit'] + soilLayer['lowerLimit'])/2) * rootDepth, 3))
                         break
                     else:
-                        currentArray.append(round(waterLayer, 3))
-                        ulimitTempArray.append(round(soilLayer["upperLimit"], 3))
-                        llimitTempArray.append(round(soilLayer["lowerLimit"], 3))
+                        currentArray.append(round(waterLayer * soilDepth, 3))
+                        ulimitTempArray.append(round(soilLayer["upperLimit"] * soilDepth, 3))
+                        llimitTempArray.append(round(((soilLayer['upperLimit'] + soilLayer['lowerLimit'])/2) * soilDepth, 3))
                     depthTracker += soilDepth
+
                 rootDay += 1
-                waterArray.append(round(sum(currentArray), 3) * modifier)
-                ulimitArray.append(round(sum(ulimitTempArray), 3) * modifier)
-                llimitArray.append(round(sum(llimitTempArray), 3) * modifier)
+                waterArray.append(round(sum(currentArray), 3) / modifier)
+                ulimitArray.append(round(sum(ulimitTempArray), 3) / modifier)
+                llimitArray.append(round(sum(llimitTempArray), 3) / modifier)
 
     limitRange = range(1, len(ulimitArray)+1)
     waterRange = range(1, len(waterArray)+1)
@@ -660,7 +662,7 @@ def plotWaterLayers(date, start_day):
                 break
             else:
                 for index2, layer in enumerate(waterLayers):
-                    layer.append(float(items[index+index2]) + (layerNum - index2))
+                    layer.append(float(items[index+index2]) + ((layerNum - index2)/500))
 
     fig, ax = plt.subplots()
     box = ax.get_position()

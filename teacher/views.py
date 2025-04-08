@@ -71,7 +71,7 @@ def sendConfirmationEmail(user):
             Teacher.objects.get(activation_key=activation_key)
     except:
         user.activation_key = activation_key
-        user.key_expires = time.time() + (60 * 60 * 24)
+        user.key_expires = time.time() + (60 * 60 * 24 * 7)
         user.save()
 
         connection = mail.get_connection()
