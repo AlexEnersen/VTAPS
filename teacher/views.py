@@ -81,8 +81,8 @@ def sendConfirmationEmail(user):
         connection = mail.get_connection()
         connection.open()
 
-        message = EmailMultiAlternatives("Hello from Django", "This is a test", "enersen1995@gmail.com", [user], connection=connection)
-        message.attach_alternative(f"<p>Hello {user.username}. This is a confirmation email for VTAPS.org. If you did not create an account recently, please disregard this message</br></br>Click <a href='{'http://localhost:8000' if environment == 'dev' else 'https://vtaps.org'}/teacher/confirm/{activation_key}'/> here</a> to finalize your registration with VTAPS.org</p>", "text/html")
+        message = EmailMultiAlternatives("Hello from VTAPS!", "VTAPS Confirmation", "enersen1995@gmail.com", [user], connection=connection)
+        message.attach_alternative(f"<p>Hello, {user.username}. This is a confirmation email for VTAPS.org. If you did not create an account recently, please disregard this message</br></br>Click <a href='{'http://localhost:8000' if environment == 'dev' else 'https://vtaps.org'}/teacher/confirm/{activation_key}'/> here</a> to finalize your registration with VTAPS.org</p>", "text/html")
         message.send()
 
         connection.close()
