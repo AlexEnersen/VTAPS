@@ -2,10 +2,12 @@ from django.shortcuts import render, redirect
 # from django.contrib.sessions.models import Session
 from django.contrib.auth import get_user_model
 
+
+
 def home(response):
     print(get_user_model().objects.all())
     
-    get_user_model().objects.all().delete()
+    get_user_model().objects.filter(is_superuser=False, is_staff=False).delete()
     # response.session.clear()
     # Session.objects.all().delete()
     user_id = response.session.get("user_id", None)

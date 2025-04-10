@@ -8,6 +8,9 @@ import random
 import string
 import time
 from django.http import HttpResponse    
+import os
+
+environment = os.environ['ENV']
 
 def teacherHome(response):
     if not response.user.is_authenticated:
@@ -22,8 +25,9 @@ def teacherRegister(response):
             user = form.save()
 
             sendConfirmationEmail(user)
-
-        return redirect("/teacher")
+            return render(response, "teacher/t_submission.html")
+        else:
+            return render(response, "error_register.html")
     else:
         form = RegisterTeacherForm()
     return render(response, "teacher/t_register.html", {"form":form})
@@ -78,7 +82,7 @@ def sendConfirmationEmail(user):
         connection.open()
 
         message = EmailMultiAlternatives("Hello from Django", "This is a test", "enersen1995@gmail.com", [user], connection=connection)
-        message.attach_alternative(f"<p>Hi, Dr. Cooper! I'm sending this from Django. This is a prototype of a confirmation email for teachers.</br></br> <a href='http://localhost:8000/teacher/confirm/{activation_key}'/>Click Here</a> to finalize your registration with VTAPS</br>(I can't link to localhost, so I'm linking to the VTAPS website for now)</p>", "text/html")
+        message.attach_alternative(f"<p>Hello {user.username}. This is a confirmation email for VTAPS.org. If you did not create an account recently, please disregard this message</br></br>Click <a href='{'http://localhost:8000' if environment == 'dev' else 'https://vtaps.org'}/teacher/confirm/{activation_key}'/> here</a> to finalize your registration with VTAPS.org</p>", "text/html")
         message.send()
 
         connection.close()
