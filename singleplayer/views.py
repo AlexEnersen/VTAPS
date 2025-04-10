@@ -333,7 +333,7 @@ def compileWeather():
     rainArray = []
 
     try:
-        weather_file = open("NEME2301.WTH", 'r')
+        weather_file = open("NEME2001.WTH", 'r')
         weather_text = weather_file.readlines()
         weather_file.close()
     except Exception as error:
@@ -727,7 +727,7 @@ def computeDSSAT(user_id, hybrid, controlFile):
     zip = zipfile.ZipFile("id-%s.zip" % (user_id), "w", zipfile.ZIP_DEFLATED)
     zip.write("command.ps1")
     zip.write("NE.SOL")
-    zip.write("NEME2301.WTH")
+    zip.write("NEME2001.WTH")
     zip.write("UNLI2309.MZX")
     zip.close()
 
@@ -808,5 +808,5 @@ def createDirectory(user_id):
         os.mkdir("id-%s" % (user_id))
         shutil.copy2("UNLI2309.MZX", "id-%s/" % (user_id))
         shutil.copy2("NE.SOL", "id-%s/" % (user_id))
-        shutil.copy2("NEME2301.WTH", "id-%s/" % (user_id))
+        shutil.copy2("NEME2001.WTH", "id-%s/" % (user_id))
 
