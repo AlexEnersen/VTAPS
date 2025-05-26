@@ -14,3 +14,8 @@ class RegisterTeacherForm(UserCreationForm):
 
 class LoginTeacherForm(AuthenticationForm):
     password = forms.PasswordInput()
+
+
+
+class SuperuserForm(forms.Form):
+    email = forms.CharField(label="email")

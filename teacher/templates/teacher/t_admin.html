@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Teacher</title>
+    <meta name="description" content />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href />
+    <style type="text/css">
+      .rowContainer {
+        display: flex;
+        flex-direction: row;
+        width: 90%;
+        justify-content: space-between;
+        font-size: 24px;
+        align-items: center;
+        height: 64px;
+        line-height: 64px;
+        padding-left: 8px
+      }
+      .columnContainer {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 16px;
+      }
+      .bigHeader {
+        font-size: 48px;
+      }
+      .header {
+        font-size: 32px;
+        text-decoration: underline;
+      }
+      .grayRow {
+        background-color: lightgray;
+      }
+      .rowText {
+        line-height: 64px;
+      }
+      .logout {
+        font-size: 18px
+      }
+    </style>
+  </head>
+  <body>
+    <h2 class="bigHeader">Welcome, Admin</h2>
+    <h class="header">Pending Users</h>
+    <div class="columnContainer">
+      {% for un_user in unauthorized_users %}
+      <div class="rowContainer {% if forloop.counter|divisibleby:2 == 0 %} grayRow {% endif %}">
+        <p class="rowText">{{un_user}}</p>
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="email" value="{{ user }}" />
+          <button type="submit" class="btn btn-success">Add teacher</button>
+        </form>
+      </div>
+      {% endfor %}
+    </div>
+    <h class="header">Authorized Users</h>
+    <div class="columnContainer">
+      {% for auth_user in authorized_users %}
+      <div class="rowContainer {% if forloop.counter|divisibleby:2 == 0 %} grayRow {% endif %}">
+        <p class="rowText">{{auth_user}}</p>
+      </div>
+      {% endfor %}
+    </div>
+    <a class="logout" href="/logout">Logout</a>
+  </body>
+</html>

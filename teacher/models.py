@@ -7,6 +7,7 @@ class Teacher(AbstractUser):
     username = models.CharField(max_length = 16)
     password = models.CharField(max_length = 256)
     confirmed = models.BooleanField(default = False)        #If this gets removed, you can't create super users anymore
+    authorized = models.BooleanField(default = False)
 
     activation_key = models.CharField(max_length=40, default=None, null=True, unique=True)
     key_expires = models.IntegerField(default=time.time, blank=True)

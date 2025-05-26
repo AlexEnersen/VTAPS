@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
-from .forms import LoginTeacherForm, RegisterTeacherForm
+from .forms import LoginTeacherForm, RegisterTeacherForm, SuperuserForm
 from .models import Teacher
 from django.core import mail
 from django.core.mail import EmailMultiAlternatives
@@ -9,11 +9,26 @@ import string
 import time
 from django.http import HttpResponse    
 import os
+from django.contrib.auth import get_user_model
 
 environment = os.environ['ENV']
 
 def teacherHome(response):
-    if not response.user.is_authenticated:
+    print(response.method)
+    if response.user.is_superuser:
+        form = SuperuserForm()
+        if response.method == 'POST':
+            user = get_user_model().objects.get(email = response.POST['email'])
+            print(user)
+            user.authorized = True
+            user.save()
+
+        unauthorized_users = get_user_model().objects.filter(is_superuser = False, confirmed = True, authorized = False)
+        authorized_users = get_user_model().objects.filter(is_superuser = False, confirmed = True, authorized = True)
+
+        context = {"unauthorized_users": unauthorized_users, "authorized_users": authorized_users, "form": form}
+        return render(response, "teacher/t_admin.html", context)
+    elif not response.user.is_authenticated:
         return render(response, "teacher/t_home.html", {"user": None, "authenticated": None})
     else:
         return render(response, "teacher/t_home.html", {"user": response.user, "authenticated": response.user.is_authenticated})

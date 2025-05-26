@@ -16,7 +16,9 @@ import zipfile
 import boto3
 import environ
 import watchtower, logging
+from .functions.functions import forecastWeather, altForecastWeather
 from django.contrib.auth import get_user_model
+import pandas as pd
 
 environment = os.environ['ENV']
 
@@ -170,6 +172,9 @@ def weeklySelection(request):
 
     # Insurance + Insecticide + Seeds
     context['other_costs'] = round(11.68 + 11 + 120.4, 2)
+
+    context['total_cost'] = round(context['irr_cost'] + context['fert_cost'] + context['other_costs'], 2)
+    context['bushel_cost'] = round(context['total_cost']/230, 2)
         
     if (user.week > 1):
         context['aquaspy_graph'] = plotAquaSpy(date, start_day)
@@ -187,9 +192,20 @@ def weeklySelection(request):
 def finalResults(request):
     context = {}
 
+    controlFile = 'UNLI2309.MZX'
+    try:
+        file = open(controlFile, 'r')
+        text = file.readlines()
+        file.close()
+    except Exception as error:
+        if environment == 'prod':
+            logger.info('error:', error)
+        else:
+            print("error:", error)
+
     start_date = int(request.session.get('start_date', None))
-    start_date_str = str(start_date)
-    start_day = int(start_date_str[len(start_date_str) - 3:])
+    # start_date_str = str(start_date)
+    # start_day = int(start_date_str[len(start_date_str) - 3:])
 
     user_id = request.session.get('user_id', None) 
     user = SingleplayerProfile.objects.get(id=user_id)
@@ -198,10 +214,27 @@ def finalResults(request):
     if not os.getcwd().split("/")[-1] == "id-%s" % user_id:
         os.chdir("id-%s" % user_id)
 
+    total_irrigation_cost = getTotalIrrigationCost(text, date)
+    total_fertilizer_cost = getTotalFertilizerCost(text, date)
+
+    context['irr_cost'] = round(total_irrigation_cost, 2)
+    context['fert_cost'] = round(total_fertilizer_cost, 2)
+
+    # Insurance + Insecticide + Seeds
+    context['other_costs'] = round(11.68 + 11 + 120.4, 2)
+
+    context['total_cost'] = round(context['irr_cost'] + context['fert_cost'] + context['other_costs'], 2)
+
+    finalYield = getFinalYield()
+
+    context['bushel_cost'] = round(context['total_cost']/finalYield, 2)
+
+    context['yield'] = finalYield
+
     if os.getcwd().split("/")[-1] == "id-%s" % user_id:
         os.chdir("..")
 
-    request.session.clear()
+    # request.session.clear()
 
     return render(request, "singleplayer/final.html", context)
     
@@ -328,9 +361,7 @@ def getTotalFertilizerCost(text, date):
         
 def compileWeather():
 
-    lowArray = []
-    highArray = []
-    rainArray = []
+    altForecast = True
 
     try:
         weather_file = open("NEME2001.WTH", 'r')
@@ -353,35 +384,10 @@ def compileWeather():
             logger.info('error', error)
         else:
             print("compileWeather error:", error)
+    
+    forecast_text = altForecastWeather() if altForecast else forecastWeather(weather_text)
 
-    for line in weather_text:
-        items = list(filter(None, line.split(" ")))
-        weatherDate = items[0]
-
-        if not weatherDate.isnumeric():
-            continue
-            
-        weatherDay = weatherDate[len(weatherDate) - 3:]
-
-        highArray.append(round((float(items[2]) * (9/5)) + 32, 1))
-        lowArray.append(round((float(items[3]) * (9/5)) + 32, 1))
-        rainArray.append(float(items[4].strip()))
-
-        if len(lowArray) >= 21:
-            highArray.pop(0)
-            lowArray.pop(0)
-            rainArray.pop(0)
-            
-        high_forecast = str(round(forecastData(highArray), 1))
-        low_forecast = str(round(forecastData(lowArray), 1 ))
-        rain_forecast = str(abs(round(forecastData(rainArray), 2)))
-        
-        if high_forecast < low_forecast:
-            low_forecast = str(round(float(high_forecast) - 1, 1))
-        
-        weather_string = weatherDay + " " + high_forecast + " " + low_forecast + " " + rain_forecast + "\n"
-
-        forecast_file.write(weather_string)
+    forecast_file.write(forecast_text)
 
     forecast_file.close()
 
@@ -406,8 +412,6 @@ def getWeather(date):
         for line in text:
             items = list(filter(None, line.split(" ")))
             weatherDay = items[0]
-
-            # converted_day = datetime.strptime("2022-" + day, "%Y-%j").strftime("%m-%d-%Y")
 
             if int(day) - int(weatherDay) <= 20 and len(lowArray) < 20:
                 highArray.append(float(items[2]))
@@ -446,12 +450,6 @@ def getWeather(date):
             logger.info(error)
         else:
             print("getWeather error:", error)
-
-def forecastData(previousArray):
-    mean = np.mean(previousArray)
-    std = np.std(previousArray)
-    value = np.random.normal(mean, std/2, 1)
-    return(value[0])
 
 def mmToInches(mm):
     inches = round(float(0.0393701 * mm), 1)
@@ -513,6 +511,30 @@ def plotOneAttribute(date, start_day, filename, attribute, yaxis, title):
     
     return data
 
+def getFinalYield():
+    filename = 'UNLI2309.OOV'
+    try:
+        file = open(filename, 'r')
+        text = file.readlines()
+        file.close()
+    except Exception as error:
+        if environment == 'prod':
+            logger.info('error:', error)
+        else:
+            print("error:", error)
+        return None
+    
+    readingVariables = False
+    finalYield = -1
+
+    for line in text:
+        items = list(filter(None, line.split(" ")))
+        if items[0] == '@' and not readingVariables:
+            readingVariables = True
+        elif readingVariables and items[0].startswith('Yield'):
+            finalYield = round(float(items[-2]) / 62.77, 1)
+            return finalYield
+
 def plotAquaSpy(date, start_day):
     day = int(date[len(date) - 3:])
     try:
@@ -550,7 +572,6 @@ def plotAquaSpy(date, start_day):
             soilArray.append({'upperLimit': float(items[index]), 'lowerLimit': float(items[index2]), "depth": int(items[0])})
             if int(items[0]) > rootArray[-1]:
                 break
-    print(soilArray)
     try:
         file2 = open("UNLI2309.OSW", "r")
         text2 = file2.readlines()
@@ -649,9 +670,9 @@ def plotWaterLayers(date, start_day):
         if len(items) == 0 and not readingWater:
             continue
         elif len(items) > 0 and not readingWater:
-            if (items[0] == "!" and items[1].startswith("0-")):
-                soilVolumes = [item for item in items]
-                soilVolumes.pop(0)
+            # if (items[0] == "!" and items[1].startswith("0-")):
+            #     soilVolumes = [item for item in items]
+            #     soilVolumes.pop(0)
             if (items[0] == "@YEAR"):
                 index = items.index("SW1D")
                 readingWater = True
@@ -662,17 +683,20 @@ def plotWaterLayers(date, start_day):
                 break
             else:
                 for index2, layer in enumerate(waterLayers):
-                    layer.append(float(items[index+index2]) + ((layerNum - index2)/500))
+                    layer.append(float(items[index+index2]) + ((layerNum - index2)/10))
+
+    desiredLayers = waterLayers[1:9]
+    legendLayers = ['4"', '8"', '12"', '16"', '24"', '32"', '40"', '48"']
 
     fig, ax = plt.subplots()
     box = ax.get_position()
-    ax.set_position([box.x0, box.y0, box.width * 0.75, box.height])
-    for layer in waterLayers:           
+    ax.set_position([box.x0, box.y0, box.width * 0.85, box.height])
+    for layer in desiredLayers:           
         plt.plot(layer)
     plt.xlabel('Days since planting')
     plt.ylabel("Soil Water Amount")
     plt.yticks([])
-    plt.legend(soilVolumes, loc="upper right", bbox_to_anchor = (1.35, 1))
+    plt.legend(legendLayers, loc="upper right", bbox_to_anchor = (1.25, 1))
     # plt.yticks(range(1, layerNum+1), soilVolumes)
     plt.title("Soil Water", fontsize=16)
     imgdata = StringIO()
