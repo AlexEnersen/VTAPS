@@ -59,17 +59,31 @@
       display: flex;
       flex-direction: row;
       flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-evenly;
+    }
+    .graphContainer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     .weatherHistory {
       border: 1px solid black;
       display: table;
-      margin: 48px;
+      padding: 2px;
+    }
+    .weatherContainer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     .infoContainer {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
+      justify-content: space-evenly;
     }
-    th, td {
+    th,
+    td {
       text-align: center;
     }
   </style>
@@ -218,37 +232,45 @@
 
       <input type="submit" value="Continue" />
     </form>
+    {% if week > 1 %}
     <div class="infoContainer">
-      <div class="graphs">
-        <div>{{ aquaspy_graph | safe }}</div>
-        <div>{{ water_layer_graph | safe }}</div>
-        <div>{{ root_depth_graph | safe }}</div>
+      <div class="graphContainer">
+        <h2>Graphs</h2>
+        <div class="graphs">
+          <div>{{ aquaspy_graph | safe }}</div>
+          <div>{{ water_layer_graph | safe }}</div>
+          <div>{{ root_depth_graph | safe }}</div>
+        </div>
       </div>
-      <table class="weatherHistory">
-        <tr>
-          <th>Day</th>
-          <th>High</th>
-          <th>Low</th>
-          <th>Rain</th>
-          <th>&nbsp;&nbsp;&nbsp;</th>
-          <th>Forecasted High</th>
-          <th>Forecasted Low</th>
-          <th>Forecasted Rain</th>
-        </tr>
-        {% for day in weather_history %}
-        <tr>
-          <td>{{ day.day }}</td>
-          <td>{{ day.high }}</td>
-          <td>{{ day.low }}</td>
-          <td>{{ day.rain}}</td>
-          <td></td>
-          <td>{{ day.forecast_high }}</td>
-          <td>{{ day.forecast_low }}</td>
-          <td>{{ day.forecast_rain }}</td>
-        </tr>
-        {% endfor %}
-      </table>
+      <div class="weatherContainer">
+        <h2>Weather History</h2>
+        <table class="weatherHistory">
+          <tr>
+            <th>Day</th>
+            <th>High</th>
+            <th>Low</th>
+            <th>Rain</th>
+            <th>&nbsp;&nbsp;&nbsp;</th>
+            <th>Forecasted High</th>
+            <th>Forecasted Low</th>
+            <th>Forecasted Rain</th>
+          </tr>
+          {% for day in weather_history %}
+          <tr>
+            <td>{{ day.day }}</td>
+            <td>{{ day.high }}</td>
+            <td>{{ day.low }}</td>
+            <td>{{ day.rain}}</td>
+            <td></td>
+            <td>{{ day.forecast_high }}</td>
+            <td>{{ day.forecast_low }}</td>
+            <td>{{ day.forecast_rain }}</td>
+          </tr>
+          {% endfor %}
+        </table>
+      </div>
     </div>
+    {% endif %}
   </div>
   {% endblock %}
 </div>

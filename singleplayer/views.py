@@ -33,7 +33,7 @@ def startGame(request):
     user = SingleplayerProfile()
     user.save()
     request.session['user_id'] = user.id
-    return render(request, "singleplayer/home.html", {})
+    return render(request, "singleplayer/intro.html", {})
 
 def pickHybrid(request):
     context = {}
@@ -883,5 +883,5 @@ def createDirectory(user_id):
         os.mkdir("id-%s" % (user_id))
         shutil.copy2("UNLI2309.MZX", "id-%s/" % (user_id))
         shutil.copy2("NE.SOL", "id-%s/" % (user_id))
-        # shutil.copy2("NEME0000.WTH", "id-%s/" % (user_id))
+        shutil.copy2("NEME2001.WTH", "id-%s/" % (user_id))
 

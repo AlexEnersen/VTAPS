@@ -1,0 +1,52 @@
+{% extends "singleplayer/base.html" %} {% block content %}
+<h1>Introduction</h1>
+<p>
+  The Virtual Testing Ag Performance Solutions (VTAPS) has been modeled
+  around the highly successful TAPS (<a href=https://taps.unl.edu>https://taps.unl.edu</a>) program. In the TAPS
+  program farmers and other participants make a series of management decisions
+  as they respond to field, agronomic and technology based information. At the
+  end of the growing season, the TAPS participants see how the compare (rank)
+  against other participants in terms of profitability, irrigation and nitrogen
+  efficiency and crop yield. The TAPS program has helped participants in the
+  self-realization of management changes that need to be improved and
+  participants have adopted new technology and management practices on their
+  farming operation.
+</p>
+
+<p>
+  The VTAPS program was developed so that high school ag students, and others,
+  could have a similar TAPS experience. VTAPS participants will select the
+  hybrid and seeding rate they wish to plant. They will also be able to apply
+  nitrogen fertilizer (at $0.60 per pound) for pre-plant ($8.50 application
+  cost), sidedress ($8.50 application cost) and five fertigation applications
+  ($1.25 application cost). Participants will also be able to apply irrigation
+  water ($6.10 per acre inch) twice during each week of the simulation (maximum
+  of 1.0 inches per application). Other costs such as machinery, materials, land
+  taxes and opportunity costs amount to $745. Cost of production is calculated
+  on a weekly basis and divided by the Farm Service Agency Annual Production
+  History (APH) of 230 bushels per acre. At the end of the simulation the total
+  cost is divided by the final yield. A complete budget is available at:
+  <a href=https://taps.unl.edu/budget>https://taps.unl.edu/budget</a> (TEMP LINK) . All the decisions and generated weather
+  information will be fed into a crop simulation model, Decision Support System
+  for Agrotechnology Transfer (DSSAT) and results will be included in a weekly
+  summary. Participants will also have a soil moisture sensor information
+  showing soil moisture at various depths of the soil profile.
+</p>
+
+<p>
+  At the end of week 24 participants will be able to see their final yield, cost
+  of production ($/bushel) and nitrogen and irrigation efficiency (Water ×
+  Nitrogen Intensification Performance Index – WNIPI, Lo et al., 2019. In a
+  group simulation such as a crop production class, participants will see how
+  they rank in these same categories, allowing them to self-realize what areas
+  of their management decisions are the strongest and which ones could use some
+  improvement. Participants will also be able to see what how much nitrogen has
+  potentially leached below the root zone. The single player version of VTAPS
+  will allow participants to try to improve their yield, cost of production and
+  nitrogen and irrigation application efficiency with additional simulations.
+</p>
+<a href="/singleplayer/hybrid">Click here to continue</a>
+<!-- <form method="post">
+    {% csrf_token %}
+    <input type="submit" value="Continue" /></form> -->
+{% endblock %}

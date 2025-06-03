@@ -136,28 +136,36 @@ def yearlyRandomizer():
     newWeather = ""
     tempDay = 1
 
-    for index, endPoint in enumerate(monthRanges):
+    try:
+        for index, endPoint in enumerate(monthRanges):
+            randomYear = np.random.choice(fileNames)
 
-        randomYear = np.random.choice(fileNames)
-        fileName = f'../weather_files/{randomYear}.WTH'
+            try:
+                fileName = f'../weather_files/{randomYear}.WTH'
+            except:
+                fileName = "NEME2001.WTH"
+                logger.info("USING BACKUP WEATHER FILE")
 
-        file = open(fileName, 'r')
-        text = file.readlines()
-        file.close()
+            file = open(fileName, 'r')
+            text = file.readlines()
+            file.close()
 
-        for line in text:
-            items = line.split(" ")
-            if items[0].isdigit():
-                day = int(items[0][4:])
-                if day < tempDay:
-                    continue
-                elif day >= endPoint - 1:
-                    tempDay = day
-                    break
-                else:
+            for line in text:
+                items = line.split(" ")
+                if items[0].isdigit():
+                    day = int(items[0][4:])
+                    if day < tempDay:
+                        continue
+                    elif day >= endPoint - 1:
+                        tempDay = day
+                        break
+                    else:
+                        newWeather += line
+                elif index == 0:
                     newWeather += line
-            elif index == 0:
-                newWeather += line
+
+    except Exception as e:
+        logger.info("YEARLYRANDOMIZER ERROR:", e)
 
     file = open("NEME0000.WTH", "w")
     file.write(newWeather)
