@@ -16,7 +16,7 @@ import zipfile
 import boto3
 import environ
 import watchtower, logging
-from .functions.functions import forecastWeather, altForecastWeather
+from .functions.functions import forecastWeather, altForecastWeather, yearlyRandomizer
 from django.contrib.auth import get_user_model
 import pandas as pd
 
@@ -95,7 +95,7 @@ def weeklySelection(request):
         request.session['start_date'] = start_date
         user.hybrid = request.POST['hybrid']
         user.seeding_rate = request.POST['seeding_rate']
-        user.week = 1
+        user.week = 22
         user.weather_type = request.POST['weather_type']
 
         fertilizer_init = FertilizerInit(week1 = request.POST['week1'], week6 = request.POST['week6'], week9 = request.POST['week9'], week10 = request.POST['week10'], week12 = request.POST['week12'], week14 = request.POST['week14'], week15 = request.POST['week15'])
@@ -171,14 +171,14 @@ def weeklySelection(request):
     context['fert_cost'] = round(total_fertilizer_cost, 2)
 
     # Insurance + Insecticide + Seeds
-    context['other_costs'] = round(11.68 + 11 + 120.4, 2)
+    context['other_costs'] = round(745, 2)
 
     context['total_cost'] = round(context['irr_cost'] + context['fert_cost'] + context['other_costs'], 2)
     context['bushel_cost'] = round(context['total_cost']/230, 2)
         
     if (user.week > 1):
         context['aquaspy_graph'] = plotAquaSpy(date, start_day)
-        context['root_depth_graph'] = plotOneAttribute(date, start_day, 'UNLI2309.OPG', 'RDPD', 'cm', 'Root Depth')
+        context['root_depth_graph'] = plotOneAttribute(date, start_day, 'UNLI2309.OPG', 'RDPD', 'Inches (in)', 'Root Depth')
         context['water_layer_graph'] = plotWaterLayers(date, start_day)
 
     matplotlib.pyplot.close()
@@ -190,6 +190,13 @@ def weeklySelection(request):
     return render(request, "singleplayer/weekly.html", context)
 
 def finalResults(request):
+    
+    user_id = request.session.get('user_id', None) 
+    user = SingleplayerProfile.objects.get(id=user_id)
+
+    if not os.getcwd().split("/")[-1] == "id-%s" % user_id:
+        os.chdir("id-%s" % user_id)
+
     context = {}
 
     controlFile = 'UNLI2309.MZX'
@@ -204,26 +211,21 @@ def finalResults(request):
             print("error:", error)
 
     start_date = int(request.session.get('start_date', None))
-    # start_date_str = str(start_date)
-    # start_day = int(start_date_str[len(start_date_str) - 3:])
-
-    user_id = request.session.get('user_id', None) 
-    user = SingleplayerProfile.objects.get(id=user_id)
     date = str(start_date + (user.week * 7))
 
-    if not os.getcwd().split("/")[-1] == "id-%s" % user_id:
-        os.chdir("id-%s" % user_id)
+    print("TEXT:", text)
+    print("DATE:", date)
 
-    total_irrigation_cost = getTotalIrrigationCost(text, date)
-    total_fertilizer_cost = getTotalFertilizerCost(text, date)
+    total_irrigation_cost = round(getTotalIrrigationCost(text, date), 2)
+    total_fertilizer_cost = round(getTotalFertilizerCost(text, date), 2)
 
-    context['irr_cost'] = round(total_irrigation_cost, 2)
-    context['fert_cost'] = round(total_fertilizer_cost, 2)
+    context['irr_cost'] = total_irrigation_cost
+    context['fert_cost'] = total_fertilizer_cost
 
     # Insurance + Insecticide + Seeds
-    context['other_costs'] = round(11.68 + 11 + 120.4, 2)
+    context['other_costs'] = round(745, 2)
 
-    context['total_cost'] = round(context['irr_cost'] + context['fert_cost'] + context['other_costs'], 2)
+    context['total_cost'] = round(total_irrigation_cost + total_fertilizer_cost + context['other_costs'], 2)
 
     finalYield = getFinalYield()
 
@@ -362,9 +364,13 @@ def getTotalFertilizerCost(text, date):
 def compileWeather():
 
     altForecast = True
+    filename = "NEME0000.WTH" if altForecast else "weather_files/NEME2001.WTH"
+
+    if altForecast:
+        yearlyRandomizer()
 
     try:
-        weather_file = open("NEME2001.WTH", 'r')
+        weather_file = open(filename, 'r')
         weather_text = weather_file.readlines()
         weather_file.close()
     except Exception as error:
@@ -385,7 +391,7 @@ def compileWeather():
         else:
             print("compileWeather error:", error)
     
-    forecast_text = altForecastWeather() if altForecast else forecastWeather(weather_text)
+    forecast_text = altForecastWeather(weather_text) if altForecast else forecastWeather(weather_text)
 
     forecast_file.write(forecast_text)
 
@@ -411,7 +417,9 @@ def getWeather(date):
 
         for line in text:
             items = list(filter(None, line.split(" ")))
-            weatherDay = items[0]
+            items = [x for x in items if x]
+            
+            weatherDay = items[0][len(items[0]) - 3:]
 
             if int(day) - int(weatherDay) <= 20 and len(lowArray) < 20:
                 highArray.append(float(items[2]))
@@ -476,8 +484,8 @@ def plotOneAttribute(date, start_day, filename, attribute, yaxis, title):
     
     readingStress = False
 
-    waterStress_Days = []
-    waterStress_Values = []
+    days = []
+    attribute_values = []
     index = -1
 
     for line in text:
@@ -492,12 +500,15 @@ def plotOneAttribute(date, start_day, filename, attribute, yaxis, title):
                 readingStress = True
         elif len(items) > 1 and readingStress and index > -1 and int(items[1]) >= int(start_day):
             adjusted_day = int(items[1]) - start_day
-            waterStress_Days.append(int(adjusted_day))
-            waterStress_Values.append(float(items[index]))
+            days.append(int(adjusted_day))
+            if attribute == "RDPD":
+                attribute_values.append(float(items[index]) * 0.393701)
+            else:
+                attribute_values.append(float(items[index]))
 
     #REFERENCE FOR CODE TO DISPLAY GRAPH IN TEMPLATE: https://stackoverflow.com/questions/40534715/how-to-embed-matplotlib-graph-in-django-webpage
     fig, ax = plt.subplots()
-    ax.plot(waterStress_Values)
+    ax.plot(attribute_values)
     # ax.legend(loc='upper left')
     ax.set_xlabel('Days since planting')
     ax.set_ylabel(yaxis)
@@ -731,7 +742,8 @@ def getRootDepth(date):
         elif not reading and items[0] == "@YEAR":
             reading = True
         elif reading:
-            rootArray.append(float(items[33]) * 100)
+            rootArray.append(float(items[33]) * 100 * 0.393701)
+            print(rootArray)
             if int(items[1]) == day:
                 return rootArray
         
@@ -751,7 +763,7 @@ def computeDSSAT(user_id, hybrid, controlFile):
     zip = zipfile.ZipFile("id-%s.zip" % (user_id), "w", zipfile.ZIP_DEFLATED)
     zip.write("command.ps1")
     zip.write("NE.SOL")
-    zip.write("NEME2001.WTH")
+    zip.write("NEME0000.WTH")
     zip.write("UNLI2309.MZX")
     zip.close()
 
@@ -832,5 +844,5 @@ def createDirectory(user_id):
         os.mkdir("id-%s" % (user_id))
         shutil.copy2("UNLI2309.MZX", "id-%s/" % (user_id))
         shutil.copy2("NE.SOL", "id-%s/" % (user_id))
-        shutil.copy2("NEME2001.WTH", "id-%s/" % (user_id))
+        # shutil.copy2("NEME0000.WTH", "id-%s/" % (user_id))
 
