@@ -443,7 +443,7 @@ def getWeather(date):
                 elif (int(weatherDay) - int(day)) == 6:
                     weatherDateConversion = "Sunday: " + weatherDateConversion
                 
-                weatherData = {"day": weatherDateConversion, "tHigh": items[1], "tLow": items[2], "pRain": mmToInches(float(items[3]))}
+                weatherData = {"day": weatherDateConversion, "tHigh": round(float(items[2]) * (9/5) + 32, 1), "tLow": round(float(items[3]) * (9/5) + 32, 1), "pRain": mmToInches(float(items[3]))}
 
                 weatherInfo.append(weatherData)
 
@@ -500,7 +500,7 @@ def plotOneAttribute(date, start_day, filename, attribute, yaxis, title):
             adjusted_day = int(items[1]) - start_day
             days.append(int(adjusted_day))
             if attribute == "RDPD":
-                attribute_values.append(float(items[index]) * 0.393701)
+                attribute_values.append(float(items[index]) / 2.54 * 100)
             else:
                 attribute_values.append(float(items[index]))
 
@@ -784,7 +784,7 @@ def getWeatherHistory(date, start_day):
         elif tempDay > day:
             break
         else:
-            weatherDict = {"day": tempDay, "high": items[2], "low": items[3], "rain": items[4], "forecast_high": forecastItems[2], "forecast_low": forecastItems[3], "forecast_rain": forecastItems[4]}
+            weatherDict = {"day": tempDay, "high": round(float(items[2]) * (9/5) + 32, 1), "low": round(float(items[3]) * (9/5) + 32, 1), "rain": items[4], "forecast_high": round(float(forecastItems[2]) * (9/5) + 32, 1), "forecast_low": round(float(forecastItems[3]) * (9/5) + 32, 1), "forecast_rain": forecastItems[4]}
             history.append(weatherDict)
     return history
 

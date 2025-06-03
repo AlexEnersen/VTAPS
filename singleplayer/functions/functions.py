@@ -1,6 +1,16 @@
 
 import numpy as np
 import pandas as pd
+import os
+import watchtower, logging
+
+environment = os.environ['ENV']
+
+
+if environment == 'prod':
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
+    logger.addHandler(watchtower.CloudWatchLogHandler())
 
 monthRanges = [32, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366]
 
@@ -109,12 +119,18 @@ def altForecastWeather(weather_text):
                 if (lowTemp <= highBound and lowTemp >= lowBound):
                     randLowTemp = round(np.random.uniform(lowBound, highBound), 1)
 
-            forecastString = f"{day[0]:<7}{day[1]:>6}{randHighTemp:>6}{randLowTemp:>6}{day[4]:>6}{day[5]:>6}{day[6]:>6}"
+            forecastString = f"{day[0]:<7}{day[1]:>6}{float(randHighTemp):>6}{randLowTemp:>6}{day[4]:>6}{day[5]:>6}{day[6]:>6}"
             monthlyForecast += forecastString
 
     return monthlyForecast
 
 def yearlyRandomizer():
+
+    if environment == 'prod':
+        logger.info(os.path)
+        logger.info(os.getcwd())
+        logger.info(os.listdir(os.getcwd()))
+
     fileNames = ['NEME0401', 'NEME0501', 'NEME0601', 'NEME0701', 'NEME0801', 'NEME0901', 'NEME1001', 'NEME1101', 'NEME1201', 'NEME1301', 'NEME1401', 'NEME1501', 'NEME1601', 'NEME1701', 'NEME1801', 'NEME1901', 'NEME2001', 'NEME2101', 'NEME2201', 'NEME2301']
 
     newWeather = ""
