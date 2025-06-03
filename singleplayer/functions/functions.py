@@ -109,7 +109,7 @@ def altForecastWeather(weather_text):
                 if (lowTemp <= highBound and lowTemp >= lowBound):
                     randLowTemp = round(np.random.uniform(lowBound, highBound), 1)
 
-            forecastString = f"{day[0]:<7}{day[1]:>6}{randLowTemp:>6}{randHighTemp:>6}{day[4]:>6}{day[5]:>6}{day[6]:>6}"
+            forecastString = f"{day[0]:<7}{day[1]:>6}{randHighTemp:>6}{randLowTemp:>6}{day[4]:>6}{day[5]:>6}{day[6]:>6}"
             monthlyForecast += forecastString
 
     return monthlyForecast

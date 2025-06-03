@@ -1,0 +1,21 @@
+*MANAGEMENT OPERATIONS EVENT SUMMARY
+
+*DSSAT Cropping System Model Ver. 4.8.2.000 -release  JUN 03, 2025 03:05:33
+!---------------------------------------------------------------------------------------------
+@RUN Date........  DOY    DAS    DAP  CR  Stage         Operation       Quantities
+!---------------------------------------------------------------------------------------------
+   1 APR 19, 2020  110      1      0  MZ  14 Start Sim 
+   1 APR 19, 2020  110      1      0  MZ                Organic matter    5000 kg[DM]/ha
+   1 MAY  1, 2020  122     13      0  MZ                Planting       
+   1 MAY  1, 2020  122     13      0  MZ  07 Sowing    
+   1 MAY  2, 2020  123     14      1  MZ  08 Germinate 
+   1 MAY 19, 2020  140     31     18  MZ  09 Emergence 
+   1 JUN  4, 2020  156     47     34  MZ  01 End Juveni
+   1 JUN 10, 2020  162     53     40  MZ  02 Floral Ini
+   1 JUL 15, 2020  197     88     75  MZ  03 75% Silkin
+   1 JUL 25, 2020  207     98     85  MZ  04 Beg Gr Fil
+   1 SEP 20, 2020  264    155    142  MZ  05 End Gr Fil
+   1 SEP 24, 2020  268    159    146  MZ  16 Harvest   
+                                             100.0 % yield harvested     2867. kg/ha
+                                               0.0 % by-product harv        0. kg/ha
+ 

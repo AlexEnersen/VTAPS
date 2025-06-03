@@ -95,7 +95,7 @@ def weeklySelection(request):
         request.session['start_date'] = start_date
         user.hybrid = request.POST['hybrid']
         user.seeding_rate = request.POST['seeding_rate']
-        user.week = 22
+        user.week = 1
         user.weather_type = request.POST['weather_type']
 
         fertilizer_init = FertilizerInit(week1 = request.POST['week1'], week6 = request.POST['week6'], week9 = request.POST['week9'], week10 = request.POST['week10'], week12 = request.POST['week12'], week14 = request.POST['week14'], week15 = request.POST['week15'])
@@ -180,6 +180,7 @@ def weeklySelection(request):
         context['aquaspy_graph'] = plotAquaSpy(date, start_day)
         context['root_depth_graph'] = plotOneAttribute(date, start_day, 'UNLI2309.OPG', 'RDPD', 'Inches (in)', 'Root Depth')
         context['water_layer_graph'] = plotWaterLayers(date, start_day)
+        context['weather_history'] = getWeatherHistory(date, start_day)
 
     matplotlib.pyplot.close()
 
@@ -212,9 +213,6 @@ def finalResults(request):
 
     start_date = int(request.session.get('start_date', None))
     date = str(start_date + (user.week * 7))
-
-    print("TEXT:", text)
-    print("DATE:", date)
 
     total_irrigation_cost = round(getTotalIrrigationCost(text, date), 2)
     total_fertilizer_cost = round(getTotalFertilizerCost(text, date), 2)
@@ -743,11 +741,52 @@ def getRootDepth(date):
             reading = True
         elif reading:
             rootArray.append(float(items[33]) * 100 * 0.393701)
-            print(rootArray)
             if int(items[1]) == day:
                 return rootArray
         
     return rootArray
+
+def getWeatherHistory(date, start_day):
+    day = int(date[len(date) - 3:])
+
+    try:
+        weatherFile = open("NEME0000.WTH", "r")
+        weatherText = weatherFile.readlines()
+        weatherFile.close()
+
+        forecastFile = open("forecast.txt", "r")
+        forecastText = forecastFile.readlines()
+        forecastFile.close()
+    except Exception as error:
+        if environment == 'prod':
+            logger.info('error:', error)
+        else:
+            print("error:", error)
+        return None
+    
+    history = []
+
+    forecastIndex = -1
+    for line in weatherText:
+        items = line.split(" ")
+        items = [x for x in items if x]
+
+        if not items[0].isdigit():
+            continue
+        else:
+            forecastIndex += 1
+
+        forecastItems = forecastText[forecastIndex].split(" ")
+        forecastItems = [x for x in forecastItems if x]
+        tempDay = int(items[0][len(items[0]) - 3:])
+        if tempDay < start_day:
+            continue
+        elif tempDay > day:
+            break
+        else:
+            weatherDict = {"day": tempDay, "high": items[2], "low": items[3], "rain": items[4], "forecast_high": forecastItems[2], "forecast_low": forecastItems[3], "forecast_rain": forecastItems[4]}
+            history.append(weatherDict)
+    return history
 
 def computeDSSAT(user_id, hybrid, controlFile):
     try:

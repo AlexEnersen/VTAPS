@@ -1,6 +1,4 @@
-{% extends "singleplayer/base.html" %} 
-
-{% block content %}
+{% extends "singleplayer/base.html" %} {% block content %}
 <div>
   <style type="text/css">
     .row {
@@ -62,17 +60,29 @@
       flex-direction: row;
       flex-wrap: wrap;
     }
+    .weatherHistory {
+      border: 1px solid black;
+      display: table;
+      margin: 48px;
+    }
+    .infoContainer {
+      display: flex;
+      flex-direction: column;
+    }
+    th, td {
+      text-align: center;
+    }
   </style>
 
   <h1>WEEK {{week}}</h1>
   <div class="weeklySection">
     <form action="weekly" method="post">
-      {% csrf_token %}
+      {% csrf_token %} 
       {% if week == 1 or week == 6 or week == 9 or week == 10 or week == 12 or week == 14 or week == 15 %}
-        <div class="row selectionRow">
-          <p class="irrigationLabel">Fertilizer:</p>
-          <p class="irrigationField">{{fform.fertilizer}} lbs</p>
-        </div>
+      <div class="row selectionRow">
+        <p class="irrigationLabel">Fertilizer:</p>
+        <p class="irrigationField">{{fform.fertilizer}} lbs</p>
+      </div>
       {% endif %}
       <div>Total Irrigation Costs: ${{irr_cost}}</div>
       <div>Total Fertilizer Costs: ${{fert_cost}}</div>
@@ -208,10 +218,37 @@
 
       <input type="submit" value="Continue" />
     </form>
-    <div class="graphs">
-      <div>{{ aquaspy_graph | safe }}</div>
-      <div>{{ water_layer_graph | safe }}</div>
-      <div>{{ root_depth_graph | safe }}</div>
+    <div class="infoContainer">
+      <div class="graphs">
+        <div>{{ aquaspy_graph | safe }}</div>
+        <div>{{ water_layer_graph | safe }}</div>
+        <div>{{ root_depth_graph | safe }}</div>
+      </div>
+      <table class="weatherHistory">
+        <tr>
+          <th>Day</th>
+          <th>High</th>
+          <th>Low</th>
+          <th>Rain</th>
+          <th>&nbsp;&nbsp;&nbsp;</th>
+          <th>Forecasted High</th>
+          <th>Forecasted Low</th>
+          <th>Forecasted Rain</th>
+        </tr>
+        {% for day in weather_history %}
+        <tr>
+          <td>{{ day.day }}</td>
+          <td>{{ day.high }}</td>
+          <td>{{ day.low }}</td>
+          <td>{{ day.rain}}</td>
+          <td></td>
+          <td>{{ day.forecast_high }}</td>
+          <td>{{ day.forecast_low }}</td>
+          <td>{{ day.forecast_rain }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
   </div>
+  {% endblock %}
 </div>
-{% endblock %}
