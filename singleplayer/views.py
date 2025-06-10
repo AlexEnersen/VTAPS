@@ -3,7 +3,7 @@
 from django.shortcuts import render, redirect
 import os
 import time
-from singleplayer.forms import IrrigationEntriesForm, FertilizerEntriesForm, SingleplayerProfileForm, FertilizerInitForm
+from singleplayer.forms import IrrigationEntriesForm, FertilizerEntriesForm1, FertilizerEntriesForm2, SingleplayerProfileForm, FertilizerInitForm
 from .models import SingleplayerProfile, FertilizerInit
 import numpy as np
 from datetime import datetime
@@ -54,8 +54,6 @@ def weeklySelection(request):
 
     user_id = request.session.get('user_id', None) 
     user = SingleplayerProfile.objects.get(id=user_id)
-    if (user.week >= 24):
-        return redirect("/singleplayer/final")
     
     controlFile = 'UNLI2309.MZX'
     try:
@@ -95,7 +93,7 @@ def weeklySelection(request):
         request.session['start_date'] = start_date
         user.hybrid = request.POST['hybrid']
         user.seeding_rate = request.POST['seeding_rate']
-        user.week = 1
+        user.week = 23
         user.weather_type = request.POST['weather_type']
 
         fertilizer_init = FertilizerInit(week1 = request.POST['week1'], week6 = request.POST['week6'], week9 = request.POST['week9'], week10 = request.POST['week10'], week12 = request.POST['week12'], week14 = request.POST['week14'], week15 = request.POST['week15'])
@@ -152,7 +150,7 @@ def weeklySelection(request):
     fert_entry = fert_init.week1 if user.week == 1 else fert_init.week6 if user.week == 6 else fert_init.week9 if user.week == 9 else fert_init.week10 if user.week == 10 else fert_init.week12 if user.week == 12 else fert_init.week14 if user.week == 14 else fert_init.week15 if user.week == 15 else 0
     context['fert_entry'] = fert_entry
     
-    fform = FertilizerEntriesForm(initial = {'fertilizer': fert_entry})
+    fform = FertilizerEntriesForm1(initial = {'fertilizer': fert_entry}) if user.week <= 6 else FertilizerEntriesForm2(initial = {'fertilizer': fert_entry})
     if fform.is_valid():
         fform.save()
 
@@ -171,7 +169,7 @@ def weeklySelection(request):
     context['fert_cost'] = round(total_fertilizer_cost, 2)
 
     # Insurance + Insecticide + Seeds
-    context['other_costs'] = round(745, 2)
+    context['other_costs'] = round(142.79, 2)
 
     context['total_cost'] = round(context['irr_cost'] + context['fert_cost'] + context['other_costs'], 2)
     context['bushel_cost'] = round(context['total_cost']/230, 2)
@@ -188,7 +186,11 @@ def weeklySelection(request):
     if os.getcwd().split("/")[-1] == "id-%s" % user_id:
         os.chdir("..")
     
-    return render(request, "singleplayer/weekly.html", context)
+    
+    if (user.week >= 24):
+        return redirect("/singleplayer/final")
+    else:
+        return render(request, "singleplayer/weekly.html", context)
 
 def finalResults(request):
     
@@ -212,6 +214,7 @@ def finalResults(request):
             print("error:", error)
 
     start_date = int(request.session.get('start_date', None))
+    start_day = int(str(start_date)[len(str(start_date)) - 3:])
     date = str(start_date + (user.week * 7))
 
     total_irrigation_cost = round(getTotalIrrigationCost(text, date), 2)
@@ -221,15 +224,17 @@ def finalResults(request):
     context['fert_cost'] = total_fertilizer_cost
 
     # Insurance + Insecticide + Seeds
-    context['other_costs'] = round(745, 2)
-
+    context['other_costs'] = round(142.79, 2)
     context['total_cost'] = round(total_irrigation_cost + total_fertilizer_cost + context['other_costs'], 2)
 
     finalYield = getFinalYield()
 
     context['bushel_cost'] = round(context['total_cost']/finalYield, 2)
-
     context['yield'] = finalYield
+
+    
+    context['aquaspy_graph'] = plotAquaSpy(date, start_day)
+    context['water_layer_graph'] = plotWaterLayers(date, start_day)
 
     if os.getcwd().split("/")[-1] == "id-%s" % user_id:
         os.chdir("..")
@@ -510,6 +515,8 @@ def plotOneAttribute(date, start_day, filename, attribute, yaxis, title):
     # ax.legend(loc='upper left')
     ax.set_xlabel('Days since planting')
     ax.set_ylabel(yaxis)
+    if attribute == 'RDPD':
+        ax.invert_yaxis()
     fig.suptitle(title, fontsize=16)
     imgdata = StringIO()
     fig.savefig(imgdata, format='svg')
@@ -781,7 +788,7 @@ def getWeatherHistory(date, start_day):
         tempDay = int(items[0][len(items[0]) - 3:])
         if tempDay < start_day:
             continue
-        elif tempDay > day:
+        elif tempDay >= day:
             break
         else:
             weatherDict = {"day": tempDay, "high": round(float(items[2]) * (9/5) + 32, 1), "low": round(float(items[3]) * (9/5) + 32, 1), "rain": items[4], "forecast_high": round(float(forecastItems[2]) * (9/5) + 32, 1), "forecast_low": round(float(forecastItems[3]) * (9/5) + 32, 1), "forecast_rain": forecastItems[4]}

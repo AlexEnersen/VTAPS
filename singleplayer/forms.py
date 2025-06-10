@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import ModelForm
 
-from .models import IrrigationEntries, FertilizerEntries, SingleplayerProfile, FertilizerInit
+from .models import IrrigationEntries, FertilizerEntries1, FertilizerEntries2, SingleplayerProfile, FertilizerInit
 
 class SingleplayerProfileForm(ModelForm):
     class Meta:
@@ -13,9 +13,14 @@ class IrrigationEntriesForm(ModelForm):
         model = IrrigationEntries
         fields = '__all__'
 
-class FertilizerEntriesForm(ModelForm):
+class FertilizerEntriesForm1(ModelForm):
     class Meta:
-        model = FertilizerEntries
+        model = FertilizerEntries1
+        fields = '__all__'
+
+class FertilizerEntriesForm2(ModelForm):
+    class Meta:
+        model = FertilizerEntries2
         fields = '__all__'
 
 class FertilizerInitForm(ModelForm):

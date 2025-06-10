@@ -104,8 +104,11 @@ class SingleplayerProfile(models.Model):
     week = models.IntegerField(default=1)
     fert_id = models.IntegerField(default=-1, blank=False)
 
-class FertilizerEntries(models.Model):
-    fertilizer = models.IntegerField(blank=False)
+class FertilizerEntries1(models.Model):
+    fertilizer = models.IntegerField(blank=False, default=0, choices=FERT_CHOICES_1)
+
+class FertilizerEntries2(models.Model):
+    fertilizer = models.IntegerField(blank=False, default=0, choices=FERT_CHOICES_2)
 
 class IrrigationEntries(models.Model):
     monday = models.FloatField(choices=IRRIGATION_CHOICES, default=0)

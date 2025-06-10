@@ -1,37 +1,54 @@
 {% extends "singleplayer/base.html" %} {% block content %}
 <style>
+    .body {
+      display: flex;
+      flex-direction: row;
+    }
     .row {
         display: flex;
         flex-direction: row;
-        width: 15%;
+        /* width: 5%; */
         justify-content: space-between;
+    }
+    .graphs {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-evenly;
     }
 </style>
 
-<div>
-  <div class="row">
-    <p>Irrigation Cost:</p>
-    <p>${{irr_cost}}</p>
+<div class="body">
+  <div>
+    <div class="row">
+      <p>Irrigation Cost:</p>
+      <p>${{irr_cost}}</p>
+    </div>
+    <div class="row">
+      <p>Fertilizer Cost:</p>
+      <p>${{fert_cost}}</p>  
+    </div>
+    <div class="row">
+      <p>Other Costs:</p>
+      <p>${{other_costs}}</p>  
+    </div>
+    <div class="row">
+      <p>Total Cost:</p>
+      <p>${{total_cost}}</p>
+    </div>
+    <div class="row">
+      <p>Total Yield:</p>
+      <p>{{yield}} bushels</p>
+    </div>
+    <div class="row">
+      <p>Cost per Bushel:</p>
+      <p>${{bushel_cost}}</p>
+    </div>
   </div>
-  <div class="row">
-    <p>Fertilizer Cost:</p>
-    <p>${{fert_cost}}</p>  
-  </div>
-  <div class="row">
-    <p>Other Costs:</p>
-    <p>${{other_costs}}</p>  
-  </div>
-  <div class="row">
-    <p>Total Cost:</p>
-    <p>${{total_cost}}</p>
-  </div>
-  <div class="row">
-    <p>Total Yield:</p>
-    <p>{{yield}} bushels</p>
-  </div>
-  <div class="row">
-    <p>Cost per Bushel:</p>
-    <p>${{bushel_cost}}</p>
+  <div class="graphs">
+    <div>{{ aquaspy_graph | safe }}</div>
+    <div>{{ water_layer_graph | safe }}</div>
   </div>
 </div>
 
