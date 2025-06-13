@@ -136,7 +136,6 @@ def yearlyRandomizer():
     newWeather = ""
     tempDay = 1
 
-    # try:
     for index, endPoint in enumerate(monthRanges):
         randomYear = np.random.choice(fileNames)
 
@@ -163,9 +162,6 @@ def yearlyRandomizer():
                     newWeather += line
             elif index == 0:
                 newWeather += line
-
-    # except Exception as e:
-    #     logger.info("YEARLYRANDOMIZER ERROR:", e.message)
 
     file = open("NEME0000.WTH", "w")
     file.write(newWeather)

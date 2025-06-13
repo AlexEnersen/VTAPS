@@ -124,7 +124,7 @@ def weeklySelection(request):
         irrigationQuantity = getIrrigation(request)
         
         text = addFertilizer(text, fertilizerQuantity, int(date)-7)
-        text = addIrrigation(text, irrigationQuantity, int(date)-7)
+        text = addIrrigation(text, irrigationQuantity, fertilizerQuantity, int(date)-7)
 
         newText = "".join(text)
         try:
@@ -259,7 +259,7 @@ def getIrrigation(request):
 
     return [monday, thursday]
         
-def addIrrigation(text, irrigationQuantity, date):
+def addIrrigation(text, irrigationQuantity, fertilizerQuantity, date):
     onIrrigation = False
 
     irrigationLines = []
