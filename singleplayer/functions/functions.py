@@ -141,13 +141,15 @@ def yearlyRandomizer():
 
         try:
             fileName = f'../weather_files/{randomYear}.WTH'
+            file = open(fileName, 'r')
+            text = file.readlines()
+            file.close()
         except:
             fileName = "NEME2001.WTH"
+            file = open(fileName, 'r')
+            text = file.readlines()
+            file.close()
             logger.info("USING BACKUP WEATHER FILE")
-
-        file = open(fileName, 'r')
-        text = file.readlines()
-        file.close()
 
         for line in text:
             items = line.split(" ")

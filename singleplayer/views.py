@@ -177,6 +177,8 @@ def weeklySelection(request):
     if (user.week > 1):
         context['aquaspy_graph'] = plotAquaSpy(date, start_day)
         context['root_depth_graph'] = plotOneAttribute(date, start_day, 'UNLI2309.OPG', 'RDPD', 'Inches (in)', 'Root Depth')
+        context['growth_stage_graph'] = plotOneAttribute(date, start_day, 'UNLI2309.OPG', 'GSTD', 'Stage', 'Growth Stage')
+        context['nitrogen_stress_graph'] = plotOneAttribute(date, start_day, 'UNLI2309.OPG', 'NSTD', 'N Stress', 'Nitrogen Stress')
         context['water_layer_graph'] = plotWaterLayers(date, start_day)
         context['weather_history'] = getWeatherHistory(date, start_day)
 
@@ -265,8 +267,11 @@ def addIrrigation(text, irrigationQuantity, fertilizerQuantity, date):
     irrigationLines = []
 
     for index, quantity in enumerate(irrigationQuantity):
-        if float(quantity) > 0:
-            quantity = inchesToMM(float(quantity))
+        quantity = float(quantity)
+        if index == 0:
+            quantity += (float(fertilizerQuantity if fertilizerQuantity else 0) * 0.01)
+        if quantity > 0:
+            quantity = inchesToMM(quantity)
             beforeSpaces = " " * (6 - len(quantity))
             if index == 0:
                 newString = " 1 %s IR001%s%s\n" % (date, beforeSpaces, quantity)
