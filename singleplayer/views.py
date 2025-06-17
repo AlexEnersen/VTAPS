@@ -95,7 +95,7 @@ def weeklySelection(request):
         user.hybrid = request.POST['hybrid']
         user.seeding_rate = request.POST['seeding_rate']
         text = setSeedingRate(text, user.seeding_rate)
-        user.week = 23
+        user.week = 1
         user.weather_type = request.POST['weather_type']
 
         fertilizer_init = FertilizerInit(week1 = request.POST['week1'], week6 = request.POST['week6'], week9 = request.POST['week9'], week10 = request.POST['week10'], week12 = request.POST['week12'], week14 = request.POST['week14'], week15 = request.POST['week15'])
