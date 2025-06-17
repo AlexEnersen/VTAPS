@@ -16,7 +16,8 @@ import zipfile
 import boto3
 import environ
 import watchtower, logging
-from .functions.functions import forecastWeather, altForecastWeather, yearlyRandomizer
+from .functions.functions import *
+from .functions.fileSearch import *
 from django.contrib.auth import get_user_model
 import pandas as pd
 
@@ -93,7 +94,8 @@ def weeklySelection(request):
         request.session['start_date'] = start_date
         user.hybrid = request.POST['hybrid']
         user.seeding_rate = request.POST['seeding_rate']
-        user.week = 1
+        text = setSeedingRate(text, user.seeding_rate)
+        user.week = 23
         user.weather_type = request.POST['weather_type']
 
         fertilizer_init = FertilizerInit(week1 = request.POST['week1'], week6 = request.POST['week6'], week9 = request.POST['week9'], week10 = request.POST['week10'], week12 = request.POST['week12'], week14 = request.POST['week14'], week15 = request.POST['week15'])
@@ -126,18 +128,18 @@ def weeklySelection(request):
         text = addFertilizer(text, fertilizerQuantity, int(date)-7)
         text = addIrrigation(text, irrigationQuantity, fertilizerQuantity, int(date)-7)
 
-        newText = "".join(text)
-        try:
-            file2 = open(controlFile, 'w')
-            file2.write(newText)
-            file2.close()
-        except Exception as error:
-            if environment == 'prod':
-                logger.info('error:', error)
-            else:
-                print("error:", error)
-
         computeDSSAT(user_id, user.hybrid, controlFile)
+
+    newText = "".join(text)
+    try:
+        file2 = open(controlFile, 'w')
+        file2.write(newText)
+        file2.close()
+    except Exception as error:
+        if environment == 'prod':
+            logger.info('error:', error)
+        else:
+            print("error:", error)
 
     context['week'] = user.week
 
