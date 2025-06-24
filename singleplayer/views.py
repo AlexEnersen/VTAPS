@@ -23,6 +23,7 @@ import pandas as pd
 
 environment = os.environ['ENV']
 
+userPath = ""
 
 if environment == 'prod':
     logging.basicConfig(level=logging.INFO)
@@ -56,9 +57,15 @@ def weeklySelection(request):
     user_id = request.session.get('user_id', None) 
     user = SingleplayerProfile.objects.get(id=user_id)
     
+    global userPath
+    userPath = f"id-{user_id}/"
+
+    if not os.path.exists(userPath):
+        createDirectory(userPath)
+    
     controlFile = 'UNLI2309.MZX'
     try:
-        file = open(controlFile, 'r')
+        file = open(userPath + controlFile, 'r')
         text = file.readlines()
         file.close()
     except Exception as error:
@@ -72,17 +79,6 @@ def weeklySelection(request):
 
     context = {}
     fert_entry = -1
-
-    if not os.path.exists("id-%s" % user_id):
-        createDirectory(user_id)
-
-    if environment == 'prod':
-        logger.info(os.path)
-        logger.info(os.getcwd())
-        logger.info(os.listdir(os.getcwd()))
-    
-    if not os.getcwd().split("/")[-1] == "id-%s" % user_id:
-        os.chdir("id-%s" % user_id)
 
         
     if environment == 'prod':
@@ -113,7 +109,7 @@ def weeklySelection(request):
 
         date = str(int(start_date) + (((user.week)-1) * 7))
         try:
-            file = open(controlFile, 'r')
+            file = open(userPath + controlFile, 'r')
             text = file.readlines()
             file.close()
         except Exception as error:
@@ -132,7 +128,7 @@ def weeklySelection(request):
 
     newText = "".join(text)
     try:
-        file2 = open(controlFile, 'w')
+        file2 = open(userPath + controlFile, 'w')
         file2.write(newText)
         file2.close()
     except Exception as error:
@@ -185,10 +181,6 @@ def weeklySelection(request):
         context['weather_history'] = getWeatherHistory(date, start_day)
 
     matplotlib.pyplot.close()
-
-    
-    if os.getcwd().split("/")[-1] == "id-%s" % user_id:
-        os.chdir("..")
     
     
     if (user.week >= 24):
@@ -201,14 +193,11 @@ def finalResults(request):
     user_id = request.session.get('user_id', None) 
     user = SingleplayerProfile.objects.get(id=user_id)
 
-    if not os.getcwd().split("/")[-1] == "id-%s" % user_id:
-        os.chdir("id-%s" % user_id)
-
     context = {}
 
     controlFile = 'UNLI2309.MZX'
     try:
-        file = open(controlFile, 'r')
+        file = open(userPath + controlFile, 'r')
         text = file.readlines()
         file.close()
     except Exception as error:
@@ -239,9 +228,6 @@ def finalResults(request):
     
     context['aquaspy_graph'] = plotAquaSpy(date, start_day)
     context['water_layer_graph'] = plotWaterLayers(date, start_day)
-
-    if os.getcwd().split("/")[-1] == "id-%s" % user_id:
-        os.chdir("..")
 
     # request.session.clear()
 
@@ -374,13 +360,13 @@ def getTotalFertilizerCost(text, date):
 def compileWeather():
 
     altForecast = True
-    filename = "NEME0000.WTH" if altForecast else "weather_files/NEME2001.WTH"
+    filename = "NEME0000.WTH"
 
     if altForecast:
-        yearlyRandomizer()
+        yearlyRandomizer(userPath)
 
     try:
-        weather_file = open(filename, 'r')
+        weather_file = open(userPath + filename, 'r')
         weather_text = weather_file.readlines()
         weather_file.close()
     except Exception as error:
@@ -394,7 +380,7 @@ def compileWeather():
         logger.info(os.listdir(os.path.dirname(os.path.realpath(__file__))))
 
     try:
-        forecast_file = open("forecast.txt", 'w')
+        forecast_file = open(userPath + "forecast.txt", 'w')
     except Exception as error:
         if environment == 'prod':
             logger.info('error', error)
@@ -416,12 +402,8 @@ def getWeather(date):
 
     day = date[len(date) - 3:]
 
-    if environment == 'prod':
-        logger.info(os.path.dirname(os.path.realpath(__file__)))
-        logger.info(os.listdir(os.path.dirname(os.path.realpath(__file__))))
-
     try:
-        file = open("forecast.txt", 'r')
+        file = open(userPath + "forecast.txt", 'r')
         text = file.readlines()
         file.close()
 
@@ -480,7 +462,7 @@ def inchesToMM(inches):
 def plotOneAttribute(date, start_day, filename, attribute, yaxis, title):
 
     try:
-        file = open(filename, 'r')
+        file = open(userPath + filename, 'r')
         text = file.readlines()
         file.close()
     except Exception as error:
@@ -537,7 +519,7 @@ def plotOneAttribute(date, start_day, filename, attribute, yaxis, title):
 def getFinalYield():
     filename = 'UNLI2309.OOV'
     try:
-        file = open(filename, 'r')
+        file = open(userPath + filename, 'r')
         text = file.readlines()
         file.close()
     except Exception as error:
@@ -561,7 +543,7 @@ def getFinalYield():
 def plotAquaSpy(date, start_day):
     day = int(date[len(date) - 3:])
     try:
-        file = open("NE.SOL", 'r')
+        file = open(userPath + "NE.SOL", 'r')
         text = file.readlines()
         file.close()
     except Exception as error:
@@ -596,7 +578,7 @@ def plotAquaSpy(date, start_day):
             if int(items[0]) > rootArray[-1]:
                 break
     try:
-        file2 = open("UNLI2309.OSW", "r")
+        file2 = open(userPath + "UNLI2309.OSW", "r")
         text2 = file2.readlines()
         file2.close()
     except Exception as error:
@@ -673,7 +655,7 @@ def plotAquaSpy(date, start_day):
 def plotWaterLayers(date, start_day):
     day = int(date[len(date) - 3:])
     try:
-        file = open("UNLI2309.OSW", 'r')
+        file = open(userPath + "UNLI2309.OSW", 'r')
         text = file.readlines()
         file.close()
     except Exception as error:
@@ -732,7 +714,7 @@ def plotWaterLayers(date, start_day):
 
 def getRootDepth(date):
     try:
-        file = open("UNLI2309.OPG", 'r')
+        file = open(userPath + "UNLI2309.OPG", 'r')
         text = file.readlines()
         file.close()
     except Exception as error:
@@ -764,11 +746,11 @@ def getWeatherHistory(date, start_day):
     day = int(date[len(date) - 3:])
 
     try:
-        weatherFile = open("NEME0000.WTH", "r")
+        weatherFile = open(userPath + "NEME0000.WTH", "r")
         weatherText = weatherFile.readlines()
         weatherFile.close()
 
-        forecastFile = open("forecast.txt", "r")
+        forecastFile = open(userPath + "forecast.txt", "r")
         forecastText = forecastFile.readlines()
         forecastFile.close()
     except Exception as error:
@@ -804,7 +786,7 @@ def getWeatherHistory(date, start_day):
 
 def computeDSSAT(user_id, hybrid, controlFile):
     try:
-        commandFile = open("command.ps1", "w")
+        commandFile = open(userPath + "command.ps1", "w")
         commandFile.write("../../DSCSM048 %s A %s" % (hybrid, controlFile))
         commandFile.close()
     except Exception as error:
@@ -812,12 +794,15 @@ def computeDSSAT(user_id, hybrid, controlFile):
             logger.info('error:', error)
         else:
             print("error:", error)
+
+    zipFile = f"id-{user_id}.zip"
+    zipPath = userPath + zipFile
             
-    zip = zipfile.ZipFile("id-%s.zip" % (user_id), "w", zipfile.ZIP_DEFLATED)
-    zip.write("command.ps1")
-    zip.write("NE.SOL")
-    zip.write("NEME0000.WTH")
-    zip.write("UNLI2309.MZX")
+    zip = zipfile.ZipFile(zipPath, "w", zipfile.ZIP_DEFLATED)
+    zip.write(userPath + "command.ps1", "command.ps1")
+    zip.write(userPath + "NE.SOL", "NE.SOL")
+    zip.write(userPath + "NEME0000.WTH", "NEME0000.WTH")
+    zip.write(userPath + "UNLI2309.MZX", "UNLI2309.MZX")
     zip.close()
 
     secret_name = "S3_Keys"
@@ -843,11 +828,11 @@ def computeDSSAT(user_id, hybrid, controlFile):
             environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
             s3 = boto3.client("s3", aws_access_key_id=env('S3_ACCESS_KEY_ID'), aws_secret_access_key=env('S3_SECRET_ACCESS_KEY'),)
         
-        s3.upload_file("id-%s.zip" % (user_id), "vtapsbucket", "id-%s.zip" % (user_id))
+        s3.upload_file(zipPath, "vtapsbucket", zipFile)
 
 
-        os.remove("id-%s.zip" % (user_id))
-        os.remove("command.ps1")
+        os.remove(zipPath)
+        os.remove(userPath + "command.ps1")
 
 
         file_present = False
@@ -872,30 +857,30 @@ def computeDSSAT(user_id, hybrid, controlFile):
             elif bucket['KeyCount'] > 0:
                 file_present = True
 
-        s3.download_file('outputvtapsbucket', "id-%s/id-%s.zip" % (user_id, user_id), "id-%s.zip" % user_id)
+        s3.download_file('outputvtapsbucket', zipPath, zipPath)
 
-        s3.delete_object(Bucket='outputvtapsbucket', Key='id-%s/id-%s.zip' % (user_id, user_id))
+        s3.delete_object(Bucket='outputvtapsbucket', Key=zipPath)
 
-        zip = zipfile.ZipFile("id-%s.zip" % user_id, 'r')
-        zip.extractall(".")
+        zip = zipfile.ZipFile(zipPath, 'r')
+        zip.extractall(userPath)
         zip.close()
 
-        files = os.listdir(".")
+        files = os.listdir(userPath)
         for file in files:
             if file.startswith("id-%s\\" % user_id):
-                os.rename(file,file.split("\\")[1])
+                os.rename(userPath + file,userPath + file.split("\\")[1])
 
-        os.remove("id-%s.zip" % user_id)
+        os.remove(zipPath)
     except Exception as error:
         if environment == 'prod':
             logger.info('error:', error)
         else:
             print("Error:", error)
 
-def createDirectory(user_id):
-    if not os.path.isdir("id-%s" % (user_id)):
-        os.mkdir("id-%s" % (user_id))
-        shutil.copy2("UNLI2309.MZX", "id-%s/" % (user_id))
-        shutil.copy2("NE.SOL", "id-%s/" % (user_id))
-        shutil.copy2("NEME2001.WTH", "id-%s/" % (user_id))
+def createDirectory(userPath):
+    if not os.path.isdir(userPath):
+        os.mkdir(userPath)
+        shutil.copy2("UNLI2309.MZX", userPath)
+        shutil.copy2("NE.SOL", userPath)
+        shutil.copy2("NEME2001.WTH", userPath)
 

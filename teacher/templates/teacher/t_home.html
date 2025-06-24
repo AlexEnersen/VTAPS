@@ -1,5 +1,17 @@
 <!DOCTYPE html>
 <html>
+    <style>
+        .gameList {
+            display: flex;
+            flex-direction: column
+        }
+        .game {
+            border: 1px solid black;
+            margin: 4px;
+            height: 60px;
+            width: 280px;
+        }
+    </style>
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -10,17 +22,25 @@
     </head>
     <body>
         {% if authenticated %}
-        <h1>{{user}}</h1>
-        {% if user.confirmed %}
-        <h2>Welcome!</h2>
+            <h1>Welcome {{user.username}}</h1>
+            {% if user.confirmed %}
+                <h2>Current Games</h2>
+                <div class="gameList">
+                    {% for game in games %}
+                        <a href={{ game.url }} class="game">{{game}}</div>
+                    {% endfor %}
+                    <a href="/teacher/newGame">Create New Game</a>
+                </div>
+
+            {% else %}
+                <h2>You still haven't confirmed your email yet</h2>
+                <h3>Click <a href="/teacher/sendEmail">here</a> to send it again</h3>
+            {% endif %}
+            <a class="home_button" href="/teacher/logout"><h1>Logout</h1></a>
+
         {% else %}
-        <h2>You still haven't confirmed your email yet</h2>
-        <h3>Click <a href="/teacher/sendEmail">here</a> to send it again</h3>
-        {% endif %}
-        <a class="home_button" href="/teacher/logout"><h1>Logout</h1></a>
-        {% else %}
-        <a class="home_button" href="/teacher/register"><h1>Register</h1></a>
-        <a class="home_button" href="/teacher/login"><h1>Login</h1></a>
+            <a class="home_button" href="/teacher/register"><h1>Register</h1></a>
+            <a class="home_button" href="/teacher/login"><h1>Login</h1></a>
         {% endif %}
     </body>
 </html>

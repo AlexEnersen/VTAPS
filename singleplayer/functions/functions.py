@@ -118,18 +118,14 @@ def altForecastWeather(weather_text):
                     break
                 if (lowTemp <= highBound and lowTemp >= lowBound):
                     randLowTemp = round(np.random.uniform(lowBound, highBound), 1)
+                    print("RAND LOW TEMP:", randLowTemp)
 
             forecastString = f"{day[0]:<7}{day[1]:>6}{float(randHighTemp):>6}{randLowTemp:>6}{day[4]:>6}{day[5]:>6}{day[6]:>6}"
             monthlyForecast += forecastString
 
     return monthlyForecast
 
-def yearlyRandomizer():
-
-    if environment == 'prod':
-        logger.info(os.path)
-        logger.info(os.getcwd())
-        logger.info(os.listdir(os.getcwd()))
+def yearlyRandomizer(userPath):
 
     fileNames = ['NEME0401', 'NEME0501', 'NEME0601', 'NEME0701', 'NEME0801', 'NEME0901', 'NEME1001', 'NEME1101', 'NEME1201', 'NEME1301', 'NEME1401', 'NEME1501', 'NEME1601', 'NEME1701', 'NEME1801', 'NEME1901', 'NEME2001', 'NEME2101', 'NEME2201', 'NEME2301']
 
@@ -140,7 +136,7 @@ def yearlyRandomizer():
         randomYear = np.random.choice(fileNames)
 
         try:
-            fileName = f'../weather_files/{randomYear}.WTH'
+            fileName = f'weather_files/{randomYear}.WTH'
             file = open(fileName, 'r')
             text = file.readlines()
             file.close()
@@ -149,7 +145,8 @@ def yearlyRandomizer():
             file = open(fileName, 'r')
             text = file.readlines()
             file.close()
-            logger.info("USING BACKUP WEATHER FILE")
+            if environment == 'prod':
+                logger.info("USING BACKUP FILE")
 
         for line in text:
             items = line.split(" ")
@@ -165,7 +162,7 @@ def yearlyRandomizer():
             elif index == 0:
                 newWeather += line
 
-    file = open("NEME0000.WTH", "w")
+    file = open(userPath + "NEME0000.WTH", "w")
     file.write(newWeather)
     file.close()
 

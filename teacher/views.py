@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from .forms import LoginTeacherForm, RegisterTeacherForm, SuperuserForm
-from .models import Teacher
+from .models import Teacher, Game
 from django.core import mail
 from django.core.mail import EmailMultiAlternatives
 import random
@@ -31,7 +31,18 @@ def teacherHome(response):
     elif not response.user.is_authenticated:
         return render(response, "teacher/t_home.html", {"user": None, "authenticated": None})
     else:
-        return render(response, "teacher/t_home.html", {"user": response.user, "authenticated": response.user.is_authenticated})
+        user = response.user
+        print(user.games)
+        user.games = [game for game in user.games if game is not None]
+        user.save()
+        userGames = []
+        for game in user.games:
+            print(game)
+            if game == None:
+                game.delete()
+            else:
+                userGames.append(Game.objects.get(id = game))
+        return render(response, "teacher/t_home.html", {"user": user, "authenticated": user.is_authenticated, "games": userGames})
 
 def teacherRegister(response):
     if response.method == "POST":
@@ -62,18 +73,6 @@ def teacherLogin(response):
         form = LoginTeacherForm()
     return render(response, "teacher/t_login.html", {"form":form})
 
-def teacherConfirm(response, activation_key):
-    try:
-        teacher = Teacher.objects.get(activation_key=activation_key)
-        if teacher.key_expires > time.time():
-            teacher.confirmed = True
-            teacher.save()
-            return render(response, "teacher/t_confirmation.html")
-        else:
-            return render(response, 'teacher/t_failure.html')
-    except:
-        return render(response, 'teacher/t_failure.html')
-
 def teacherLogout(response):
     logout(response)
     return redirect("/teacher")
@@ -82,11 +81,38 @@ def teacherSendEmail(response):
     sendConfirmationEmail(response.user)
     return redirect("/teacher")
 
+def newGame(response):
+    teacher = response.user
+
+    game = Game()
+    game.save()
+    teacher.games.append(game.id)
+    
+    
+    game.url = f"/teacher/editGame/{game.id}/"
+    game.save()
+
+    teacher.save()
+
+    return redirect(game.url)
+
+def editGame(response, id):
+    game = Game.objects.get(id = id)
+    if response.method == 'POST':
+        addedPlayers = response.POST['players'].split("\n")
+        print(addedPlayers)
+        for player in addedPlayers:
+            print(player)
+            game.players.append(player)
+    
+    game.save()
+
+    return render(response, 'game/newgame.html', {"game": game})
+
 def sendConfirmationEmail(user):
     try:
         while(1):
             activation_key = "".join(random.sample(string.ascii_uppercase, 10))
-            print(activation_key)
             Teacher.objects.get(activation_key=activation_key)
     except:
         user.activation_key = activation_key
@@ -102,3 +128,14 @@ def sendConfirmationEmail(user):
 
         connection.close()
 
+def teacherConfirm(response, activation_key):
+    try:
+        teacher = Teacher.objects.get(activation_key=activation_key)
+        if teacher.key_expires > time.time():
+            teacher.confirmed = True
+            teacher.save()
+            return render(response, "teacher/t_confirmation.html")
+        else:
+            return render(response, 'teacher/t_failure.html')
+    except:
+        return render(response, 'teacher/t_failure.html')
