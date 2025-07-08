@@ -17,6 +17,7 @@ import environ
 import os
 import sys
 
+print(sys.argv)
 env_var = 'dev' if (sys.argv[0] == 'manage.py') else 'prod'
 os.environ['ENV'] = env_var
 
