@@ -18,7 +18,7 @@ import os
 import sys
 
 print(sys.argv)
-env_var = 'dev' if (sys.argv[0] == 'manage.py') else 'prod'
+env_var = 'dev' if (sys.argv[0] == 'manage.py' and not sys.argv[1] == 'collectstatic') else 'prod'
 os.environ['ENV'] = env_var
 
 BASE_DIR = Path(__file__).resolve().parent.parent
