@@ -11,16 +11,32 @@
                 padding: auto;
                 display: flex;
                 flex-direction: row;
-                justify-content: center;
+                justify-content: space-evenly;
             }
-
-            .home_button {
-                margin: 0 12px;
-            }
-            .reset_button {
+            .accountContainer {
+                margin-top: 120px;
+                width: 100%;
                 display: flex;
-                flex-direction: row;
-                justify-content: center;
+                flex-direction: column;
+                justify-content: flex-start;
+            }
+            .verticalLine {
+                height: 100vh;
+                border: 1px solid black;
+            }
+            .header {
+                font-size: 48px;
+                text-align: center;
+                text-decoration: underline;
+            }
+            .link {
+                font-size: 16px;
+                text-align: center;
+            }
+            .button {
+                margin: 0 12px;
+                width: 100%;
+                display: block
             }
         </style>
 
@@ -34,17 +50,24 @@
     <body>{% csrf_token %}
         <div class="home">
             {% csrf_token %}
-            <a class="home_button" href="/teacher"><h1>I'm a teacher</h1></a>
-            {% if not user_id %}
-                <a class="home_button" href="/singleplayer"><h1>Play Single Player
-                        Game</h1></a>
-            {% else %}
-                <a class="home_button" href="/singleplayer/weekly"><h1>Return Player
-                        Game</h1></a>
-            {% endif %}
+            <div class="accountContainer">
+                <h2 class="header">Account</h2>
+                <a class="link button" href="/teacher"><h1>Teacher</h1></a>
+                <a class="link button" href="/student"><h1>Student</h1></a>
+            </div>
+            <vl class="verticalLine"></vl>
+            <div class="accountContainer">
+                <h2 class="header">Game</h2>
+                {% if not user_id %}
+                    <a class="link button" href="/singleplayer"><h1>Play Single Player
+                    Game</h1></a>
+                {% else %}
+                    <a class="link button" href="/singleplayer/weekly"><h1>Return Player
+                    Game</h1></a>
+                    <a class="link button" href="/reset">RESET GAME</a>
+                    
+                {% endif %}
+            </div>
         </div>
-        {% if user_id %}
-            <a class="reset_button" href="/reset">RESET GAME</a>
-        {% endif %}
     </body>
 </html>

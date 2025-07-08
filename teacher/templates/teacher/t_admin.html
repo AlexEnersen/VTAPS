@@ -17,7 +17,7 @@
         align-items: center;
         height: 64px;
         line-height: 64px;
-        padding-left: 8px
+        padding-left: 8px;
       }
       .columnContainer {
         display: flex;
@@ -38,7 +38,7 @@
         line-height: 64px;
       }
       .logout {
-        font-size: 18px
+        font-size: 18px;
       }
     </style>
   </head>
@@ -47,11 +47,13 @@
     <h class="header">Pending Users</h>
     <div class="columnContainer">
       {% for un_user in unauthorized_users %}
-      <div class="rowContainer {% if forloop.counter|divisibleby:2 == 0 %} grayRow {% endif %}">
-        <p class="rowText">{{un_user}}</p>
+      <div
+        class="rowContainer {% if forloop.counter|divisibleby:2 == 0 %} grayRow {% endif %}"
+      >
+        <p class="rowText">{{un_user.user.email}}</p>
         <form method="post">
           {% csrf_token %}
-          <input type="hidden" name="email" value="{{ user }}" />
+          <input type="hidden" name="email" value="{{ un_user.user.email }}" />
           <button type="submit" class="btn btn-success">Add teacher</button>
         </form>
       </div>
@@ -60,11 +62,13 @@
     <h class="header">Authorized Users</h>
     <div class="columnContainer">
       {% for auth_user in authorized_users %}
-      <div class="rowContainer {% if forloop.counter|divisibleby:2 == 0 %} grayRow {% endif %}">
-        <p class="rowText">{{auth_user}}</p>
+      <div
+        class="rowContainer {% if forloop.counter|divisibleby:2 == 0 %} grayRow {% endif %}"
+      >
+        <p class="rowText">{{auth_user.user.email}}</p>
       </div>
       {% endfor %}
     </div>
-    <a class="logout" href="/logout">Logout</a>
+    <a class="logout" href="/teacher/logout">Logout</a>
   </body>
 </html>
