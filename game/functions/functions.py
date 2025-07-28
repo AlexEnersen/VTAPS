@@ -19,7 +19,7 @@ def forecastWeather(weather_text):
     lowArray = []
     highArray = []
     rainArray = []
-    forecast_text = ""
+    forecast_text = []
 
     for line in weather_text:
         items = list(filter(None, line.split(" ")))
@@ -46,9 +46,9 @@ def forecastWeather(weather_text):
         if high_forecast < low_forecast:
             low_forecast = str(round(float(high_forecast) - 1, 1))
         
-        weather_string = weatherDay + " " + high_forecast + " " + low_forecast + " " + rain_forecast + "\n"
+        weather_string = weatherDay + " " + high_forecast + " " + low_forecast + " " + rain_forecast
         
-        forecast_text += weather_string
+        forecast_text.append(weather_string)
 
     return forecast_text
 
@@ -62,7 +62,6 @@ def forecastData(previousArray):
 
 def altForecastWeather(weather_text):
 
-    fileFluff = ""
     tempDay = 1
     numDivisions = 6
 
@@ -75,8 +74,6 @@ def altForecastWeather(weather_text):
             items = [x for x in items if x]
 
             if len(items) == 0 or not items[0].isdigit():
-                if index == 0:
-                    fileFluff += line + "\n"
                 continue
             
             else:
@@ -90,7 +87,7 @@ def altForecastWeather(weather_text):
                     monthlyItems.append(items)
         monthlyData.append(monthlyItems)
 
-    monthlyForecast = ""
+    monthlyForecast = []
     for month in monthlyData:
         maxTemp = float(month[0][2])
         minTemp = float(month[0][3])
@@ -108,24 +105,28 @@ def altForecastWeather(weather_text):
         tempRanges = [round(minTemp + (divider * (div+1)), 1) for div in range(numDivisions)]
 
         for day in month:
+            print("DAY:", day)
             highTemp = float(day[2])
             lowTemp = float(day[3])
 
+    
             for index, highBound in enumerate(tempRanges):
                 lowBound = tempRanges[index-1] if index > 0 else minTemp
+                print("Bounds:", lowBound, "-", highBound)
                 if (highTemp <= highBound and highTemp >= lowBound) or index == len(tempRanges)-1:
                     randHighTemp = round(np.random.uniform(lowBound, highBound), 1)
                     break
                 if (lowTemp <= highBound and lowTemp >= lowBound):
                     randLowTemp = round(np.random.uniform(lowBound, highBound), 1)
-                    print("RAND LOW TEMP:", randLowTemp)
+                    print("LOW TEMP:", lowTemp)
+                    print("RANDOM LOW TEMP:", randLowTemp)
 
             forecastString = f"{day[0]:<7}{day[1]:>6}{float(randHighTemp):>6}{randLowTemp:>6}{day[4]:>6}{day[5]:>6}{day[6]:>6}"
-            monthlyForecast += forecastString
+            monthlyForecast.append(forecastString)
 
     return monthlyForecast
 
-def yearlyRandomizer(userPath):
+def yearlyRandomizer():
 
     fileNames = ['NEME0401', 'NEME0501', 'NEME0601', 'NEME0701', 'NEME0801', 'NEME0901', 'NEME1001', 'NEME1101', 'NEME1201', 'NEME1301', 'NEME1401', 'NEME1501', 'NEME1601', 'NEME1701', 'NEME1801', 'NEME1901', 'NEME2001', 'NEME2101', 'NEME2201', 'NEME2301']
 
@@ -162,8 +163,4 @@ def yearlyRandomizer(userPath):
             elif index == 0:
                 newWeather += line
 
-    file = open(userPath + "NEME0000.WTH", "w")
-    file.write(newWeather)
-    file.close()
-
-    return
+    return newWeather.split("\n")

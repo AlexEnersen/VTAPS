@@ -9,5 +9,7 @@ class Student(models.Model):
 
     confirmed = models.BooleanField(default = False)        #Email Confirmed
 
+    games = ArrayField(models.CharField(max_length = 256), default=list, blank=True)
+
     activation_key = models.CharField(max_length=40, default=None, null=True, unique=True)
     key_expires = models.IntegerField(default=time.time, blank=True)

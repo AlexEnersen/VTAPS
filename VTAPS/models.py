@@ -5,7 +5,7 @@ from django.contrib.postgres.fields import ArrayField
 class User(AbstractUser):
     email = models.EmailField(max_length = 256, unique=True)
     username = models.CharField(max_length = 16)
-    password = models.CharField(max_length = 256)
+    password = models.CharField(max_length = 256, null=True, default=None)
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['username']

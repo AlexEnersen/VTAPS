@@ -3,14 +3,14 @@
 from django.shortcuts import render, redirect
 import os
 import time
-from singleplayer.forms import IrrigationEntriesForm, FertilizerEntriesForm1, FertilizerEntriesForm2, SingleplayerProfileForm, FertilizerInitForm
-from .models import SingleplayerProfile, FertilizerInit
+from game.forms import IrrigationEntriesForm, FertilizerEntriesForm1, FertilizerEntriesForm2, GameProfileForm, FertilizerInitForm
+from .models import GameProfile, FertilizerInit
 import numpy as np
 from datetime import datetime
 import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('agg')
-from io import StringIO
+import io
 import shutil
 import zipfile
 import boto3
@@ -18,28 +18,58 @@ import environ
 import watchtower, logging
 from .functions.functions import *
 from .functions.fileSearch import *
-from django.contrib.auth import get_user_model
 import pandas as pd
 
 environment = os.environ['ENV']
 
-userPath = ""
+gamePath = ""
+secret_name = "S3_Keys"
+region_name = "us-east-1"
 
 if environment == 'prod':
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger(__name__)
     logger.addHandler(watchtower.CloudWatchLogHandler())
 
-def startGame(request):
+try:
+    if environment == 'prod':
+        session = boto3.session.Session()
+        client = session.client(
+            service_name='secretsmanager',
+            region_name=region_name
+        )
 
-    user = SingleplayerProfile()
-    user.save()
-    request.session['user_id'] = user.id
-    return render(request, "singleplayer/intro.html", {})
+        get_secret_value_response = client.get_secret_value(
+            SecretId=secret_name
+        )
+        SECRET_KEY = eval(get_secret_value_response['SecretString'])
+        s3_access_key = SECRET_KEY['S3_ACCESS_KEY_ID']
+        s3_secret_key = SECRET_KEY['S3_SECRET_ACCESS_KEY']
+        
+    else:
+        env = environ.Env()
+        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+        s3_access_key = env('S3_ACCESS_KEY_ID')
+        s3_secret_key = env('S3_SECRET_ACCESS_KEY')
+
+    s3 = boto3.client("s3", aws_access_key_id=s3_access_key, aws_secret_access_key=s3_secret_key)
+        
+except Exception as error:
+    if environment == 'prod':
+        logger.info('error:', error)
+    else:
+        print("Error:", error)
+
+def startGame(request):
+    return render(request, "game/intro.html", {})
 
 def pickHybrid(request):
+    game = GameProfile()
+    game.save()
+    request.session['game_id'] = game.id
     context = {}
-    hybrid_form = SingleplayerProfileForm()
+    hybrid_form = GameProfileForm()
     fert_form = FertilizerInitForm()
 
     if hybrid_form.is_valid():
@@ -48,120 +78,107 @@ def pickHybrid(request):
     context['hybrid_form'] = hybrid_form
     context['fert_form'] = fert_form
 
-    return render(request, "singleplayer/hybrid.html", context)
+    return render(request, "game/hybrid.html", context)
 
-def weeklySelection(request):
+def weeklySelection(request, game_id=None):
+    
     context = {}
     matplotlib.pyplot.close()
 
-    user_id = request.session.get('user_id', None) 
-    user = SingleplayerProfile.objects.get(id=user_id)
+    if game_id == None:
+        game_id = request.session.get('game_id', None) 
+    game = GameProfile.objects.get(id=game_id)
     
-    global userPath
-    userPath = f"id-{user_id}/"
+    global gamePath
+    gamePath = f"id-{game_id}"
 
-    if not os.path.exists(userPath):
-        createDirectory(userPath)
-    
-    controlFile = 'UNLI2309.MZX'
-    try:
-        file = open(userPath + controlFile, 'r')
-        text = file.readlines()
-        file.close()
-    except Exception as error:
-        if environment == 'prod':
-            logger.info('error:', error)
-        else:
-            print("error:", error)
+    gameInputs = {}
 
-    start_date = str(int(getDate(text)))
-    date = str(int(start_date) + (((user.week)-1) * 7))
+    with open("UNLI2309.MZX", 'r') as f:
+       gameInputs['MZX_content'] = f.read().split("\n")
+            
+
+    start_date = str(int(getDate(gameInputs['MZX_content'])))
+    start_day = int(start_date[len(start_date) - 3:])
+    date = str(int(start_date) + (((game.week)-1) * 7))
 
     context = {}
     fert_entry = -1
+    if game.hybrid is None and request.POST.get('hybrid') is None:
+        return redirect("hybrid")
 
-        
-    if environment == 'prod':
-        logger.info(os.path)
-        logger.info(os.getcwd())
-        logger.info(os.listdir(os.getcwd()))
+    if request.method == "POST":
 
-    if (request.POST.get('hybrid') != None):
-        request.session['start_date'] = start_date
-        user.hybrid = request.POST['hybrid']
-        user.seeding_rate = request.POST['seeding_rate']
-        text = setSeedingRate(text, user.seeding_rate)
-        user.week = 1
-        user.weather_type = request.POST['weather_type']
+        game.week += 1
+        if (game.week == 1):
+            request.session['start_date'] = start_date
+            game.hybrid = request.POST['hybrid']
+            game.seeding_rate = request.POST['seeding_rate']
+            gameInputs['MZX_content'] = setSeedingRate(gameInputs['MZX_content'], game.seeding_rate)
+            game.weather_type = request.POST['weather_type']
 
-        fertilizer_init = FertilizerInit(week1 = request.POST['week1'], week6 = request.POST['week6'], week9 = request.POST['week9'], week10 = request.POST['week10'], week12 = request.POST['week12'], week14 = request.POST['week14'], week15 = request.POST['week15'])
-        fertilizer_init.save()
-        user.fert_id = fertilizer_init.id
+            fertilizer_init = FertilizerInit(week1 = request.POST['week1'], week6 = request.POST['week6'], week9 = request.POST['week9'], week10 = request.POST['week10'], week12 = request.POST['week12'], week14 = request.POST['week14'], week15 = request.POST['week15'])
+            fertilizer_init.save()
+            game.fert_id = fertilizer_init.id
 
-        user.save()
+            gameInputs['WTH_name'] = "NEME0000.WTH"
+            gameInputs['WTH_content'] = yearlyRandomizer()
 
-        compileWeather()
+            altForecast = True
+            gameInputs['forecast_content'] = altForecastWeather(gameInputs['WTH_content']) if altForecast else forecastWeather(gameInputs['WTH_content'])
 
-    elif len(request.POST.keys()) > 0:
+            uploadInputs(gameInputs)
+            print("WEEK 1 BABY!!!")
 
-        user.week += 1
-        user.save()
-
-        date = str(int(start_date) + (((user.week)-1) * 7))
-        try:
-            file = open(userPath + controlFile, 'r')
-            text = file.readlines()
-            file.close()
-        except Exception as error:
-            if environment == 'prod':
-                logger.info('error:', error)
-            else:
-                print("error:", error)
-
-        fertilizerQuantity = request.POST.get('fertilizer')
-        irrigationQuantity = getIrrigation(request)
-        
-        text = addFertilizer(text, fertilizerQuantity, int(date)-7)
-        text = addIrrigation(text, irrigationQuantity, fertilizerQuantity, int(date)-7)
-
-        computeDSSAT(user_id, user.hybrid, controlFile)
-
-    newText = "".join(text)
-    try:
-        file2 = open(userPath + controlFile, 'w')
-        file2.write(newText)
-        file2.close()
-    except Exception as error:
-        if environment == 'prod':
-            logger.info('error:', error)
         else:
-            print("error:", error)
+            gameInputs = downloadInputs()
+            
+            date = str(int(start_date) + (((game.week)-1) * 7))
 
-    context['week'] = user.week
+            fertilizerQuantity = request.POST.get('fertilizer')
+            irrigationQuantity = getIrrigation(request)
+            
+            gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fertilizerQuantity, int(date)-7)
+            gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], irrigationQuantity, fertilizerQuantity, int(date)-7)
+
+            computeDSSAT(game.hybrid, gameInputs)
+
+        game.save()
+        return redirect("weekly")
+
+    gameInputs = downloadInputs()
+    if game.week > 1:
+        gameOutputs = downloadOutputs()
+        context['aquaspy_graph'] = plotAquaSpy(date, start_day, gameInputs, gameOutputs)
+        context['root_depth_graph'] = plotOneAttribute(date, start_day, gameOutputs['OPG_content'], 'RDPD', 'Inches (in)', 'Root Depth')
+        context['growth_stage_graph'] = plotOneAttribute(date, start_day, gameOutputs['OPG_content'], 'GSTD', 'Stage', 'Growth Stage')
+        context['nitrogen_stress_graph'] = plotOneAttribute(date, start_day, gameOutputs['OPG_content'], 'NSTD', 'N Stress', 'Nitrogen Stress')
+        context['water_layer_graph'] = plotWaterLayers(date, start_day, gameOutputs)
+        context['weather_history'] = getWeatherHistory(date, start_day, gameInputs)
+
+    gameInputs['MZX_content'] = gameInputs['MZX_content']
+
+    context['week'] = game.week
 
     iform = IrrigationEntriesForm()
     if iform.is_valid():
         iform.save()
     context['iform'] = iform
 
-    fert_init = FertilizerInit.objects.get(id=user.fert_id)
-    fert_entry = fert_init.week1 if user.week == 1 else fert_init.week6 if user.week == 6 else fert_init.week9 if user.week == 9 else fert_init.week10 if user.week == 10 else fert_init.week12 if user.week == 12 else fert_init.week14 if user.week == 14 else fert_init.week15 if user.week == 15 else 0
+    fert_init = FertilizerInit.objects.get(id=game.fert_id)
+    fert_entry = fert_init.week1 if game.week == 1 else fert_init.week6 if game.week == 6 else fert_init.week9 if game.week == 9 else fert_init.week10 if game.week == 10 else fert_init.week12 if game.week == 12 else fert_init.week14 if game.week == 14 else fert_init.week15 if game.week == 15 else 0
     context['fert_entry'] = fert_entry
     
-    fform = FertilizerEntriesForm1(initial = {'fertilizer': fert_entry}) if user.week <= 6 else FertilizerEntriesForm2(initial = {'fertilizer': fert_entry})
+    fform = FertilizerEntriesForm1(initial = {'fertilizer': fert_entry}) if game.week <= 6 else FertilizerEntriesForm2(initial = {'fertilizer': fert_entry})
     if fform.is_valid():
         fform.save()
 
     context['fform'] = fform
 
-    context['weather'] = getWeather(date)
+    context['weather'] = getWeather(date, gameInputs)
 
-    start_date_str = str(start_date)
-
-    start_day = int(start_date_str[len(start_date_str) - 3:])
-
-    total_irrigation_cost = getTotalIrrigationCost(text, date)
-    total_fertilizer_cost = getTotalFertilizerCost(text, date)
+    total_irrigation_cost = getTotalIrrigationCost(gameInputs['MZX_content'], date)
+    total_fertilizer_cost = getTotalFertilizerCost(gameInputs['MZX_content'], date)
 
     context['irr_cost'] = round(total_irrigation_cost, 2)
     context['fert_cost'] = round(total_fertilizer_cost, 2)
@@ -171,67 +188,48 @@ def weeklySelection(request):
 
     context['total_cost'] = round(context['irr_cost'] + context['fert_cost'] + context['other_costs'], 2)
     context['bushel_cost'] = round(context['total_cost']/230, 2)
-        
-    if (user.week > 1):
-        context['aquaspy_graph'] = plotAquaSpy(date, start_day)
-        context['root_depth_graph'] = plotOneAttribute(date, start_day, 'UNLI2309.OPG', 'RDPD', 'Inches (in)', 'Root Depth')
-        context['growth_stage_graph'] = plotOneAttribute(date, start_day, 'UNLI2309.OPG', 'GSTD', 'Stage', 'Growth Stage')
-        context['nitrogen_stress_graph'] = plotOneAttribute(date, start_day, 'UNLI2309.OPG', 'NSTD', 'N Stress', 'Nitrogen Stress')
-        context['water_layer_graph'] = plotWaterLayers(date, start_day)
-        context['weather_history'] = getWeatherHistory(date, start_day)
 
     matplotlib.pyplot.close()
     
-    
-    if (user.week >= 24):
-        return redirect("/singleplayer/final")
+    if (game.week >= 24):
+        return redirect("/game/final")
     else:
-        return render(request, "singleplayer/weekly.html", context)
+        return render(request, "game/weekly.html", context)
 
 def finalResults(request):
     
-    user_id = request.session.get('user_id', None) 
-    user = SingleplayerProfile.objects.get(id=user_id)
+    game_id = request.session.get('game_id', None) 
+    game = GameProfile.objects.get(id=game_id)
 
     context = {}
-
-    controlFile = 'UNLI2309.MZX'
-    try:
-        file = open(userPath + controlFile, 'r')
-        text = file.readlines()
-        file.close()
-    except Exception as error:
-        if environment == 'prod':
-            logger.info('error:', error)
-        else:
-            print("error:", error)
+    
+    gameInputs = downloadInputs()
+    gameOutputs = downloadOutputs()
 
     start_date = int(request.session.get('start_date', None))
     start_day = int(str(start_date)[len(str(start_date)) - 3:])
-    date = str(start_date + (user.week * 7))
+    date = str(start_date + (game.week * 7))
 
-    total_irrigation_cost = round(getTotalIrrigationCost(text, date), 2)
-    total_fertilizer_cost = round(getTotalFertilizerCost(text, date), 2)
+    total_irrigation_cost = round(getTotalIrrigationCost(gameInputs['MZX_content'], date), 2)
+    total_fertilizer_cost = round(getTotalFertilizerCost(gameInputs['MZX_content'], date), 2)
 
     context['irr_cost'] = total_irrigation_cost
     context['fert_cost'] = total_fertilizer_cost
-
-    # Insurance + Insecticide + Seeds
     context['other_costs'] = round(142.79, 2)
     context['total_cost'] = round(total_irrigation_cost + total_fertilizer_cost + context['other_costs'], 2)
 
-    finalYield = getFinalYield()
+    finalYield = getFinalYield(gameOutputs)
 
     context['bushel_cost'] = round(context['total_cost']/finalYield, 2)
     context['yield'] = finalYield
 
     
-    context['aquaspy_graph'] = plotAquaSpy(date, start_day)
-    context['water_layer_graph'] = plotWaterLayers(date, start_day)
+    context['aquaspy_graph'] = plotAquaSpy(date, start_day, gameInputs, gameOutputs)
+    context['water_layer_graph'] = plotWaterLayers(date, start_day, gameOutputs)
 
     # request.session.clear()
 
-    return render(request, "singleplayer/final.html", context)
+    return render(request, "game/final.html", context)
     
 def getDate(text):
     onDate = False
@@ -262,9 +260,9 @@ def addIrrigation(text, irrigationQuantity, fertilizerQuantity, date):
             quantity = inchesToMM(quantity)
             beforeSpaces = " " * (6 - len(quantity))
             if index == 0:
-                newString = " 1 %s IR001%s%s\n" % (date, beforeSpaces, quantity)
+                newString = " 1 %s IR001%s%s" % (date, beforeSpaces, quantity)
             elif index == 1:
-                newString = " 1 %s IR001%s%s\n" % (date+3, beforeSpaces, quantity)
+                newString = " 1 %s IR001%s%s" % (date+3, beforeSpaces, quantity)
             irrigationLines.append(newString)
 
     for i, line in enumerate(text):
@@ -272,16 +270,17 @@ def addIrrigation(text, irrigationQuantity, fertilizerQuantity, date):
             onIrrigation = True
         
 
-        if (onIrrigation and line == "\n"):
+        if (onIrrigation and line == ""):
             for j, line in enumerate(irrigationLines):
                 text.insert(i+j, line)
             return text
+    return text
 
 def getTotalIrrigationCost(text, date):
     onIrrigation = False
     totalIrrigationCost = 0
 
-    for i, line in enumerate(text):
+    for line in text:
         lines = list(filter(None, line.strip("\n").split(" ")))
         if (len(lines) < 4):
             if (onIrrigation):
@@ -316,9 +315,8 @@ def addFertilizer(text, fertilizerQuantity, date):
     for i, line in enumerate(text):
         if (line.startswith("@F")):
             onFertilizer = True
-        
-        if (onFertilizer and line == "\n"):
-            newString = " 1 %s FE001 AP001    10%s%s   -99   -99   -99   -99   -99 -99\n" % (str(date), beforeSpaces, fertilizerQuantity)
+        if (onFertilizer and line == ""):
+            newString = " 1 %s FE001 AP001    10%s%s   -99   -99   -99   -99   -99 -99" % (str(date), beforeSpaces, fertilizerQuantity)
             text.insert(i, newString)
             onFertilizer = False
             return text
@@ -356,45 +354,9 @@ def getTotalFertilizerCost(text, date):
             startIndex = i
 
     return totalFertilizerCost
-        
-def compileWeather():
-
-    altForecast = True
-    filename = "NEME0000.WTH"
-
-    if altForecast:
-        yearlyRandomizer(userPath)
-
-    try:
-        weather_file = open(userPath + filename, 'r')
-        weather_text = weather_file.readlines()
-        weather_file.close()
-    except Exception as error:
-        if environment == 'prod':
-            logger.info('error', error)
-        else:
-            print("error:", error)
-
-    if environment == 'prod':
-        logger.info(os.path.dirname(os.path.realpath(__file__)))
-        logger.info(os.listdir(os.path.dirname(os.path.realpath(__file__))))
-
-    try:
-        forecast_file = open(userPath + "forecast.txt", 'w')
-    except Exception as error:
-        if environment == 'prod':
-            logger.info('error', error)
-        else:
-            print("compileWeather error:", error)
-    
-    forecast_text = altForecastWeather(weather_text) if altForecast else forecastWeather(weather_text)
-
-    forecast_file.write(forecast_text)
-
-    forecast_file.close()
 
         
-def getWeather(date):
+def getWeather(date, gameInputs):
     lowArray = []
     highArray = []
     dateFound = False
@@ -403,11 +365,7 @@ def getWeather(date):
     day = date[len(date) - 3:]
 
     try:
-        file = open(userPath + "forecast.txt", 'r')
-        text = file.readlines()
-        file.close()
-
-        for line in text:
+        for line in gameInputs['forecast_content']:
             items = list(filter(None, line.split(" ")))
             items = [x for x in items if x]
             
@@ -459,18 +417,7 @@ def inchesToMM(inches):
     mm = round(float(25.4 * inches), 1)
     return str(mm)
 
-def plotOneAttribute(date, start_day, filename, attribute, yaxis, title):
-
-    try:
-        file = open(userPath + filename, 'r')
-        text = file.readlines()
-        file.close()
-    except Exception as error:
-        if environment == 'prod':
-            logger.info('error:', error)
-        else:
-            print("error:", error)
-        return None
+def plotOneAttribute(date, start_day, content, attribute, yaxis, title):
 
     day = int(date[len(date) - 3:])
     
@@ -480,7 +427,7 @@ def plotOneAttribute(date, start_day, filename, attribute, yaxis, title):
     attribute_values = []
     index = -1
 
-    for line in text:
+    for line in content:
         items = list(filter(None, line.split(" ")))
         if len(items) <= 3 and not readingStress:
             continue
@@ -507,7 +454,7 @@ def plotOneAttribute(date, start_day, filename, attribute, yaxis, title):
     if attribute == 'RDPD':
         ax.invert_yaxis()
     fig.suptitle(title, fontsize=16)
-    imgdata = StringIO()
+    imgdata = io.StringIO()
     fig.savefig(imgdata, format='svg')
     imgdata.seek(0)
     data = imgdata.getvalue()
@@ -516,23 +463,11 @@ def plotOneAttribute(date, start_day, filename, attribute, yaxis, title):
     
     return data
 
-def getFinalYield():
-    filename = 'UNLI2309.OOV'
-    try:
-        file = open(userPath + filename, 'r')
-        text = file.readlines()
-        file.close()
-    except Exception as error:
-        if environment == 'prod':
-            logger.info('error:', error)
-        else:
-            print("error:", error)
-        return None
-    
+def getFinalYield(gameOutputs):
     readingVariables = False
     finalYield = -1
 
-    for line in text:
+    for line in gameOutputs['OOV_content']:
         items = list(filter(None, line.split(" ")))
         if items[0] == '@' and not readingVariables:
             readingVariables = True
@@ -540,19 +475,11 @@ def getFinalYield():
             finalYield = round(float(items[-2]) / 62.77, 1)
             return finalYield
 
-def plotAquaSpy(date, start_day):
+def plotAquaSpy(date, start_day, gameInputs, gameOutputs):
+    
     day = int(date[len(date) - 3:])
-    try:
-        file = open(userPath + "NE.SOL", 'r')
-        text = file.readlines()
-        file.close()
-    except Exception as error:
-        if environment == 'prod':
-            logger.info('error:', error)
-        else:
-            print("error:", error)
 
-    rootArray = getRootDepth(date)
+    rootArray = getRootDepth(date, gameOutputs)
     if not rootArray:
         return None
 
@@ -561,7 +488,7 @@ def plotAquaSpy(date, start_day):
     index = -1
     soilArray = []
 
-    for line in text:
+    for line in gameInputs['SOL_content']:
         items = list(filter(None, line.strip("\n").split(" ")))
         if len(items) == 0 and not readingSoil:
             continue
@@ -577,15 +504,6 @@ def plotAquaSpy(date, start_day):
             soilArray.append({'upperLimit': float(items[index]), 'lowerLimit': float(items[index2]), "depth": int(items[0])})
             if int(items[0]) > rootArray[-1]:
                 break
-    try:
-        file2 = open(userPath + "UNLI2309.OSW", "r")
-        text2 = file2.readlines()
-        file2.close()
-    except Exception as error:
-        if environment == 'prod':
-            logger.info('error:', error)
-        else:
-            print("error:", error)
 
     readingWater = False
     index2 = -1
@@ -594,7 +512,7 @@ def plotAquaSpy(date, start_day):
     llimitArray = []
     rootDay = 0
 
-    for line in text2:
+    for line in gameOutputs['OSW_content']:
         currentArray = []
         ulimitTempArray = []
         llimitTempArray = []
@@ -643,7 +561,7 @@ def plotAquaSpy(date, start_day):
     plt.xlabel('Days since planting')
     plt.ylabel("Soil Water Limits")
     plt.title("Soil Water", fontsize=16)
-    imgdata = StringIO()
+    imgdata = io.StringIO()
     plt.savefig(imgdata, format='svg')
     imgdata.seek(0)
     data = imgdata.getvalue()
@@ -652,25 +570,14 @@ def plotAquaSpy(date, start_day):
 
     return data
 
-def plotWaterLayers(date, start_day):
+def plotWaterLayers(date, start_day, gameOutputs):
     day = int(date[len(date) - 3:])
-    try:
-        file = open(userPath + "UNLI2309.OSW", 'r')
-        text = file.readlines()
-        file.close()
-    except Exception as error:
-        if environment == 'prod':
-            logger.info('error:', error)
-        else:
-            print("error:", error)
-        return None
 
     readingWater = False
     layerNum = 12
     waterLayers = [[] for i in range(1,layerNum)]
-    soilVolumes = []
 
-    for textIndex, line in enumerate(text):
+    for line in gameOutputs['OSW_content']:
         items = list(filter(None, line.strip("\n").split(" ")))
         if len(items) == 0 and not readingWater:
             continue
@@ -704,7 +611,7 @@ def plotWaterLayers(date, start_day):
     plt.legend(legendLayers, loc="upper right", bbox_to_anchor = (1.25, 1))
     # plt.yticks(range(1, layerNum+1), soilVolumes)
     plt.title("Soil Water", fontsize=16)
-    imgdata = StringIO()
+    imgdata = io.StringIO()
     plt.savefig(imgdata, format='svg')
     imgdata.seek(0)
     data = imgdata.getvalue()
@@ -712,24 +619,13 @@ def plotWaterLayers(date, start_day):
 
     return data
 
-def getRootDepth(date):
-    try:
-        file = open(userPath + "UNLI2309.OPG", 'r')
-        text = file.readlines()
-        file.close()
-    except Exception as error:
-        if environment == 'prod':
-            logger.info('error:', error)
-        else:
-            print("error:", error)
-        return None
-
+def getRootDepth(date, gameOutputs):
     day = int(date[len(date) - 3:])
     reading = False
     day = 0
     rootArray = []
 
-    for line in text:
+    for line in gameOutputs['OPG_content']:
         items = list(filter(None, line.split(" ")))
         if len(items) <= 33:
             continue 
@@ -742,37 +638,22 @@ def getRootDepth(date):
         
     return rootArray
 
-def getWeatherHistory(date, start_day):
+def getWeatherHistory(date, start_day, gameInputs):
     day = int(date[len(date) - 3:])
-
-    try:
-        weatherFile = open(userPath + "NEME0000.WTH", "r")
-        weatherText = weatherFile.readlines()
-        weatherFile.close()
-
-        forecastFile = open(userPath + "forecast.txt", "r")
-        forecastText = forecastFile.readlines()
-        forecastFile.close()
-    except Exception as error:
-        if environment == 'prod':
-            logger.info('error:', error)
-        else:
-            print("error:", error)
-        return None
     
     history = []
 
     forecastIndex = -1
-    for line in weatherText:
+    for line in gameInputs['WTH_content']:
         items = line.split(" ")
         items = [x for x in items if x]
 
-        if not items[0].isdigit():
+        if len(items) == 0 or not items[0].isdigit():
             continue
         else:
             forecastIndex += 1
 
-        forecastItems = forecastText[forecastIndex].split(" ")
+        forecastItems = gameInputs['forecast_content'][forecastIndex].split(" ")
         forecastItems = [x for x in forecastItems if x]
         tempDay = int(items[0][len(items[0]) - 3:])
         if tempDay < start_day:
@@ -784,103 +665,116 @@ def getWeatherHistory(date, start_day):
             history.append(weatherDict)
     return history
 
-def computeDSSAT(user_id, hybrid, controlFile):
-    try:
-        commandFile = open(userPath + "command.ps1", "w")
-        commandFile.write("../../DSCSM048 %s A %s" % (hybrid, controlFile))
-        commandFile.close()
-    except Exception as error:
-        if environment == 'prod':
-            logger.info('error:', error)
-        else:
-            print("error:", error)
-
-    zipFile = f"id-{user_id}.zip"
-    zipPath = userPath + zipFile
-            
-    zip = zipfile.ZipFile(zipPath, "w", zipfile.ZIP_DEFLATED)
-    zip.write(userPath + "command.ps1", "command.ps1")
-    zip.write(userPath + "NE.SOL", "NE.SOL")
-    zip.write(userPath + "NEME0000.WTH", "NEME0000.WTH")
-    zip.write(userPath + "UNLI2309.MZX", "UNLI2309.MZX")
-    zip.close()
-
-    secret_name = "S3_Keys"
-    region_name = "us-east-1"
+def computeDSSAT(hybrid, gameInputs): 
     
-    try:
-        if environment == 'prod':
-            session = boto3.session.Session()
-            client = session.client(
-                service_name='secretsmanager',
-                region_name=region_name
-            )
+    # try:  
+    zip_buffer = io.BytesIO()
 
-            get_secret_value_response = client.get_secret_value(
-                SecretId=secret_name
-            )
-            SECRET_KEY = eval(get_secret_value_response['SecretString'])
-            s3 = boto3.client("s3", aws_access_key_id=SECRET_KEY['S3_ACCESS_KEY_ID'], aws_secret_access_key=SECRET_KEY['S3_SECRET_ACCESS_KEY'],)
+    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+        zip_file.writestr(gameInputs['MZX_name'], "\n".join(gameInputs['MZX_content']))
+        zip_file.writestr(gameInputs['SOL_name'], "\n".join(gameInputs['SOL_content']))
+        zip_file.writestr(gameInputs['WTH_name'], "\n".join(gameInputs['WTH_content']))
+        zip_file.writestr('command.ps1', "../../DSCSM048 %s A %s" % (hybrid, gameInputs['MZX_name']))
 
+    zip_buffer.seek(0)     
+
+    # Upload to S3
+    s3.delete_object(Bucket='outputvtapsbucket', Key=f"{gamePath}/{gamePath}.zip")  
+    s3.upload_fileobj(zip_buffer, 'vtapsbucket', f"{gamePath}.zip")
+
+
+    file_present = False
+
+    bucket = None
+    timeout = time.time() + 60*5
+
+    while not file_present:
+        try:
+            bucket = s3.list_objects_v2(
+                Bucket='outputvtapsbucket',
+                Prefix =gamePath,
+                MaxKeys=100 )
+        except Exception as error:
+            if environment == 'prod':
+                logger.info('error:', error)
+            else:
+                print('error:', error)
+            
+        if time.time() > timeout:
+            break
+        elif bucket['KeyCount'] > 0:
+            file_present = True
+
+    gameOutputs = downloadOutputs()
+
+    return gameOutputs
+
+def uploadInputs(gameInputs):
+    zip_buffer = io.BytesIO()
+
+    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+        if 'MZX_name' not in gameInputs:
+            with open("UNLI2309.MZX", 'r') as f:
+                contents = f.read()
+                zip_file.writestr("UNLI2309.MZX", contents)
         else:
-            env = environ.Env()
-            BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-            s3 = boto3.client("s3", aws_access_key_id=env('S3_ACCESS_KEY_ID'), aws_secret_access_key=env('S3_SECRET_ACCESS_KEY'),)
+            zip_file.writestr(gameInputs['MZX_name'], "\n".join(gameInputs['MZX_content']))
         
-        s3.upload_file(zipPath, "vtapsbucket", zipFile)
-
-
-        os.remove(zipPath)
-        os.remove(userPath + "command.ps1")
-
-
-        file_present = False
-
-        bucket = None
-        timeout = time.time() + 60*5
-
-        while not file_present:
-            try:
-                bucket = s3.list_objects_v2(
-                    Bucket='outputvtapsbucket',
-                    Prefix ='id-%s/' % (user_id),
-                    MaxKeys=100 )
-            except Exception as error:
-                if environment == 'prod':
-                    logger.info('error:', error)
-                else:
-                    print('error:', error)
-                
-            if time.time() > timeout:
-                break
-            elif bucket['KeyCount'] > 0:
-                file_present = True
-
-        s3.download_file('outputvtapsbucket', zipPath, zipPath)
-
-        s3.delete_object(Bucket='outputvtapsbucket', Key=zipPath)
-
-        zip = zipfile.ZipFile(zipPath, 'r')
-        zip.extractall(userPath)
-        zip.close()
-
-        files = os.listdir(userPath)
-        for file in files:
-            if file.startswith("id-%s\\" % user_id):
-                os.rename(userPath + file,userPath + file.split("\\")[1])
-
-        os.remove(zipPath)
-    except Exception as error:
-        if environment == 'prod':
-            logger.info('error:', error)
+        if 'SOL_name' not in gameInputs:
+            with open("NE.SOL", 'r') as f:
+                contents = f.read()
+                zip_file.writestr("NE.SOL", contents)
         else:
-            print("Error:", error)
+            zip_file.writestr(gameInputs['SOL_name'], "\n".join(gameInputs['SOL_content']))
 
-def createDirectory(userPath):
-    if not os.path.isdir(userPath):
-        os.mkdir(userPath)
-        shutil.copy2("UNLI2309.MZX", userPath)
-        shutil.copy2("NE.SOL", userPath)
-        shutil.copy2("NEME2001.WTH", userPath)
 
+        zip_file.writestr(gameInputs["WTH_name"], "\n".join(gameInputs["WTH_content"]))
+        zip_file.writestr("forecast.txt", "\n".join(gameInputs["forecast_content"]))
+
+    zip_buffer.seek(0)
+
+    # Upload to S3
+    s3.upload_fileobj(zip_buffer, 'vtapsgamedata', f"{gamePath}.zip")
+
+
+def downloadInputs():
+    zip_buffer = io.BytesIO()
+    s3.download_fileobj('vtapsgamedata', f"{gamePath}.zip", zip_buffer)
+    zip_buffer.seek(0)
+    data = {}
+    with zipfile.ZipFile(zip_buffer) as zipFile:
+        for name in zipFile.namelist():
+            if name[-4:] == '.MZX':
+                data['MZX_name'] = name
+                data['MZX_content'] = zipFile.read(name).decode('utf-8').split("\n")
+            elif name[-4:] == '.SOL':
+                data['SOL_name'] = name
+                data['SOL_content'] = zipFile.read(name).decode('utf-8').split("\n")
+            elif name[-4:] == '.WTH':
+                data['WTH_name'] = name
+                data['WTH_content'] = zipFile.read(name).decode('utf-8').split("\n")
+            elif name == 'forecast.txt':
+                data['forecast_content'] = zipFile.read(name).decode('utf-8').split("\n")
+
+    return data
+
+def downloadOutputs():
+    zip_buffer = io.BytesIO()
+    print("DOWNLOAD GAME PATH:", gamePath)
+    s3.download_fileobj('outputvtapsbucket', f"{gamePath}/{gamePath}.zip", zip_buffer)
+    data = {}
+    with zipfile.ZipFile(zip_buffer) as zipFile:
+        for name in zipFile.namelist():
+            if name[-4:] == '.OPG':
+                data['OPG_name'] = name
+                data['OPG_content'] = zipFile.read(name).decode('utf-8').split("\n")
+            elif name[-4:] == '.OOV':
+                data['OOV_name'] = name
+                data['OOV_content'] = zipFile.read(name).decode('utf-8').split("\n")
+            elif name[-4:] == '.OSW':
+                data['OSW_name'] = name
+                data['OSW_content'] = zipFile.read(name).decode('utf-8').split("\n")
+            # elif name == f"{gamePath}\\WARNING.OUT":
+            #     print("\n".join(zipFile.read(name).decode('utf-8').split("\n")))
+
+    return data

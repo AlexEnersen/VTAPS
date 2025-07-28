@@ -97,11 +97,11 @@ WEATHER_CHOICES = [
     ('Dry', 'Dry')
 ]
 
-class SingleplayerProfile(models.Model):
-    hybrid = models.CharField(max_length=8, choices=HYBRID_CHOICES, default="BRPI0202")
+class GameProfile(models.Model):
+    hybrid = models.CharField(max_length=8, choices=HYBRID_CHOICES, null=True, default=None)
     seeding_rate = models.IntegerField(choices=SEEDING_CHOICES, default=10000)
     weather_type = models.CharField(max_length=6, choices=WEATHER_CHOICES, default='Normal')
-    week = models.IntegerField(default=1)
+    week = models.IntegerField(default=0)
     fert_id = models.IntegerField(default=-1, blank=False)
 
 class FertilizerEntries1(models.Model):

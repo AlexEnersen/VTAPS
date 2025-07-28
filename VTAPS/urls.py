@@ -17,13 +17,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from teacher import views as t
-from singleplayer import views as s
+from game import views as g
 from student import views as u
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include("main.urls")),
     path('teacher/', include("teacher.urls")),
-    path('singleplayer/', include("singleplayer.urls")),
+    path('game/', include("game.urls")),
     path('student/', include('student.urls'))
 ]

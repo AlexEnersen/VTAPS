@@ -1,11 +1,11 @@
 from django import forms
 from django.forms import ModelForm
 
-from .models import IrrigationEntries, FertilizerEntries1, FertilizerEntries2, SingleplayerProfile, FertilizerInit
+from .models import IrrigationEntries, FertilizerEntries1, FertilizerEntries2, GameProfile, FertilizerInit
 
-class SingleplayerProfileForm(ModelForm):
+class GameProfileForm(ModelForm):
     class Meta:
-        model = SingleplayerProfile
+        model = GameProfile
         fields = ['hybrid', 'seeding_rate', 'weather_type']
 
 class IrrigationEntriesForm(ModelForm):

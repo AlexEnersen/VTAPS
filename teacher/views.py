@@ -149,22 +149,35 @@ def createGame(response, id):
     for player in game.players:
         connection = mail.get_connection()
         connection.open()
-        user = User(email=player, username=player)
-        user.save()
-        student = Student(user=user)
         try:
-            while(1):
-                activation_key = "".join(random.sample(string.ascii_uppercase, 10))
-                Teacher.objects.get(activation_key=activation_key)
-        except:
-            student.activation_key = activation_key
-            student.key_expires = time.time() + (60 * 60 * 24 * 7)
+            user = User.objects.get(email=player)
+            student = user.student
+            student.games.append(id)
             student.save()
             message = EmailMultiAlternatives("Hello from VTAPS!", "VTAPS Confirmation", "enersen1995@gmail.com", [player], connection=connection)
-            message.attach_alternative(f"<p>Hello, {player}. Your teacher has added you to a VTAPS game.<br></br>Click <a href='{'http://localhost:8000' if environment == 'dev' else 'https://vtaps.org'}/student/confirm/{activation_key}'> here</a> to make an account with VTAPS.org</p>", "text/html")
+            message.attach_alternative(f"<p>Hello, {player}. Your teacher has added you to a VTAPS game.<br></br>Click <a href='{'http://localhost:8000' if environment == 'dev' else 'https://vtaps.org'}/student/login'> here</a> to login to VTAPS.org</p>", "text/html")
             message.send()
+        except:
+            user = User(email=player, username=player)
+            user.set_unusable_password()
+            user.save()
+            student = Student(user=user)
+            student.games.append(id)
+            student.save()
+            try:
+                while(1):
+                    activation_key = "".join(random.sample(string.ascii_uppercase, 10))
+                    Teacher.objects.get(activation_key=activation_key)
+            except:
+                student.activation_key = activation_key
+                student.key_expires = time.time() + (60 * 60 * 24 * 7)
+                student.save()
+                print("SENDING...")
+                message = EmailMultiAlternatives("Hello from VTAPS!", "VTAPS Confirmation", "enersen1995@gmail.com", [player], connection=connection)
+                message.attach_alternative(f"<p>Hello, {player}. Your teacher has added you to a VTAPS game.<br></br>Click <a href='{'http://localhost:8000' if environment == 'dev' else 'https://vtaps.org'}/student/confirm/{activation_key}'> here</a> to make an account with VTAPS.org</p>", "text/html")
+                message.send()
 
-            connection.close()
+        connection.close()
 
 
     return redirect('/teacher')

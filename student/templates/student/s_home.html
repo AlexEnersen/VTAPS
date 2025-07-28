@@ -21,27 +21,16 @@
         <link rel="stylesheet" href>
     </head>
     <body>
-        {% if authenticated %}
-            <h1>Welcome {{user.username}}</h1>
-            {% if user.confirmed %}
-                <h2>Current Games</h2>
-                <div class="gameList">
-                    {% for game in games %}
-                        <a href={{ game.url }} class="game">{{game}}</div>
-                    {% endfor %}
-                    <a href="/student/newGame">Create New Game</a>
-                </div>
-
-            {% else %}
-                <h2>You still haven't confirmed your email yet</h2>
-                <h3>Click <a href="/student/sendEmail">here</a> to send it again</h3>
-            {% endif %}
-            <a class="home_button" href="/student/logout"><h1>Logout</h1></a>
-
+        <h1>Student Account</h1>
+        {% if student.confirmed%}
+        <p>Hello {{user.username}}</p>
+        {% for game in student.games %}
+            <a href="{% url 'weekly' game %}">{{game}}</p>
+        {% endfor %}
+        <a class="home_button" href="/student/logout">Logout</a>
         {% else %}
-            <h1>Student Account</h1>
-            <a class="home_button" href="/student/register"><h1>Register</h1></a>
-            <a class="home_button" href="/student/login"><h1>Login</h1></a>
+        <a class="home_button" href="/student/register"><h1>Register</h1></a>
+        <a class="home_button" href="/student/login"><h1>Login</h1></a>
         {% endif %}
     </body>
 </html>

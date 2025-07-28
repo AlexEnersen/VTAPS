@@ -17,7 +17,6 @@ import environ
 import os
 import sys
 
-print(sys.argv)
 env_var = 'dev' if (sys.argv[0] == 'manage.py' and not sys.argv[1] == 'collectstatic') else 'prod'
 os.environ['ENV'] = env_var
 
@@ -86,7 +85,7 @@ INSTALLED_APPS = [
     'main.apps.MainConfig',
     'teacher.apps.TeacherConfig',
     'student.apps.StudentConfig',
-    'singleplayer.apps.SingleplayerConfig',
+    'game.apps.GameConfig',
     'corsheaders'
 ]
 
