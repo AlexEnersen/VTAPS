@@ -1,5 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator
+from django.conf import settings
+from teacher.models import Game
 
 HYBRID_CHOICES = [
     ('MZCER048', 'MZCER048')
@@ -98,11 +100,14 @@ WEATHER_CHOICES = [
 ]
 
 class GameProfile(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
     hybrid = models.CharField(max_length=8, choices=HYBRID_CHOICES, null=True, default=None)
     seeding_rate = models.IntegerField(choices=SEEDING_CHOICES, default=10000)
     weather_type = models.CharField(max_length=6, choices=WEATHER_CHOICES, default='Normal')
     week = models.IntegerField(default=0)
     fert_id = models.IntegerField(default=-1, blank=False)
+    computing = models.BooleanField(default=False)
 
 class FertilizerEntries1(models.Model):
     fertilizer = models.IntegerField(blank=False, default=0, choices=FERT_CHOICES_1)

@@ -1,0 +1,258 @@
+{% extends "game/base.html" %} {% block content %}
+<div>
+  <style type="text/css">
+    .row {
+      display: flex;
+      flex-direction: row;
+    }
+    .weatherRow {
+      justify-content: space-between;
+      margin-bottom: 16px;
+      width: 400px;
+    }
+    .column {
+      display: flex;
+      flex-direction: column;
+    }
+    .weatherBox {
+      border: 1px solid black;
+      align-items: left;
+      padding: 0px 16px;
+      margin: 8px 0;
+    }
+    .weatherItem {
+      padding: 0px 4px;
+      display: flex;
+      flex-direction: row;
+    }
+    .redItem {
+      color: red;
+    }
+    .blueItem {
+      color: blue;
+    }
+    .bolded {
+      font-weight: bold;
+      margin-right: 10px;
+    }
+    .selectionRow {
+      width: 400px;
+    }
+    .weeklySection {
+      padding: 0px 3vw;
+      align-items: center;
+      justify-content: space-between;
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: flex-start;
+    }
+    .date {
+      font-size: 18px;
+      margin-top: 20px;
+      margin-bottom: 4px;
+    }
+    .irrigationLabel {
+      margin-right: 10px;
+    }
+    .graphs {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-evenly;
+    }
+    .graphContainer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .weatherHistory {
+      border: 1px solid black;
+      display: table;
+      padding: 2px;
+    }
+    .weatherContainer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .infoContainer {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-evenly;
+    }
+    th,
+    td {
+      text-align: center;
+    }
+  </style>
+
+  <h1>STANDBY</h1>
+  <div class="weeklySection"><div class="column weatherRow">
+    <h1 class="date">{{weather.0.day}}</h1>
+    <div class="column weatherBox">
+      <div class="column">
+        <div class="weatherItem">
+          <p class="redItem bolded">Forecasted High Temperature:</p>
+          <p class="redItem">{{recap.0.fHigh}}&deg;F</p>
+        </div>
+        <div class="weatherItem">
+          <p class="redItem bolded">Actual High Temperature:</p>
+          <p class="redItem">{{recap.0.aHigh}}&deg;F</p>
+        </div>
+        <div class="weatherItem">
+          <p class="blueItem bolded">Forecasted Low Temperature:</p>
+          <p class="blueItem">{{recap.0.fLow}}&deg;F</p>
+        </div>
+        <div class="weatherItem">
+          <p class="blueItem bolded">Actual Low Temperature:</p>
+          <p class="blueItem">{{recap.0.aLow}}&deg;F</p>
+        </div>
+      </div>
+      <p class="weatherItem">Expected Rainfall: {{recap.0.fRain}} in.</p>
+      <p class="weatherItem">Actual Rainfall: {{recap.0.aRain}} in.</p>
+    </div>
+    
+    <div class="column weatherBox">
+      <div class="column">
+        <div class="weatherItem">
+          <p class="redItem bolded">Forecasted High Temperature:</p>
+          <p class="redItem">{{recap.1.fHigh}}&deg;F</p>
+        </div>
+        <div class="weatherItem">
+          <p class="redItem bolded">Actual High Temperature:</p>
+          <p class="redItem">{{recap.1.aHigh}}&deg;F</p>
+        </div>
+        <div class="weatherItem">
+          <p class="blueItem bolded">Forecasted Low Temperature:</p>
+          <p class="blueItem">{{recap.1.fLow}}&deg;F</p>
+        </div>
+        <div class="weatherItem">
+          <p class="blueItem bolded">Actual Low Temperature:</p>
+          <p class="blueItem">{{recap.1.aLow}}&deg;F</p>
+        </div>
+      </div>
+      <p class="weatherItem">Expected Rainfall: {{recap.1.fRain}} in.</p>
+      <p class="weatherItem">Actual Rainfall: {{recap.1.aRain}} in.</p>
+    </div>
+    
+    <div class="column weatherBox">
+      <div class="column">
+        <div class="weatherItem">
+          <p class="redItem bolded">Forecasted High Temperature:</p>
+          <p class="redItem">{{recap.2.fHigh}}&deg;F</p>
+        </div>
+        <div class="weatherItem">
+          <p class="redItem bolded">Actual High Temperature:</p>
+          <p class="redItem">{{recap.2.aHigh}}&deg;F</p>
+        </div>
+        <div class="weatherItem">
+          <p class="blueItem bolded">Forecasted Low Temperature:</p>
+          <p class="blueItem">{{recap.2.fLow}}&deg;F</p>
+        </div>
+        <div class="weatherItem">
+          <p class="blueItem bolded">Actual Low Temperature:</p>
+          <p class="blueItem">{{recap.2.aLow}}&deg;F</p>
+        </div>
+      </div>
+      <p class="weatherItem">Expected Rainfall: {{recap.2.fRain}} in.</p>
+      <p class="weatherItem">Actual Rainfall: {{recap.2.aRain}} in.</p>
+    </div>
+    
+    <div class="column weatherBox">
+      <div class="column">
+        <div class="weatherItem">
+          <p class="redItem bolded">Forecasted High Temperature:</p>
+          <p class="redItem">{{recap.3.fHigh}}&deg;F</p>
+        </div>
+        <div class="weatherItem">
+          <p class="redItem bolded">Actual High Temperature:</p>
+          <p class="redItem">{{recap.3.aHigh}}&deg;F</p>
+        </div>
+        <div class="weatherItem">
+          <p class="blueItem bolded">Forecasted Low Temperature:</p>
+          <p class="blueItem">{{recap.3.fLow}}&deg;F</p>
+        </div>
+        <div class="weatherItem">
+          <p class="blueItem bolded">Actual Low Temperature:</p>
+          <p class="blueItem">{{recap.3.aLow}}&deg;F</p>
+        </div>
+      </div>
+      <p class="weatherItem">Expected Rainfall: {{recap.3.fRain}} in.</p>
+      <p class="weatherItem">Actual Rainfall: {{recap.3.aRain}} in.</p>
+    </div>
+    
+    <div class="column weatherBox">
+      <div class="column">
+        <div class="weatherItem">
+          <p class="redItem bolded">Forecasted High Temperature:</p>
+          <p class="redItem">{{recap.4.fHigh}}&deg;F</p>
+        </div>
+        <div class="weatherItem">
+          <p class="redItem bolded">Actual High Temperature:</p>
+          <p class="redItem">{{recap.4.aHigh}}&deg;F</p>
+        </div>
+        <div class="weatherItem">
+          <p class="blueItem bolded">Forecasted Low Temperature:</p>
+          <p class="blueItem">{{recap.4.fLow}}&deg;F</p>
+        </div>
+        <div class="weatherItem">
+          <p class="blueItem bolded">Actual Low Temperature:</p>
+          <p class="blueItem">{{recap.4.aLow}}&deg;F</p>
+        </div>
+      </div>
+      <p class="weatherItem">Expected Rainfall: {{recap.4.fRain}} in.</p>
+      <p class="weatherItem">Actual Rainfall: {{recap.4.aRain}} in.</p>
+    </div>
+    
+    <div class="column weatherBox">
+      <div class="column">
+        <div class="weatherItem">
+          <p class="redItem bolded">Forecasted High Temperature:</p>
+          <p class="redItem">{{recap.5.fHigh}}&deg;F</p>
+        </div>
+        <div class="weatherItem">
+          <p class="redItem bolded">Actual High Temperature:</p>
+          <p class="redItem">{{recap.5.aHigh}}&deg;F</p>
+        </div>
+        <div class="weatherItem">
+          <p class="blueItem bolded">Forecasted Low Temperature:</p>
+          <p class="blueItem">{{recap.5.fLow}}&deg;F</p>
+        </div>
+        <div class="weatherItem">
+          <p class="blueItem bolded">Actual Low Temperature:</p>
+          <p class="blueItem">{{recap.5.aLow}}&deg;F</p>
+        </div>
+      </div>
+      <p class="weatherItem">Expected Rainfall: {{recap.5.fRain}} in.</p>
+      <p class="weatherItem">Actual Rainfall: {{recap.5.aRain}} in.</p>
+    </div>
+    
+    <div class="column weatherBox">
+      <div class="column">
+        <div class="weatherItem">
+          <p class="redItem bolded">Forecasted High Temperature:</p>
+          <p class="redItem">{{recap.6.fHigh}}&deg;F</p>
+        </div>
+        <div class="weatherItem">
+          <p class="redItem bolded">Actual High Temperature:</p>
+          <p class="redItem">{{recap.6.aHigh}}&deg;F</p>
+        </div>
+        <div class="weatherItem">
+          <p class="blueItem bolded">Forecasted Low Temperature:</p>
+          <p class="blueItem">{{recap.6.fLow}}&deg;F</p>
+        </div>
+        <div class="weatherItem">
+          <p class="blueItem bolded">Actual Low Temperature:</p>
+          <p class="blueItem">{{recap.6.aLow}}&deg;F</p>
+        </div>
+      </div>
+      <p class="weatherItem">Expected Rainfall: {{recap.6.fRain}} in.</p>
+      <p class="weatherItem">Actual Rainfall: {{recap.6.aRain}} in.</p>
+    </div>
+  </div>
+    <a href='{{game_url}}'>Click here to continue</a>
+  </div>
+  {% endblock %}
+</div>

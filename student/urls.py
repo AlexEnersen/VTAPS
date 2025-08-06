@@ -8,5 +8,4 @@ urlpatterns = [
     path('login', views.studentLogin, name="studentLogin"),
     path('logout', views.studentLogout, name="studentLogout"),
     path('confirm/<str:activation_key>/', views.studentConfirm, name='studentConfirm'),
-    path('game/<int:game_id>', gameviews.weeklySelection, name="weekly")
     ]

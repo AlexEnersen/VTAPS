@@ -163,4 +163,4 @@ def yearlyRandomizer():
             elif index == 0:
                 newWeather += line
 
-    return newWeather.split("\n")
+    return newWeather.split("\n")[5:]
