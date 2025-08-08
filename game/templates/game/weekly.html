@@ -1,14 +1,44 @@
 {% extends "game/base.html" %} {% block content %}
 <div>
   <style type="text/css">
+    hr {
+      position: relative;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100vw; /* full viewport width */
+      border: none;
+      border-top: 2px solid black;
+      margin: 24px 0 12px 0;
+    }
+    .bold {
+      font-weight: bold;
+    }
+    .italic {
+      font-style: italic;
+    }
+    .title {
+      font-size: 30px;
+      text-decoration: underline;
+      margin: 12px auto;
+    }
     .row {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+    }
+    .subRow {
+      display: flex;
+      flex-direction: row;
+      width: auto;
+    }
+    .inputRow {
+      margin-right: 40px;
       display: flex;
       flex-direction: row;
     }
     .weatherRow {
-      justify-content: space-between;
       margin-bottom: 16px;
-      width: 400px;
+      width: 14.25%;
     }
     .column {
       display: flex;
@@ -17,8 +47,8 @@
     .weatherBox {
       border: 1px solid black;
       align-items: left;
-      padding: 0px 16px;
-      margin: 8px 0;
+      padding: 0px 8px;
+      margin: 4px 0;
     }
     .weatherItem {
       padding: 0px 4px;
@@ -35,42 +65,44 @@
       font-weight: bold;
       margin-right: 10px;
     }
-    .selectionRow {
-      width: 400px;
-    }
     .weeklySection {
       padding: 0px 3vw;
       align-items: center;
       justify-content: space-between;
       display: flex;
-      flex-direction: row;
+      flex-direction: column;
       justify-content: flex-start;
       align-items: flex-start;
     }
     .date {
       font-size: 18px;
-      margin-top: 20px;
-      margin-bottom: 4px;
+      margin: 0px 8px;
     }
     .irrigationLabel {
-      margin-right: 10px;
+      margin-right: 4px;
     }
     .graphs {
       display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      align-items: flex-start;
-      justify-content: space-evenly;
+      overflow-x: auto;
+      overflow-y: hidden;
+      white-space: nowrap;
+      max-width: 100%;
+      box-sizing: border-box;
     }
     .graphContainer {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       align-items: center;
     }
     .weatherHistory {
       border: 1px solid black;
       display: table;
       padding: 2px;
+    }
+    .divRow {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
     }
     .weatherContainer {
       display: flex;
@@ -79,8 +111,13 @@
     }
     .infoContainer {
       display: flex;
-      flex-direction: row;
+      flex-direction: column;
       justify-content: space-evenly;
+      max-width: 100%;
+    }
+    .inputButton {
+      margin-left: auto;
+      padding: 0 6px;
     }
     th,
     td {
@@ -88,154 +125,162 @@
     }
   </style>
 
-  <h1>WEEK {{week}}</h1>
   <div class="weeklySection">
-    <form action="" method="post">
-      {% csrf_token %} 
-      {% if week == 1 or week == 6 or week == 9 or week == 10 or week == 12 or week == 14 or week == 15 %}
-      <div class="row selectionRow">
-        <p class="irrigationLabel">Fertilizer:</p>
-        <p class="irrigationField">{{fform.fertilizer}} lbs</p>
-      </div>
-      {% endif %}
-      <div>Total Irrigation Costs: ${{irr_cost}}</div>
-      <div>Total Fertilizer Costs: ${{fert_cost}}</div>
-      <div>Other Costs: ${{other_costs}}</div>
-      <div>Total Cost: ${{total_cost}}</div>
-      <div>Cost per Bushel: ${{bushel_cost}}</div>
+    <h2 class="title">WEEK {{week}}</h2>
+    <div class="divRow">
       <div class="column weatherRow">
-        <h1 class="date">{{weather.0.day}}</h1>
+        <h1 class="date">{{weather.0.day|linebreaksbr}}</h1>
         <div class="column weatherBox">
           <div class="column">
             <div class="weatherItem">
-              <p class="redItem bolded">High Temperature:</p>
+              <p class="redItem bolded">High:</p>
               <p class="redItem">{{weather.0.tHigh}}&deg;F</p>
             </div>
             <div class="weatherItem">
-              <p class="blueItem bolded">Low Temperature:</p>
+              <p class="blueItem bolded">Low:</p>
               <p class="blueItem">{{weather.0.tLow}}&deg;F</p>
             </div>
           </div>
-          <p class="weatherItem">Expected Rainfall: {{weather.0.pRain}} in.</p>
-        </div>
-        <div class="row selectionRow">
-          <p class="irrigationLabel">Daily Irrigation:</p>
-          <p class="irrigationField">{{iform.monday}} in.</p>
+          <p class="weatherItem italic">Rain: {{weather.0.pRain}} in.</p>
         </div>
       </div>
 
       <div class="column weatherRow">
-        <h1 class="date">{{weather.1.day}}</h1>
+        <h1 class="date">{{weather.1.day|linebreaksbr}}</h1>
         <div class="column weatherBox">
           <div class="column">
             <div class="weatherItem">
-              <p class="redItem bolded">High Temperature:</p>
+              <p class="redItem bolded">High:</p>
               <p class="redItem">{{weather.1.tHigh}}&deg;F</p>
             </div>
             <div class="weatherItem">
-              <p class="blueItem bolded">Low Temperature:</p>
+              <p class="blueItem bolded">Low:</p>
               <p class="blueItem">{{weather.1.tLow}}&deg;F</p>
             </div>
           </div>
-          <p class="weatherItem">Expected Rainfall: {{weather.1.pRain}} in.</p>
+          <p class="weatherItem italic">Rain: {{weather.1.pRain}} in.</p>
         </div>
       </div>
 
       <div class="column weatherRow">
-        <h1 class="date">{{weather.2.day}}</h1>
+        <h1 class="date">{{weather.2.day|linebreaksbr}}</h1>
         <div class="column weatherBox">
           <div class="column">
             <div class="weatherItem">
-              <p class="redItem bolded">High Temperature:</p>
+              <p class="redItem bolded">High:</p>
               <p class="redItem">{{weather.2.tHigh}}&deg;F</p>
             </div>
             <div class="weatherItem">
-              <p class="blueItem bolded">Low Temperature:</p>
+              <p class="blueItem bolded">Low:</p>
               <p class="blueItem">{{weather.2.tLow}}&deg;F</p>
             </div>
           </div>
-          <p class="weatherItem">Expected Rainfall: {{weather.2.pRain}} in.</p>
+          <p class="weatherItem italic">Rain: {{weather.2.pRain}} in.</p>
         </div>
       </div>
 
       <div class="column weatherRow">
-        <h1 class="date">{{weather.3.day}}</h1>
+        <h1 class="date">{{weather.3.day|linebreaksbr}}</h1>
         <div class="column weatherBox">
           <div class="column">
             <div class="weatherItem">
-              <p class="redItem bolded">High Temperature:</p>
+              <p class="redItem bolded">High:</p>
               <p class="redItem">{{weather.3.tHigh}}&deg;F</p>
             </div>
             <div class="weatherItem">
-              <p class="blueItem bolded">Low Temperature:</p>
+              <p class="blueItem bolded">Low:</p>
               <p class="blueItem">{{weather.3.tLow}}&deg;F</p>
             </div>
           </div>
-          <p class="weatherItem">Expected Rainfall: {{weather.3.pRain}} in.</p>
-        </div>
-        <div class="row selectionRow">
-          <p class="irrigationLabel">Daily Irrigation:</p>
-          <p class="irrigationField">{{iform.thursday}} in.</p>
+          <p class="weatherItem italic">Rain: {{weather.3.pRain}} in.</p>
         </div>
       </div>
 
       <div class="column weatherRow">
-        <h1 class="date">{{weather.4.day}}</h1>
+        <h1 class="date">{{weather.4.day|linebreaksbr}}</h1>
         <div class="column weatherBox">
           <div class="column">
             <div class="weatherItem">
-              <p class="redItem bolded">High Temperature:</p>
+              <p class="redItem bolded">High:</p>
               <p class="redItem">{{weather.4.tHigh}}&deg;F</p>
             </div>
             <div class="weatherItem">
-              <p class="blueItem bolded">Low Temperature:</p>
+              <p class="blueItem bolded">Low:</p>
               <p class="blueItem">{{weather.4.tLow}}&deg;F</p>
             </div>
           </div>
-          <p class="weatherItem">Expected Rainfall: {{weather.4.pRain}} in.</p>
+          <p class="weatherItem italic">Rain: {{weather.4.pRain}} in.</p>
         </div>
       </div>
 
       <div class="column weatherRow">
-        <h1 class="date">{{weather.5.day}}</h1>
+        <h1 class="date">{{weather.5.day|linebreaksbr}}</h1>
         <div class="column weatherBox">
           <div class="column">
             <div class="weatherItem">
-              <p class="redItem bolded">High Temperature:</p>
+              <p class="redItem bolded">High:</p>
               <p class="redItem">{{weather.5.tHigh}}&deg;F</p>
             </div>
             <div class="weatherItem">
-              <p class="blueItem bolded">Low Temperature:</p>
+              <p class="blueItem bolded">Low:</p>
               <p class="blueItem">{{weather.5.tLow}}&deg;F</p>
             </div>
           </div>
-          <p class="weatherItem">Expected Rainfall: {{weather.5.pRain}} in.</p>
+          <p class="weatherItem italic">Rain: {{weather.5.pRain}} in.</p>
         </div>
       </div>
 
       <div class="column weatherRow">
-        <h1 class="date">{{weather.6.day}}</h1>
+        <h1 class="date">{{weather.6.day|linebreaksbr}}</h1>
         <div class="column weatherBox">
           <div class="column">
             <div class="weatherItem">
-              <p class="redItem bolded">High Temperature:</p>
+              <p class="redItem bolded">High:</p>
               <p class="redItem">{{weather.6.tHigh}}&deg;F</p>
             </div>
             <div class="weatherItem">
-              <p class="blueItem bolded">Low Temperature:</p>
+              <p class="blueItem bolded">Low:</p>
               <p class="blueItem">{{weather.6.tLow}}&deg;F</p>
             </div>
           </div>
-          <p class="weatherItem">Expected Rainfall: {{weather.6.pRain}} in.</p>
+          <p class="weatherItem italic">Rain: {{weather.6.pRain}} in.</p>
         </div>
       </div>
+    </div>
 
-      <input type="submit" value="Continue" />
+    <div>Total Irrigation Costs: &Tab;&Tab;&Tab;&Tab;&Tab;&Tab;${{irr_cost}}</div>
+    <div>Total Fertilizer Costs: ${{fert_cost}}</div>
+    <div>Other Costs: ${{other_costs}}</div>
+    <div class="bold">Total Cost: ${{total_cost}}</div>
+    <div class="italic">(Cost per Bushel: ${{bushel_cost}})</div>
+
+    <form action="" method="post" class="row">
+      <div class="subRow">
+        <div class="inputRow">
+          <p class="irrigationLabel">Monday Irrigation:</p>
+          <p class="irrigationField">{{iform.monday}} in.</p>
+        </div>
+
+        <div class="inputRow">
+          <p class="irrigationLabel">Thursday Irrigation:</p>
+          <p class="irrigationField">{{iform.thursday}} in.</p>
+        </div>
+
+        {% csrf_token %} {% if week == 1 or week == 6 or week == 9 or week == 10 or week == 12 or week == 14 or week == 15 %}
+        <div class="inputRow">
+          <p class="irrigationLabel">Week {{week}} Fertilizer:</p>
+          <p class="irrigationField">{{fform.fertilizer}} lbs</p>
+        </div>
+        {% endif %}
+      </div>
+
+      <input type="submit" value="Continue" class="inputButton" />
     </form>
     {% if week > 1 %}
+    <hr />
     <div class="infoContainer">
+      <h2 class="title">Graphs</h2>
       <div class="graphContainer">
-        <h2>Graphs</h2>
         <div class="graphs">
           <div>{{ aquaspy_graph | safe }}</div>
           <div>{{ water_layer_graph | safe }}</div>

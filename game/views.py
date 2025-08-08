@@ -398,7 +398,7 @@ def getWeather(date, gameInputs):
                 dateFound = True
 
             if dateFound:
-                weatherDateConversion = datetime.strptime("2022-" + weatherDay, "%Y-%j").strftime("%m-%d-%Y")
+                weatherDateConversion = "\n" + datetime.strptime("2025-" + weatherDay, "%Y-%j").strftime("%m-%d-%Y")
                 if (int(weatherDay) - int(day)) == 0:
                     weatherDateConversion = "Monday: " + weatherDateConversion
                 elif (int(weatherDay) - int(day)) == 1:

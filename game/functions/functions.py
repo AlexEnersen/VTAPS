@@ -113,13 +113,13 @@ def altForecastWeather(weather_text):
             for index, highBound in enumerate(tempRanges):
                 lowBound = tempRanges[index-1] if index > 0 else minTemp
                 print("Bounds:", lowBound, "-", highBound)
-                if (highTemp <= highBound and highTemp >= lowBound) or index == len(tempRanges)-1:
-                    randHighTemp = round(np.random.uniform(lowBound, highBound), 1)
-                    break
                 if (lowTemp <= highBound and lowTemp >= lowBound):
                     randLowTemp = round(np.random.uniform(lowBound, highBound), 1)
                     print("LOW TEMP:", lowTemp)
                     print("RANDOM LOW TEMP:", randLowTemp)
+                if (highTemp <= highBound and highTemp >= lowBound) or index == len(tempRanges)-1:
+                    randHighTemp = round(np.random.uniform(lowBound, highBound), 1)
+                    break
 
             forecastString = f"{day[0]:<7}{day[1]:>6}{float(randHighTemp):>6}{randLowTemp:>6}{day[4]:>6}{day[5]:>6}{day[6]:>6}"
             monthlyForecast.append(forecastString)
