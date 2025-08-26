@@ -1,23 +1,5 @@
 {% extends "game/base.html" %} {% block content %}
 <div>
-  <style type="text/css">
-    .formContainer {
-      display: flex;
-      flex-direction: row;
-      width: 70%;
-      justify-content: space-between;
-    }
-    .hybridForm {
-      width: 40%;
-      display: flex;
-      flex-direction: column;
-    }
-    .fertForm {
-      width: 40%;
-      display: flex;
-      flex-direction: column;
-    }
-  </style>
   <form action="" method="post">
     {% csrf_token %}
     <div class="formContainer">

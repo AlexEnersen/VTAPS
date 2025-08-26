@@ -95,15 +95,16 @@ def runGame(request, game_id=None):
 
             context['hybrid_form'] = hybrid_form
             context['fert_form'] = fert_form
-
             return render(request, "game/init.html", context)
         else:
             if gameProfile.week < 24:
+            # if gameProfile.week <= 1:
                 context = weeklySelection(request, gameProfile)
                 if context is None:
                     return redirect(game_url)
-                elif "computing" in context:
-                    return render(request, "game/standby.html", context)
+                # elif "computing" in context or "computing" not in context:
+                # elif "computing" in context:
+                #     return render(request, "game/standby.html", context)
                 else:
                     return render(request, "game/weekly.html", context)
             else:
@@ -120,11 +121,12 @@ def weeklySelection(request, game):
     context = {}
     
     gamePath = f"id-{game.id}"
-
+            
     gameInputs = {}
 
     with open("UNLI2309.MZX", 'r') as f:
-       gameInputs['MZX_content'] = f.read().split("\n")
+        gameInputs['MZX_content'] = f.read().split("\n")
+        gameInputs['MZX_name'] = 'UNLI2309.MZX'
 
     start_date = str(int(getDate(gameInputs['MZX_content'])))
     start_day = int(start_date[len(start_date) - 3:])
@@ -136,7 +138,7 @@ def weeklySelection(request, game):
     if request.method == "POST":
         game.week += 1
         if (game.week == 1):
-            print("HIIIIIII")
+
             request.session['start_date'] = start_date
             game.hybrid = request.POST['hybrid']
             game.seeding_rate = request.POST['seeding_rate']
@@ -163,22 +165,22 @@ def weeklySelection(request, game):
             irrigationQuantity = getIrrigation(request)
             
             gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fertilizerQuantity, int(date)-7)
-            gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], irrigationQuantity, fertilizerQuantity, int(date)-7)
+            gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], irrigationQuantity, fertilizerQuantity, int(date)-7, game.week-1)
 
             computeDSSAT(game.hybrid, gameInputs, gamePath)
-            game.computing = True
+            # game.computing = True
 
         game.save()
         return None
     
     gameInputs = downloadInputs(gamePath)
     
-    if game.computing:
-        game.computing = False
-        game.save()
-        context['computing'] = True
-        context['recap'] = getRecap(date, gameInputs)
-        return context
+    # if game.computing:
+    #     game.computing = False
+    #     game.save()
+    #     context['computing'] = True
+    #     context['recap'] = getRecap(date, gameInputs)
+    #     return context
     
     if game.week > 1:
         gameOutputs = downloadOutputs(gamePath)
@@ -187,7 +189,18 @@ def weeklySelection(request, game):
         context['growth_stage_graph'] = plotOneAttribute(date, start_day, gameOutputs['OPG_content'], 'GSTD', 'Stage', 'Growth Stage')
         context['nitrogen_stress_graph'] = plotOneAttribute(date, start_day, gameOutputs['OPG_content'], 'NSTD', 'N Stress', 'Nitrogen Stress')
         context['water_layer_graph'] = plotWaterLayers(date, start_day, gameOutputs)
-        context['weather_history'] = getWeatherHistory(date, start_day, gameInputs)
+        
+        historyDict = getHistory(date, start_day, gameInputs, gameOutputs)
+        history = historyDict['history']
+        recentHistory = historyDict['recentHistory']
+        context['weekly_rain'] = round(sum(recentHistory['rain']), 2)
+        context['total_rain'] = round(sum(history['rain']), 2)
+        context['weekly_et'] = round(sum(recentHistory['et']), 2)
+        context['total_et'] = round(sum(history['et']), 2)
+        context['weekly_irr'] = round(sum(recentHistory['irr']), 2)
+        context['total_irr'] = round(sum(history['irr']), 2)
+        context['weekly_fert'] = round(sum(recentHistory['fert']), 2)
+        context['total_fert'] = round(sum(history['fert']), 2)
         
 
     gameInputs['MZX_content'] = gameInputs['MZX_content']
@@ -218,7 +231,7 @@ def weeklySelection(request, game):
     context['fert_cost'] = round(total_fertilizer_cost, 2)
 
     # Insurance + Insecticide + Seeds
-    context['other_costs'] = round(142.79, 2)
+    context['other_costs'] = round(742.79, 2)
 
     context['total_cost'] = round(context['irr_cost'] + context['fert_cost'] + context['other_costs'], 2)
     context['bushel_cost'] = round(context['total_cost']/230, 2)
@@ -242,7 +255,7 @@ def finalResults(request, game):
 
     context['irr_cost'] = total_irrigation_cost
     context['fert_cost'] = total_fertilizer_cost
-    context['other_costs'] = round(142.79, 2)
+    context['other_costs'] = round(742, 2)
     context['total_cost'] = round(total_irrigation_cost + total_fertilizer_cost + context['other_costs'], 2)
 
     finalYield = getFinalYield(gameOutputs)
@@ -252,7 +265,23 @@ def finalResults(request, game):
 
     
     context['aquaspy_graph'] = plotAquaSpy(date, start_day, gameInputs, gameOutputs)
-    context['water_layer_graph'] = plotWaterLayers(date, start_day, gameOutputs)
+    context['nitrogen_stress_graph'] = plotOneAttribute(date, start_day, gameOutputs['OPG_content'], 'NSTD', 'N Stress', 'Nitrogen Stress')
+
+
+
+    controlGameInputs = gameInputs.copy()
+    with open(controlGameInputs['MZX_name'], 'r') as f:
+        controlGameInputs['MZX_content'] = f.read().split("\n")
+
+    controlGamePath = gamePath + 'control'
+    computeDSSAT(game.hybrid, controlGameInputs, controlGamePath)
+    controlGameOutputs = downloadOutputs(controlGamePath)
+
+    context['control_aquaspy_graph'] = plotAquaSpy(date, start_day, controlGameInputs, controlGameOutputs)
+    context['control_nitrogen_stress_graph'] = plotOneAttribute(date, start_day, controlGameOutputs['OPG_content'], 'NSTD', 'N Stress', 'Nitrogen Stress')
+
+
+
 
     return context
     
@@ -272,14 +301,14 @@ def getIrrigation(request):
 
     return [monday, thursday]
         
-def addIrrigation(text, irrigationQuantity, fertilizerQuantity, date):
+def addIrrigation(text, irrigationQuantity, fertilizerQuantity, date, week):
     onIrrigation = False
 
     irrigationLines = []
 
     for index, quantity in enumerate(irrigationQuantity):
         quantity = float(quantity)
-        if index == 0:
+        if index == 0 and week > 6:
             quantity += (float(fertilizerQuantity if fertilizerQuantity else 0) * 0.01)
         if quantity > 0:
             quantity = inchesToMM(quantity)
@@ -428,40 +457,40 @@ def getWeather(date, gameInputs):
         else:
             print("getWeather error:", error)
 
-def getRecap(date, gameInputs):
-    dateFound = False
-    weatherInfo = []
+# def getRecap(date, gameInputs):
+#     dateFound = False
+#     weatherInfo = []
 
-    day = date[len(date) - 3:]
+#     day = date[len(date) - 3:]
 
-    try:
-        for index, line in enumerate(gameInputs['forecast_content']):
-            items = list(filter(None, line.split(" ")))
-            items = [x for x in items if x]
+#     try:
+#         for index, line in enumerate(gameInputs['forecast_content']):
+#             items = list(filter(None, line.split(" ")))
+#             items = [x for x in items if x]
             
-            weatherDay = items[0][len(items[0]) - 3:]
+#             weatherDay = items[0][len(items[0]) - 3:]
 
-            if weatherDay == day:
-                dateFound = True
+#             if weatherDay == day:
+#                 dateFound = True
 
-            if dateFound:
-                wth_row = list(filter(None, gameInputs['WTH_content'][index].split(" ")))
-                weatherData = {"fHigh": round(float(items[2]) * (9/5) + 32, 1), "fLow": round(float(items[3]) * (9/5) + 32, 1), "fRain": mmToInches(float(items[4])), "aHigh": round(float(wth_row[2]) * (9/5) + 32, 1), "aLow": round(float(wth_row[3]) * (9/5) + 32, 1), "aRain": mmToInches(float(wth_row[4]))}
+#             if dateFound:
+#                 wth_row = list(filter(None, gameInputs['WTH_content'][index].split(" ")))
+#                 weatherData = {"fHigh": round(float(items[2]) * (9/5) + 32, 1), "fLow": round(float(items[3]) * (9/5) + 32, 1), "fRain": mmToInches(float(items[4])), "aHigh": round(float(wth_row[2]) * (9/5) + 32, 1), "aLow": round(float(wth_row[3]) * (9/5) + 32, 1), "aRain": mmToInches(float(wth_row[4]))}
 
-                weatherInfo.append(weatherData)
+#                 weatherInfo.append(weatherData)
 
-                if int(weatherDay) - int(day) >= 6:
-                    dateFound = False
-                    return weatherInfo
+#                 if int(weatherDay) - int(day) >= 6:
+#                     dateFound = False
+#                     return weatherInfo
     
-    except Exception as error:
-        if environment == 'prod':
-            logger.info(error)
-        else:
-            print("getWeather error:", error)
+#     except Exception as error:
+#         if environment == 'prod':
+#             logger.info(error)
+#         else:
+#             print("getWeather error:", error)
 
 def mmToInches(mm):
-    inches = round(float(0.0393701 * mm), 1)
+    inches = round(float(0.0393701 * mm), 2)
     return inches
 
 def inchesToMM(inches):
@@ -504,6 +533,9 @@ def plotOneAttribute(date, start_day, content, attribute, yaxis, title):
     ax.set_ylabel(yaxis)
     if attribute == 'RDPD':
         ax.invert_yaxis()
+    if attribute == 'GSTD':
+        ax.set_yticks([0, 1, 2, 3, 4, 5])
+        ax.set_yticklabels(['VE', 'V3-V8', 'VT-R1', 'R2-R3', 'R4-R5', 'R6'])
     fig.suptitle(title, fontsize=16)
     imgdata = io.StringIO()
     fig.savefig(imgdata, format='svg')
@@ -691,32 +723,114 @@ def getRootDepth(date, gameOutputs):
         
     return rootArray
 
-def getWeatherHistory(date, start_day, gameInputs):
-    day = int(date[len(date) - 3:])
+def getHistory(date, start_day, gameInputs, gameOutputs):
     
-    history = []
+    day = int(date[len(date) - 3:])
+    history = {"rain": [0.0], "et": [0.0], "irr": [0.0], "fert": [0.0]}
+    recentHistory = {"rain": [0.0], "et": [0.0], "irr": [0.0], "fert": [0.0]}
 
-    forecastIndex = -1
     for line in gameInputs['WTH_content']:
         items = line.split(" ")
         items = [x for x in items if x]
 
         if len(items) == 0 or not items[0].isdigit():
             continue
-        else:
-            forecastIndex += 1
 
-        forecastItems = gameInputs['forecast_content'][forecastIndex].split(" ")
-        forecastItems = [x for x in forecastItems if x]
-        tempDay = int(items[0][len(items[0]) - 3:])
-        if tempDay < start_day:
+        currDay = int(items[0][len(items[0]) - 3:])
+        if currDay < start_day:
             continue
-        elif tempDay >= day:
+        elif currDay >= day:
             break
         else:
-            weatherDict = {"day": tempDay, "high": round(float(items[2]) * (9/5) + 32, 1), "low": round(float(items[3]) * (9/5) + 32, 1), "rain": mmToInches(float(items[4])), "forecast_high": round(float(forecastItems[2]) * (9/5) + 32, 1), "forecast_low": round(float(forecastItems[3]) * (9/5) + 32, 1), "forecast_rain": mmToInches(float(forecastItems[4]))}
-            history.append(weatherDict)
-    return history
+            rain = mmToInches(float(items[4]))
+            history['rain'].append(rain)
+            if currDay >= day - 7:
+                recentHistory['rain'].append(rain)
+    
+    onIrrigation = False
+    onFertilizer = False
+
+    for line in gameInputs['MZX_content']:
+        items = line.split(" ")
+        items = [x for x in items if x]
+        if (len(items) < 1):
+            if (onFertilizer):
+                break
+            else:
+                onFertilizer = False
+                onIrrigation = False
+                continue
+
+        elif (len(items) >= 4 and items[3] == "IRVAL"):
+            onIrrigation = True
+            onFertilizer = False
+
+        elif (onIrrigation):
+            if (int(items[1]) < int(date)):
+                irrigation = mmToInches(float(items[3]))
+                history['irr'].append(irrigation)
+                if (int(items[1]) >= int(date) - 7):
+                    recentHistory['irr'].append(irrigation)
+            
+        elif (len(items) >= 6 and items[5] == "FAMN"):
+            onIrrigation = False
+            onFertilizer = True
+
+        elif (onFertilizer):
+            if (int(items[1]) < int(date)):
+                history['fert'].append(float(items[5]))
+
+    for line in gameOutputs['SWB_content']:
+        items = line.split(" ")
+        items = [x for x in items if x]
+
+        if len(items) == 0 or not items[0].isdigit():
+            continue
+        
+        currDay = int(items[1][len(items[1]) - 3:])
+        if currDay < start_day:
+            continue
+        elif currDay >= day:
+            break
+        else:
+            soil_et = mmToInches(float(items[11]))
+            plant_et = mmToInches(float(items[18]))
+            total_et = soil_et + plant_et
+            history['et'].append(total_et)
+            if currDay >= day - 7:
+                recentHistory['et'].append(total_et)
+    
+    return {"history": history, "recentHistory": recentHistory}
+
+
+
+
+# def getWeatherHistory(date, start_day, gameInputs, gameOutputs):
+#     day = int(date[len(date) - 3:])
+    
+#     history = []
+
+#     forecastIndex = -1
+#     for line in gameInputs['WTH_content']:
+#         items = line.split(" ")
+#         items = [x for x in items if x]
+
+#         if len(items) == 0 or not items[0].isdigit():
+#             continue
+#         else:
+#             forecastIndex += 1
+
+#         forecastItems = gameInputs['forecast_content'][forecastIndex].split(" ")
+#         forecastItems = [x for x in forecastItems if x]
+#         tempDay = int(items[0][len(items[0]) - 3:])
+#         if tempDay < start_day:
+#             continue
+#         elif tempDay >= day:
+#             break
+#         else:
+#             weatherDict = {"day": tempDay, "high": round(float(items[2]) * (9/5) + 32, 1), "low": round(float(items[3]) * (9/5) + 32, 1), "rain": mmToInches(float(items[4])), "forecast_high": round(float(forecastItems[2]) * (9/5) + 32, 1), "forecast_low": round(float(forecastItems[3]) * (9/5) + 32, 1), "forecast_rain": mmToInches(float(forecastItems[4]))}
+#             history.append(weatherDict)
+#     return history
 
 def computeDSSAT(hybrid, gameInputs, gamePath): 
     
@@ -796,7 +910,6 @@ def downloadInputs(gamePath):
             if name[-4:] == '.MZX':
                 data['MZX_name'] = name
                 data['MZX_content'] = zipFile.read(name).decode('utf-8').split("\n")
-                # print("MZXXXXXXX:", data['MZX_content'])
             elif name[-4:] == '.SOL':
                 data['SOL_name'] = name
                 data['SOL_content'] = zipFile.read(name).decode('utf-8').split("\n")
@@ -828,6 +941,9 @@ def downloadOutputs(gamePath):
             elif name[-4:] == '.OSW':
                 data['OSW_name'] = name
                 data['OSW_content'] = zipFile.read(name).decode('utf-8').split("\n")
+            elif name[-14:] == 'SoilWatBal.OUT':
+                data['SWB_name'] = name
+                data['SWB_content'] = zipFile.read(name).decode('utf-8').split("\n")
             # elif name == f"{gamePath}\\WARNING.OUT":
             #     print("\n".join(zipFile.read(name).decode('utf-8').split("\n")))
 

@@ -103,7 +103,11 @@ def editGame(response, id):
     if response.method == 'POST':
         addedPlayers = response.POST['players'].split("\n")
         for player in addedPlayers:
-            game.players.append(player)
+            if player not in game.players:
+                game.players.append(player)
+
+        if response.POST.get('gameName') is not None:
+            game.name = response.POST['gameName']
     
     game.save()
 

@@ -1,73 +1,40 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
-    <head>
-        <style type="text/css">
-            body {
-                min-height: 100vh;
-                width: 100%;
-            }
+  <head>
 
-            .home {
-                padding: auto;
-                display: flex;
-                flex-direction: row;
-                justify-content: space-evenly;
-            }
-            .accountContainer {
-                margin-top: 120px;
-                width: 100%;
-                display: flex;
-                flex-direction: column;
-                justify-content: flex-start;
-            }
-            .verticalLine {
-                height: 100vh;
-                border: 1px solid black;
-            }
-            .header {
-                font-size: 48px;
-                text-align: center;
-                text-decoration: underline;
-            }
-            .link {
-                font-size: 16px;
-                text-align: center;
-            }
-            .button {
-                margin: 0 12px;
-                width: 100%;
-                display: block
-            }
-        </style>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title></title>
+    <meta name="description" content />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+  </head>
+  <body>
+    <div class="headerContainer">
+      <a class="headerLink" href="/">
+        <img class="headerImage" src="{% static 'images/VTAPS.png' %}" alt="VTAPS" />
+      </a>
+    </div>
+    {% csrf_token %}
+    <div class="home">
+      {% csrf_token %}
+      <div class="accountContainer">
+        <h2 class="header">Account</h2>
+        <a class="link button" href="/teacher"><h1>Teacher</h1></a>
+        <a class="link button" href="/student"><h1>Student</h1></a>
+      </div>
+      <vl class="verticalLine"></vl>
+      <div class="accountContainer">
+        <h2 class="header">Game</h2>
+        {% if not game_id %}
+        <a class="link button" href="/game"><h1>Play Single Player Game</h1></a>
+        {% else %}
+        <a class="link button" href="/game"><h1>Return Player Game</h1></a>
+        <a class="link button" href="/reset">RESET GAME</a>
 
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title></title>
-        <meta name="description" content>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href>
-    </head>
-    <body>{% csrf_token %}
-        <div class="home">
-            {% csrf_token %}
-            <div class="accountContainer">
-                <h2 class="header">Account</h2>
-                <a class="link button" href="/teacher"><h1>Teacher</h1></a>
-                <a class="link button" href="/student"><h1>Student</h1></a>
-            </div>
-            <vl class="verticalLine"></vl>
-            <div class="accountContainer">
-                <h2 class="header">Game</h2>
-                {% if not game_id %}
-                    <a class="link button" href="/game"><h1>Play Single Player
-                    Game</h1></a>
-                {% else %}
-                    <a class="link button" href="/game"><h1>Return Player
-                    Game</h1></a>
-                    <a class="link button" href="/reset">RESET GAME</a>
-                    
-                {% endif %}
-            </div>
-        </div>
-    </body>
+        {% endif %}
+      </div>
+    </div>
+  </body>
 </html>

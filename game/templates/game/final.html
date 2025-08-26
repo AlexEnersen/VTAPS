@@ -3,11 +3,17 @@
     .body {
       display: flex;
       flex-direction: row;
+      padding: 0 3vw
     }
     .row {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
+    }
+    .graphContainer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     .graphs {
       display: flex;
@@ -45,11 +51,21 @@
       <p>${{bushel_cost}}/b</p>
     </div>
   </div>
-  <div class="graphs">
-    <div>{{ aquaspy_graph | safe }}</div>
-    <div>{{ water_layer_graph | safe }}</div>
-    <div>{{ growth_stage_graph | safe }}</div>
-    <div>{{ nitrogen_stress_graph | safe }}</div>
+  <div class="graphContainer">
+    <div class="graphContainer">
+      <h1>Results</h1>
+      <div class="graphs">
+        <div>{{ aquaspy_graph | safe }}</div>
+        <div>{{ nitrogen_stress_graph | safe }}</div>
+      </div>
+    </div>
+    <div class="graphContainer">
+      <h1>Control</h1>
+      <div class="graphs">
+        <div>{{ control_aquaspy_graph | safe }}</div>
+        <div>{{ control_nitrogen_stress_graph | safe }}</div>
+      </div>
+    </div>
   </div>
 </div>
 

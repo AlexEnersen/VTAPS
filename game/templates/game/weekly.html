@@ -1,132 +1,9 @@
 {% extends "game/base.html" %} {% block content %}
 <div>
-  <style type="text/css">
-    hr {
-      position: relative;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100vw; /* full viewport width */
-      border: none;
-      border-top: 2px solid black;
-      margin: 24px 0 12px 0;
-    }
-    .bold {
-      font-weight: bold;
-    }
-    .italic {
-      font-style: italic;
-    }
-    .title {
-      font-size: 30px;
-      text-decoration: underline;
-      margin: 12px auto;
-    }
-    .row {
-      display: flex;
-      flex-direction: row;
-      width: 100%;
-    }
-    .subRow {
-      display: flex;
-      flex-direction: row;
-      width: auto;
-    }
-    .inputRow {
-      margin-right: 40px;
-      display: flex;
-      flex-direction: row;
-    }
-    .weatherRow {
-      margin-bottom: 16px;
-      width: 14.25%;
-    }
-    .column {
-      display: flex;
-      flex-direction: column;
-    }
-    .weatherBox {
-      border: 1px solid black;
-      align-items: left;
-      padding: 0px 8px;
-      margin: 4px 0;
-    }
-    .weatherItem {
-      padding: 0px 4px;
-      display: flex;
-      flex-direction: row;
-    }
-    .redItem {
-      color: red;
-    }
-    .blueItem {
-      color: blue;
-    }
-    .bolded {
-      font-weight: bold;
-      margin-right: 10px;
-    }
-    .weeklySection {
-      padding: 0px 3vw;
-      align-items: center;
-      justify-content: space-between;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      align-items: flex-start;
-    }
-    .date {
-      font-size: 18px;
-      margin: 0px 8px;
-    }
-    .irrigationLabel {
-      margin-right: 4px;
-    }
-    .graphs {
-      display: flex;
-      overflow-x: auto;
-      overflow-y: hidden;
-      white-space: nowrap;
-      max-width: 100%;
-      box-sizing: border-box;
-    }
-    .graphContainer {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-    }
-    .weatherHistory {
-      border: 1px solid black;
-      display: table;
-      padding: 2px;
-    }
-    .divRow {
-      display: flex;
-      flex-direction: row;
-      width: 100%;
-    }
-    .weatherContainer {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .infoContainer {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-evenly;
-      max-width: 100%;
-    }
-    .inputButton {
-      margin-left: auto;
-      padding: 0 6px;
-    }
-    th,
-    td {
-      text-align: center;
-    }
-  </style>
+  <style type="text/css"></style>
 
   <div class="weeklySection">
-    <h2 class="title">WEEK {{week}}</h2>
+    <p class="title">WEEK {{week}} Forecast</p>
     <div class="divRow">
       <div class="column weatherRow">
         <h1 class="date">{{weather.0.day|linebreaksbr}}</h1>
@@ -247,12 +124,60 @@
         </div>
       </div>
     </div>
+    {% if week > 1 %}
+    <div class="infoContainer">
+      <table class="history">
+        <tr>
+          <th class="historyLabel"></th>
+          <th class="historyData underline">Past Week</th>
+          <th class="historyData underline">Total</th>
+        </tr>
+        <tr class="tableRow">
+          <th class="historyLabel">Rainfall</th>
+          <th class="historyData">{{weekly_rain}} in.</th>
+          <th class="historyData">{{total_rain}} in.</th>
+        </tr>
+        <tr>
+          <th class="historyLabel">Evapotranspiration</th>
+          <th class="historyData">{{weekly_et}} in.</th>
+          <th class="historyData">{{total_et}} in.</th>
+        </tr>
+        <tr>
+          <th class="historyLabel">Irrigation</th>
+          <th class="historyData">{{weekly_irr}} in.</th>
+          <th class="historyData">{{total_irr}} in.</th>
+        </tr>
+        <tr>
+          <th class="historyLabel">Fertilizer</th>
+          <th class="historyData">{{weekly_fert}} lbs.</th>
+          <th class="historyData">{{total_fert}} lbs.</th>
+        </tr>
+      </table>
 
-    <div>Total Irrigation Costs: &Tab;&Tab;&Tab;&Tab;&Tab;&Tab;${{irr_cost}}</div>
-    <div>Total Fertilizer Costs: ${{fert_cost}}</div>
-    <div>Other Costs: ${{other_costs}}</div>
-    <div class="bold">Total Cost: ${{total_cost}}</div>
-    <div class="italic">(Cost per Bushel: ${{bushel_cost}})</div>
+      <table>
+        <tr class="costRow">
+          <th class="costLabel">Total Irrigation Costs:</th>
+          <th class="costData">${{irr_cost}}</th>
+        </tr>
+        <tr class="costRow">
+          <th class="costLabel">Total Fertilizer Costs:</th>
+          <th class="costData">${{fert_cost}}</th>
+        </tr>
+        <tr class="costRow">
+          <th class="costLabel">Other Costs:</th>
+          <th class="costData">${{other_costs}}</th>
+        </tr>
+        <tr class="costRow">
+          <th class="costLabel bold">Total Costs:</th>
+          <th class="costData bold">${{total_cost}}</th>
+        </tr>
+        <tr class="costRow">
+          <th class="costLabel italic">Cost Per Bushel:</th>
+          <th class="costData italic">${{bushel_cost}}</th>
+        </tr>
+      </table>
+    </div>
+    {% endif %}
 
     <form action="" method="post" class="row">
       <div class="subRow">
@@ -278,19 +203,17 @@
     </form>
     {% if week > 1 %}
     <hr />
-    <div class="infoContainer">
-      <h2 class="title">Graphs</h2>
-      <div class="graphContainer">
-        <div class="graphs">
-          <div>{{ aquaspy_graph | safe }}</div>
-          <div>{{ water_layer_graph | safe }}</div>
-          <div>{{ root_depth_graph | safe }}</div>
-          <div>{{ growth_stage_graph | safe }}</div>
-          <div>{{ nitrogen_stress_graph | safe }}</div>
-        </div>
+    <div class="graphContainer">
+      <p class="title">GRAPHS</p>
+      <div class="graphs">
+        <div>{{ aquaspy_graph | safe }}</div>
+        <div>{{ water_layer_graph | safe }}</div>
+        <div>{{ root_depth_graph | safe }}</div>
+        <div>{{ growth_stage_graph | safe }}</div>
+        <div>{{ nitrogen_stress_graph | safe }}</div>
       </div>
-      <div class="weatherContainer">
-        <h2>Weather History</h2>
+      <!-- <div class="weatherContainer">
+        <p class="title">WEATHER HISTORY</p>
         <table class="weatherHistory">
           <tr>
             <th>Day</th>
@@ -315,7 +238,7 @@
           </tr>
           {% endfor %}
         </table>
-      </div>
+      </div> -->
     </div>
     {% endif %}
   </div>

@@ -3,6 +3,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from .models import Student
+from teacher.models import Game
 from .forms import LoginStudentForm, ConfirmStudentForm
 from django.core import mail
 from django.core.mail import EmailMultiAlternatives
@@ -18,7 +19,12 @@ def studentHome(response):
     if not response.user.is_authenticated:
         return redirect("/student/login")
 
-    return render(response, "student/s_home.html", {"user": response.user, "student": response.user.student})
+    games = []
+    for id in response.user.student.games:
+        game = Game.objects.get(id = id)
+        games.append({'name': game.name, 'id': id})
+
+    return render(response, "student/s_home.html", {"user": response.user, "student": response.user.student, "games": games})
 
 def studentLogin(response):
     if response.method == "POST":

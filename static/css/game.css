@@ -1,0 +1,166 @@
+.formContainer {
+  display: flex;
+  flex-direction: row;
+  width: 70%;
+  justify-content: space-between;
+}
+.hybridForm {
+  width: 40%;
+  display: flex;
+  flex-direction: column;
+}
+.fertForm {
+  width: 40%;
+  display: flex;
+  flex-direction: column;
+}
+.bolded {
+  font-weight: bold;
+  margin-right: 10px;
+}
+.selectionRow {
+  width: 400px;
+}
+.summaryContainer {
+  padding: 0px 3vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+.irrigationLabel {
+  margin-right: 10px;
+}
+
+hr {
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw; /* full viewport width */
+  border: none;
+  border-top: 2px solid black;
+  margin: 24px 0 12px 0;
+}
+.row {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+.subRow {
+  display: flex;
+  flex-direction: row;
+  width: auto;
+}
+.inputRow {
+  margin-right: 40px;
+  display: flex;
+  flex-direction: row;
+}
+.weatherRow {
+  margin-bottom: 16px;
+  width: 14.25%;
+}
+.weatherBox {
+  border: 4px solid black;
+  align-items: left;
+  padding: 0px 8px;
+  margin: 4px 0;
+  margin-left: -4px;
+}
+.weatherItem {
+  padding: 0px 4px;
+  display: flex;
+  flex-direction: row;
+}
+.redItem {
+  color: rgb(252, 11, 11);
+}
+.blueItem {
+  color: rgb(34, 34, 231);
+}
+.bolded {
+  font-weight: bold;
+  margin-right: 10px;
+}
+.weeklySection {
+  padding: 0px 3vw;
+  align-items: center;
+  justify-content: space-between;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+.date {
+  font-size: 24px;
+  margin: 0px 8px;
+}
+.irrigationLabel {
+  margin-right: 4px;
+}
+.graphContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.graphs {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+}
+.divRow {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+.weatherContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.infoContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  max-width: 100%;
+}
+.inputButton {
+  margin-left: auto;
+  padding: 0 6px;
+}
+.title {
+  font-size: 36px;
+  text-decoration: underline;
+  margin: 12px auto;
+  font-weight: bold;
+  text-align: center;
+}
+
+.history {
+  display: table;
+}
+.historyLabel {
+  text-align: left;
+  font-weight: bold;
+}
+.historyData {
+  padding: 0 32px;
+  text-align: right;
+}
+.infoContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+}
+.costRow {
+  margin-bottom: 6px;
+}
+.costLabel {
+  text-align: left;
+  margin-right: 8px;
+}
+.costData {
+  text-align: right;
+}

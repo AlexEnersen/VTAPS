@@ -1,36 +1,15 @@
-<!DOCTYPE html>
-<html>
-    <style>
-        .gameList {
-            display: flex;
-            flex-direction: column
-        }
-        .game {
-            border: 1px solid black;
-            margin: 4px;
-            height: 60px;
-            width: 280px;
-        }
-    </style>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>Student</title>
-        <meta name="description" content>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href>
-    </head>
-    <body>
-        <h1>Student Account</h1>
-        {% if student.confirmed%}
-        <p>Hello {{user.username}}</p>
-        {% for game in student.games %}
-            <a href="{% url 'game' game %}">{{game}}</p>
-        {% endfor %}
-        <a class="home_button" href="/student/logout">Logout</a>
-        {% else %}
-        <a class="home_button" href="/student/register"><h1>Register</h1></a>
-        <a class="home_button" href="/student/login"><h1>Login</h1></a>
-        {% endif %}
-    </body>
-</html>
+{% extends "s_base.html" %} {% block content %}
+<div>
+    <h1>Student Account</h1>
+    {% if student.confirmed%}
+    <p>Hello {{user.username}}</p>
+    {% for game in games %}
+        <a href="{% url 'game' game.id %}">{{game.name}}</p>
+    {% endfor %}
+    <a class="home_button" href="/student/logout">Logout</a>
+    {% else %}
+    <a class="home_button" href="/student/register"><h1>Register</h1></a>
+    <a class="home_button" href="/student/login"><h1>Login</h1></a>
+    {% endif %}
+    {% endblock %}
+</div>
