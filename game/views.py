@@ -443,7 +443,7 @@ def getWeather(date, gameInputs):
                 elif (int(weatherDay) - int(day)) == 6:
                     weatherDateConversion = "Sunday: " + weatherDateConversion
                 
-                weatherData = {"day": weatherDateConversion, "tHigh": round(float(items[2]) * (9/5) + 32, 1), "tLow": round(float(items[3]) * (9/5) + 32, 1), "pRain": mmToInches(float(items[4]))}
+                weatherData = {"day": weatherDateConversion, "tHigh": round((float(items[2]) * (9/5)) + 32, 1), "tLow": round((float(items[3]) * (9/5)) + 32, 1), "pRain": mmToInches(float(items[4]))}
 
                 weatherInfo.append(weatherData)
 

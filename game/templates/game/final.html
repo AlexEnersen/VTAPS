@@ -1,9 +1,8 @@
 {% extends "game/base.html" %} {% block content %}
 <style>
-    .body {
+    .finalSelection {
       display: flex;
       flex-direction: row;
-      padding: 0 3vw
     }
     .row {
         display: flex;
@@ -24,7 +23,7 @@
     }
 </style>
 
-<div class="body">
+<div class="finalSelection">
   <div>
     <div class="row">
       <p>Irrigation Cost: </p>
@@ -53,14 +52,14 @@
   </div>
   <div class="graphContainer">
     <div class="graphContainer">
-      <h1>Results</h1>
+      <h1 class="underline">Results</h1>
       <div class="graphs">
         <div>{{ aquaspy_graph | safe }}</div>
         <div>{{ nitrogen_stress_graph | safe }}</div>
       </div>
     </div>
     <div class="graphContainer">
-      <h1>Control</h1>
+      <h1 class="underline">Control</h1>
       <div class="graphs">
         <div>{{ control_aquaspy_graph | safe }}</div>
         <div>{{ control_nitrogen_stress_graph | safe }}</div>
