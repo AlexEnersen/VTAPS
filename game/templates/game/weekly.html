@@ -8,14 +8,16 @@
         <div class="column">
           <div class="weatherItem">
             <p class="redItem bolded">High:</p>
-            <p class="redItem">{{weather.0.tHigh}}&deg;F</p>
+            <p class="redItem bolded">{{weather.0.tHigh|floatformat:1}}&deg;F</p>
           </div>
           <div class="weatherItem">
             <p class="blueItem bolded">Low:</p>
-            <p class="blueItem">{{weather.0.tLow}}&deg;F</p>
+            <p class="blueItem bolded">{{weather.0.tLow|floatformat:1}}&deg;F</p>
           </div>
         </div>
-        <p class="weatherItem italic">Rain: {{weather.0.pRain}} in.</p>
+        <p class="weatherItem italic">
+          Rain: {{weather.0.pRain|floatformat:1}} in.
+        </p>
       </div>
     </div>
 
@@ -25,14 +27,16 @@
         <div class="column">
           <div class="weatherItem">
             <p class="redItem bolded">High:</p>
-            <p class="redItem">{{weather.1.tHigh}}&deg;F</p>
+            <p class="redItem bolded">{{weather.1.tHigh|floatformat:1}}&deg;F</p>
           </div>
           <div class="weatherItem">
             <p class="blueItem bolded">Low:</p>
-            <p class="blueItem">{{weather.1.tLow}}&deg;F</p>
+            <p class="blueItem bolded">{{weather.1.tLow|floatformat:1}}&deg;F</p>
           </div>
         </div>
-        <p class="weatherItem italic">Rain: {{weather.1.pRain}} in.</p>
+        <p class="weatherItem italic">
+          Rain: {{weather.1.pRain|floatformat:1}} in.
+        </p>
       </div>
     </div>
 
@@ -42,14 +46,16 @@
         <div class="column">
           <div class="weatherItem">
             <p class="redItem bolded">High:</p>
-            <p class="redItem">{{weather.2.tHigh}}&deg;F</p>
+            <p class="redItem bolded">{{weather.2.tHigh|floatformat:1}}&deg;F</p>
           </div>
           <div class="weatherItem">
             <p class="blueItem bolded">Low:</p>
-            <p class="blueItem">{{weather.2.tLow}}&deg;F</p>
+            <p class="blueItem bolded">{{weather.2.tLow|floatformat:1}}&deg;F</p>
           </div>
         </div>
-        <p class="weatherItem italic">Rain: {{weather.2.pRain}} in.</p>
+        <p class="weatherItem italic">
+          Rain: {{weather.2.pRain|floatformat:1}} in.
+        </p>
       </div>
     </div>
 
@@ -59,14 +65,16 @@
         <div class="column">
           <div class="weatherItem">
             <p class="redItem bolded">High:</p>
-            <p class="redItem">{{weather.3.tHigh}}&deg;F</p>
+            <p class="redItem bolded">{{weather.3.tHigh|floatformat:1}}&deg;F</p>
           </div>
           <div class="weatherItem">
             <p class="blueItem bolded">Low:</p>
-            <p class="blueItem">{{weather.3.tLow}}&deg;F</p>
+            <p class="blueItem bolded">{{weather.3.tLow|floatformat:1}}&deg;F</p>
           </div>
         </div>
-        <p class="weatherItem italic">Rain: {{weather.3.pRain}} in.</p>
+        <p class="weatherItem italic">
+          Rain: {{weather.3.pRain|floatformat:1}} in.
+        </p>
       </div>
     </div>
 
@@ -76,14 +84,16 @@
         <div class="column">
           <div class="weatherItem">
             <p class="redItem bolded">High:</p>
-            <p class="redItem">{{weather.4.tHigh}}&deg;F</p>
+            <p class="redItem bolded">{{weather.4.tHigh|floatformat:1}}&deg;F</p>
           </div>
           <div class="weatherItem">
             <p class="blueItem bolded">Low:</p>
-            <p class="blueItem">{{weather.4.tLow}}&deg;F</p>
+            <p class="blueItem bolded">{{weather.4.tLow|floatformat:1}}&deg;F</p>
           </div>
         </div>
-        <p class="weatherItem italic">Rain: {{weather.4.pRain}} in.</p>
+        <p class="weatherItem italic">
+          Rain: {{weather.4.pRain|floatformat:1}} in.
+        </p>
       </div>
     </div>
 
@@ -93,14 +103,16 @@
         <div class="column">
           <div class="weatherItem">
             <p class="redItem bolded">High:</p>
-            <p class="redItem">{{weather.5.tHigh}}&deg;F</p>
+            <p class="redItem bolded">{{weather.5.tHigh|floatformat:1}}&deg;F</p>
           </div>
           <div class="weatherItem">
             <p class="blueItem bolded">Low:</p>
-            <p class="blueItem">{{weather.5.tLow}}&deg;F</p>
+            <p class="blueItem bolded">{{weather.5.tLow|floatformat:1}}&deg;F</p>
           </div>
         </div>
-        <p class="weatherItem italic">Rain: {{weather.5.pRain}} in.</p>
+        <p class="weatherItem italic">
+          Rain: {{weather.5.pRain|floatformat:1}} in.
+        </p>
       </div>
     </div>
 
@@ -110,14 +122,16 @@
         <div class="column">
           <div class="weatherItem">
             <p class="redItem bolded">High:</p>
-            <p class="redItem">{{weather.6.tHigh}}&deg;F</p>
+            <p class="redItem bolded">{{weather.6.tHigh|floatformat:1}}&deg;F</p>
           </div>
           <div class="weatherItem">
             <p class="blueItem bolded">Low:</p>
-            <p class="blueItem">{{weather.6.tLow}}&deg;F</p>
+            <p class="blueItem bolded">{{weather.6.tLow|floatformat:1}}&deg;F</p>
           </div>
         </div>
-        <p class="weatherItem italic">Rain: {{weather.6.pRain}} in.</p>
+        <p class="weatherItem italic">
+          Rain: {{weather.6.pRain|floatformat:1}} in.
+        </p>
       </div>
     </div>
   </div>
@@ -131,72 +145,72 @@
       </tr>
       <tr class="tableRow">
         <th class="historyLabel">Rainfall</th>
-        <th class="historyData">{{weekly_rain}} in.</th>
-        <th class="historyData">{{total_rain}} in.</th>
+        <th class="historyData">{{weekly_rain|floatformat:2}} in.</th>
+        <th class="historyData">{{total_rain|floatformat:2}} in.</th>
       </tr>
       <tr>
         <th class="historyLabel">Evapotranspiration</th>
-        <th class="historyData">{{weekly_et}} in.</th>
-        <th class="historyData">{{total_et}} in.</th>
+        <th class="historyData">{{weekly_et|floatformat:2}} in.</th>
+        <th class="historyData">{{total_et|floatformat:2}} in.</th>
       </tr>
       <tr>
         <th class="historyLabel">Irrigation</th>
-        <th class="historyData">{{weekly_irr}} in.</th>
-        <th class="historyData">{{total_irr}} in.</th>
+        <th class="historyData">{{weekly_irr|floatformat:2}} in.</th>
+        <th class="historyData">{{total_irr|floatformat:2}} in.</th>
       </tr>
       <tr>
         <th class="historyLabel">Fertilizer</th>
-        <th class="historyData">{{weekly_fert}} lbs.</th>
-        <th class="historyData">{{total_fert}} lbs.</th>
+        <th class="historyData">{{weekly_fert|floatformat:0}} lbs.</th>
+        <th class="historyData">{{total_fert|floatformat:0}} lbs.</th>
       </tr>
     </table>
 
-    <table>
+    <table class="costTable">
       <tr class="costRow">
         <th class="costLabel">Total Irrigation Costs:</th>
-        <th class="costData">${{irr_cost}}</th>
+        <th class="costData">${{irr_cost|floatformat:2}}</th>
       </tr>
       <tr class="costRow">
         <th class="costLabel">Total Fertilizer Costs:</th>
-        <th class="costData">${{fert_cost}}</th>
+        <th class="costData">${{fert_cost|floatformat:2}}</th>
       </tr>
       <tr class="costRow">
         <th class="costLabel">Other Costs:</th>
-        <th class="costData">${{other_costs}}</th>
+        <th class="costData">${{other_costs|floatformat:2}}</th>
       </tr>
       <tr class="costRow">
         <th class="costLabel bold">Total Costs:</th>
-        <th class="costData bold">${{total_cost}}</th>
+        <th class="costData bold">${{total_cost|floatformat:2}}</th>
       </tr>
       <tr class="costRow">
         <th class="costLabel italic">Cost Per Bushel:</th>
-        <th class="costData italic">${{bushel_cost}}</th>
+        <th class="costData italic">${{bushel_cost|floatformat:2}}</th>
       </tr>
     </table>
   </div>
   {% endif %}
 
-  <form action="" method="post" class="row">
+  <form action="" method="post" class="formRow">
     <div class="subRow">
       <div class="inputRow">
-        <p class="irrigationLabel">Monday Irrigation:</p>
+        <p class="irrigationLabel underline">Monday Irrigation:</p>
         <p class="irrigationField">{{iform.monday}} in.</p>
       </div>
 
       <div class="inputRow">
-        <p class="irrigationLabel">Thursday Irrigation:</p>
+        <p class="irrigationLabel underline">Thursday Irrigation:</p>
         <p class="irrigationField">{{iform.thursday}} in.</p>
       </div>
 
       {% csrf_token %} {% if week == 1 or week == 6 or week == 9 or week == 10 or week == 12 or week == 14 or week == 15 %}
       <div class="inputRow">
-        <p class="irrigationLabel">Week {{week}} Fertilizer:</p>
+        <p class="irrigationLabel underline">Week {{week}} Fertilizer:</p>
         <p class="irrigationField">{{fform.fertilizer}} lbs</p>
       </div>
       {% endif %}
     </div>
 
-    <input type="submit" value="Continue" class="inputButton" />
+    <input type="submit" value="Continue" class="continueButton" />
   </form>
   {% if week > 1 %}
   <hr />

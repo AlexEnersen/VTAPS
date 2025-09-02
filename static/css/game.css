@@ -1,18 +1,54 @@
 .formContainer {
   display: flex;
   flex-direction: row;
-  width: 70%;
-  justify-content: space-between;
+  width: 100%;
+  justify-content: flex-start;
+  flex-wrap: wrap;
 }
 .hybridForm {
-  width: 40%;
   display: flex;
   flex-direction: column;
+  margin-right: 96px;
+  min-width: 500px;
+}
+.hybridContainer div {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.hybridContainer div input {
+  height: 26px;
+  border: 1px solid #333;
+  border-radius: 4px;
+}
+.hybridContainer div label {
+  margin-top: 8px;
+}
+.fertilizerH1 {
+  margin-bottom: 0px;
 }
 .fertForm {
-  width: 40%;
   display: flex;
   flex-direction: column;
+  margin-bottom: 36px;
+}
+.fertForm p {
+  margin-top: 0px;
+  font-size: 16px;
+}
+.fertContainer {
+  flex-grow: 2;
+  width: 75%;
+  min-width: 500px;
+}
+.fertContainer div {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.fertContainer div select {
+  margin: 4px 0;
+  width: 64px;
 }
 .bolded {
   font-weight: bold;
@@ -28,9 +64,6 @@
   justify-content: flex-start;
   align-items: flex-start;
 }
-.irrigationLabel {
-  margin-right: 10px;
-}
 
 hr {
   position: relative;
@@ -38,7 +71,7 @@ hr {
   transform: translateX(-50%);
   width: 100vw; /* full viewport width */
   border: none;
-  border-top: 2px solid black;
+  border-top: 2px dashed black;
   margin: 24px 0 12px 0;
 }
 .row {
@@ -57,15 +90,20 @@ hr {
   flex-direction: row;
 }
 .weatherRow {
-  margin-bottom: 16px;
+  margin-bottom: 32px;
   width: 14.25%;
 }
 .weatherBox {
-  border: 4px solid black;
-  align-items: left;
-  padding: 0px 8px;
-  margin: 4px 0;
-  margin-left: -4px;
+  border: 1px solid #2b2b2b;
+  padding: 8px;
+  margin: 4px;
+  border-radius: 4px;
+  background: var(--lighter-background-color);
+  text-align: center;
+  transition: background-color 0.2s;
+}
+.weatherBox:hover {
+  background-color: var(--darker-background-color);
 }
 .weatherItem {
   padding: 0px 4px;
@@ -73,10 +111,10 @@ hr {
   flex-direction: row;
 }
 .redItem {
-  color: rgb(252, 11, 11);
+  color: rgb(202, 43, 43);
 }
 .blueItem {
-  color: rgb(34, 34, 231);
+  color: rgb(45, 45, 191);
 }
 .bolded {
   font-weight: bold;
@@ -95,7 +133,7 @@ hr {
   margin: 0px 8px;
 }
 .irrigationLabel {
-  margin-right: 4px;
+  margin-right: 12px;
 }
 .graphContainer {
   display: flex;
@@ -131,20 +169,21 @@ hr {
 .title {
   font-size: 36px;
   text-decoration: underline;
-  margin: 12px auto;
+  margin: 36px auto;
   font-weight: bold;
   text-align: center;
 }
 
 .history {
   display: table;
+  border-collapse: collapse;
 }
 .historyLabel {
   text-align: left;
   font-weight: bold;
 }
 .historyData {
-  padding: 0 32px;
+  padding: 0 10px;
   text-align: right;
 }
 .infoContainer {
@@ -153,13 +192,38 @@ hr {
   justify-content: space-between;
   width: 100%;
 }
+.costTable {
+  border-collapse: collapse;
+}
 .costRow {
-  margin-bottom: 6px;
+  padding: 6px;
 }
 .costLabel {
   text-align: left;
-  margin-right: 8px;
+  padding: 6px;
+  padding-right: 8px;
 }
 .costData {
   text-align: right;
+}
+.formRow {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 36px;
+}
+.continueButton {
+  border-radius: 6px;
+  border: none;
+  background-color: #007e26;
+  color: white;
+  padding: 10px 14px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.continueButton:hover {
+  background-color: #00611d;
 }

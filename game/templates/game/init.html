@@ -4,16 +4,16 @@
     {% csrf_token %}
     <div class="formContainer">
       <div class="hybridForm">
-        <p>Select your hybrid</p>
-        {{ hybrid_form }}
+        <h1>Hybrid Selection</h1>
+        <div class="hybridContainer">{{ hybrid_form }}</div>
       </div>
       <div class="fertForm">
-        <p>Enter Fertilizer Choices</p>
-        <p>These can be changed later</p>
-        {{ fert_form }}
+        <h1 class="fertilizerH1">Fertilizer Pre-Selection</h1>
+        <p class="italic">Can be changed later</p>
+        <div class="fertContainer">{{ fert_form }}</div>
       </div>
     </div>
-    <input type="submit" value="Continue" />
+    <input class="continueButton" type="submit" value="Continue" />
   </form>
 </div>
 

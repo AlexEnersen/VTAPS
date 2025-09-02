@@ -97,8 +97,8 @@ def runGame(request, game_id=None):
             context['fert_form'] = fert_form
             return render(request, "game/init.html", context)
         else:
-            if gameProfile.week < 24:
-            # if gameProfile.week <= 1:
+            # if gameProfile.week < 24:
+            if gameProfile.week <= 1:
                 context = weeklySelection(request, gameProfile)
                 if context is None:
                     return redirect(game_url)
@@ -143,7 +143,7 @@ def weeklySelection(request, game):
             game.hybrid = request.POST['hybrid']
             game.seeding_rate = request.POST['seeding_rate']
             gameInputs['MZX_content'] = setSeedingRate(gameInputs['MZX_content'], game.seeding_rate)
-            game.weather_type = request.POST['weather_type']
+            game.team_id = request.POST['team_id']
 
             fertilizer_init = FertilizerInit(week1 = request.POST['week1'], week6 = request.POST['week6'], week9 = request.POST['week9'], week10 = request.POST['week10'], week12 = request.POST['week12'], week14 = request.POST['week14'], week15 = request.POST['week15'])
             fertilizer_init.save()
@@ -259,6 +259,7 @@ def finalResults(request, game):
     context['total_cost'] = round(total_irrigation_cost + total_fertilizer_cost + context['other_costs'], 2)
 
     finalYield = getFinalYield(gameOutputs)
+    history = getHistory(date, start_day, gameInputs, gameOutputs)['history']
 
     context['bushel_cost'] = round(context['total_cost']/finalYield, 2)
     context['yield'] = finalYield
@@ -277,10 +278,17 @@ def finalResults(request, game):
     computeDSSAT(game.hybrid, controlGameInputs, controlGamePath)
     controlGameOutputs = downloadOutputs(controlGamePath)
 
+    controlFinalYield = getFinalYield(controlGameOutputs)
+    controlHistory = getHistory(date, start_day, controlGameInputs, controlGameOutputs)['history']
+
+    WNIPI_yield = ((finalYield / controlFinalYield) - 1)
+    WNIPI_irr = (1 + (sum(history['irr']) / sum(controlHistory['et'])))
+    WNIPI_fert = (1 + (sum(history['fert']) / 201.44))
+    WNIPI_total = (WNIPI_yield / (WNIPI_irr * WNIPI_fert))
+    context['WNIPI'] = round(WNIPI_total, 2)
+
     context['control_aquaspy_graph'] = plotAquaSpy(date, start_day, controlGameInputs, controlGameOutputs)
     context['control_nitrogen_stress_graph'] = plotOneAttribute(date, start_day, controlGameOutputs['OPG_content'], 'NSTD', 'N Stress', 'Nitrogen Stress')
-
-
 
 
     return context
@@ -442,8 +450,12 @@ def getWeather(date, gameInputs):
                     weatherDateConversion = "Saturday: " + weatherDateConversion
                 elif (int(weatherDay) - int(day)) == 6:
                     weatherDateConversion = "Sunday: " + weatherDateConversion
+
+                rainQuant = mmToInches(float(items[4]))
+                if rainQuant < 0:
+                    rainQuant = 0
                 
-                weatherData = {"day": weatherDateConversion, "tHigh": round((float(items[2]) * (9/5)) + 32, 1), "tLow": round((float(items[3]) * (9/5)) + 32, 1), "pRain": mmToInches(float(items[4]))}
+                weatherData = {"day": weatherDateConversion, "tHigh": round((float(items[2]) * (9/5)) + 32, 1), "tLow": round((float(items[3]) * (9/5)) + 32, 1), "pRain": rainQuant}
 
                 weatherInfo.append(weatherData)
 
@@ -646,6 +658,7 @@ def plotAquaSpy(date, start_day, gameInputs, gameOutputs):
     ax.set_xlabel('Days since planting')
     ax.set_ylabel("Soil Water Limits")
     ax.set_title("Soil Water", fontsize=16)
+    ax.set_ylim([0, 1.4])
     imgdata = io.StringIO()
     fig.savefig(imgdata, format='svg')
     imgdata.seek(0)
@@ -778,9 +791,12 @@ def getHistory(date, start_day, gameInputs, gameOutputs):
 
         elif (onFertilizer):
             if (int(items[1]) < int(date)):
-                history['fert'].append(float(items[5]))
+                fertilizer = float(items[5])
+                history['fert'].append(fertilizer)
+                if (int(items[1]) >= int(date) - 7):
+                    recentHistory['fert'].append(fertilizer)
 
-    for line in gameOutputs['SWB_content']:
+    for line in gameOutputs['OEB_content']:
         items = line.split(" ")
         items = [x for x in items if x]
 
@@ -793,12 +809,9 @@ def getHistory(date, start_day, gameInputs, gameOutputs):
         elif currDay >= day:
             break
         else:
-            soil_et = mmToInches(float(items[11]))
-            plant_et = mmToInches(float(items[18]))
-            total_et = soil_et + plant_et
-            history['et'].append(total_et)
+            history['et'].append(float(items[10]))
             if currDay >= day - 7:
-                recentHistory['et'].append(total_et)
+                recentHistory['et'].append(float(items[10]))
     
     return {"history": history, "recentHistory": recentHistory}
 
@@ -932,19 +945,23 @@ def downloadOutputs(gamePath):
     data = {}
     with zipfile.ZipFile(zip_buffer) as zipFile:
         for name in zipFile.namelist():
+            content = zipFile.read(name).decode('utf-8').split("\n")
+            name = name.split("\\")[1]
+            print("NAME:", name)
+            with open(f'exampleOutput/{name}', 'w') as f:
+                f.write("\n".join(content))
+
             if name[-4:] == '.OPG':
                 data['OPG_name'] = name
-                data['OPG_content'] = zipFile.read(name).decode('utf-8').split("\n")
+                data['OPG_content'] = content
             elif name[-4:] == '.OOV':
                 data['OOV_name'] = name
-                data['OOV_content'] = zipFile.read(name).decode('utf-8').split("\n")
+                data['OOV_content'] = content
             elif name[-4:] == '.OSW':
                 data['OSW_name'] = name
-                data['OSW_content'] = zipFile.read(name).decode('utf-8').split("\n")
-            elif name[-14:] == 'SoilWatBal.OUT':
-                data['SWB_name'] = name
-                data['SWB_content'] = zipFile.read(name).decode('utf-8').split("\n")
-            # elif name == f"{gamePath}\\WARNING.OUT":
-            #     print("\n".join(zipFile.read(name).decode('utf-8').split("\n")))
+                data['OSW_content'] = content
+            elif name[-4:] == '.OEB':
+                data['OEB_name'] = name
+                data['OEB_content'] = content
 
     return data

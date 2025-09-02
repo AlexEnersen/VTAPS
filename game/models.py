@@ -93,18 +93,12 @@ FERT_CHOICES_2 = [
     (30, 30)
 ]
 
-WEATHER_CHOICES = [
-    ('Normal', 'Normal'),
-    ('Wet', 'Wet'),
-    ('Dry', 'Dry')
-]
-
 class GameProfile(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     hybrid = models.CharField(max_length=8, choices=HYBRID_CHOICES, null=True, default=None)
     seeding_rate = models.IntegerField(choices=SEEDING_CHOICES, default=10000)
-    weather_type = models.CharField(max_length=6, choices=WEATHER_CHOICES, default='Normal')
+    team_id = models.IntegerField(null=True, blank=True)
     week = models.IntegerField(default=0)
     fert_id = models.IntegerField(default=-1, blank=False)
     computing = models.BooleanField(default=False)

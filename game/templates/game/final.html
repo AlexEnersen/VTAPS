@@ -1,69 +1,81 @@
 {% extends "game/base.html" %} {% block content %}
 <style>
-    .finalSelection {
-      display: flex;
-      flex-direction: row;
-    }
-    .row {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-    }
-    .graphContainer {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .graphs {
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      align-items: flex-start;
-      justify-content: space-evenly;
-    }
+  .finalSelection {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+  }
+  .row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  .graphContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+  }
+  .graphSubContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;    
+  }
+  /* .graph {
+    width: 500px;
+    height: auto;
+  } */
+  .finalInfoContainer {
+    display: inline-block;
+    border: 2px solid black;
+    padding: 6px 12px;
+    margin: 28px;
+    width: 360px;
+    height: auto;
+    box-sizing: border-box;
+  }
 </style>
 
 <div class="finalSelection">
-  <div>
+  <div class="finalInfoContainer">
     <div class="row">
-      <p>Irrigation Cost: </p>
-      <p>${{irr_cost}}</p>
+      <p>Irrigation Cost:</p>
+      <p>${{irr_cost|floatformat:2}}</p>
     </div>
     <div class="row">
-      <p>Fertilizer Cost: </p>
-      <p>${{fert_cost}}</p>  
+      <p>Fertilizer Cost:</p>
+      <p>${{fert_cost|floatformat:2}}</p>
     </div>
     <div class="row">
-      <p>Other Costs: </p>
-      <p>${{other_costs}}</p>  
+      <p>Other Costs:</p>
+      <p>${{other_costs|floatformat:2}}</p>
     </div>
     <div class="row">
-      <p>Total Cost: </p>
-      <p>${{total_cost}}</p>
+      <p>Total Cost:</p>
+      <p>${{total_cost|floatformat:2}}</p>
     </div>
     <div class="row">
-      <p>Total Yield: </p>
-      <p>{{yield}}b</p>
+      <p>Total Yield:</p>
+      <p>{{yield|floatformat:2}}b</p>
     </div>
     <div class="row">
-      <p>Cost per Bushel: </p>
-      <p>${{bushel_cost}}/b</p>
+      <p>Cost per Bushel:</p>
+      <p>${{bushel_cost|floatformat:2}}/b</p>
+    </div>
+    <div class="row">
+      <p>WNIPI:</p>
+      <p>{{WNIPI|floatformat:2}}</p>
     </div>
   </div>
   <div class="graphContainer">
-    <div class="graphContainer">
+    <div class="graphSubContainer">
       <h1 class="underline">Results</h1>
-      <div class="graphs">
-        <div>{{ aquaspy_graph | safe }}</div>
-        <div>{{ nitrogen_stress_graph | safe }}</div>
-      </div>
+      <div class="graph">{{ aquaspy_graph | safe }}</div>
+      <div class="graph">{{ nitrogen_stress_graph | safe }}</div>
     </div>
-    <div class="graphContainer">
+    <div class="graphSubContainer">
       <h1 class="underline">Control</h1>
-      <div class="graphs">
-        <div>{{ control_aquaspy_graph | safe }}</div>
-        <div>{{ control_nitrogen_stress_graph | safe }}</div>
-      </div>
+      <div class="graph">{{ control_aquaspy_graph | safe }}</div>
+      <div class="graph">{{ control_nitrogen_stress_graph | safe }}</div>
     </div>
   </div>
 </div>
