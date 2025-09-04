@@ -127,7 +127,6 @@ table {
   border-collapse: collapse;
   padding: 0px;
   table-layout: fixed;
-  width: 100%;
 }
 td,
 th {

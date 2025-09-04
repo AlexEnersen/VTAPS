@@ -1,6 +1,6 @@
 *MANAGEMENT OPERATIONS EVENT SUMMARY
 
-*DSSAT Cropping System Model Ver. 4.8.2.000 -release  SEP 04, 2025 19:39:05
+*DSSAT Cropping System Model Ver. 4.8.2.000 -release  SEP 04, 2025 19:41:23
 !---------------------------------------------------------------------------------------------
 @RUN Date........  DOY    DAS    DAP  CR  Stage         Operation       Quantities
 !---------------------------------------------------------------------------------------------
@@ -16,6 +16,6 @@
    1 JUL 25, 2020  207     98     85  MZ  04 Beg Gr Fil
    1 SEP 20, 2020  264    155    142  MZ  05 End Gr Fil
    1 SEP 24, 2020  268    159    146  MZ  16 Harvest   
-                                             100.0 % yield harvested     2867. kg/ha
+                                             100.0 % yield harvested     2691. kg/ha
                                                0.0 % by-product harv        0. kg/ha
  

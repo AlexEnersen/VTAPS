@@ -44,7 +44,8 @@
 
 *PLANTING DETAILS
 @P PDATE EDATE  PPOP  PPOE  PLME  PLDS  PLRS  PLRD  PLDP  PLWT  PAGE  PENV  PLPH  SPRL                        PLNAME
- 1 20122 20135   8.1   8.1     S     R    76     0     5   -99   -99   -99   -99   -99                        Maize
+ 1 20122 20135   5.9   5.9     S     R    76     0     5   -99   -99   -99   -99   -99                        Maize
+
 
 *IRRIGATION AND WATER MANAGEMENT
 @I  EFIR  IDEP  ITHR  IEPT  IOFF  IAME  IAMT IRNAME
