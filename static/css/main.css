@@ -155,3 +155,6 @@ tbody tr:last-child td {
 tbody tr th {
   background-color: var(--lighter-tint-color);
 }
+em {
+  font-weight: normal;
+}
