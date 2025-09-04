@@ -1,8 +1,21 @@
 :root {
-  --background-color: rgb(252, 255, 251);
-  --lighter-background-color: rgb(255, 255, 253);
-  --darker-background-color: rgb(255, 255, 240);
+  --background-color: rgb(252, 255, 252);
+  --lighter-background-color: rgb(255, 255, 254);
+  --darker-background-color: rgb(255, 255, 246);
+  --lighter-tint-color: rgb(250, 250, 255);
+  --tint-color: rgb(235, 235, 255);
+  --darker-tint-color: rgb(210, 210, 255);
   --text-color: #222;
+  --light-text-color: #333;
+  --primary-color: #007e26;
+  --darkened-primary-color: #00611d;
+  --lighter-primary-color: #369f55;
+
+  --sans-font: Arial, Helvetica, sans-serif;
+  --serif-font: "Times New Roman", Times, serif;
+
+  --dark-border: #666;
+  --light-border: #999;
 }
 
 .headerContainer {
@@ -23,23 +36,25 @@
   display: block;
   margin: 12px 28px;
 }
-/* html {
-  overflow-x: hidden;
-} */
 select {
   padding: 4px 8px;
   border-radius: 4px;
-  border: 1px solid #555;
-  font-size: 14px;
+  border: 2px solid #333;
+  font-size: 16px;
   background-color: var(--background-color);
-  cursor: pointer
+  cursor: pointer;
+}
+select:focus,
+select:focus-within {
+  border-radius: 0px;
 }
 .bodyWrapper {
-  padding: 0 2vw;
+  padding: 0 1vw;
 }
 .column {
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
 }
 .row {
   display: flex;
@@ -86,6 +101,10 @@ body {
   width: 100%;
   display: block;
 }
+.lightlyBold {
+  font-weight: bold;
+  color: var(--light-text-color);
+}
 .bold {
   font-weight: bold;
 }
@@ -95,12 +114,44 @@ body {
 .underline {
   text-decoration: underline;
 }
+.alignLeft {
+  text-align: left;
+}
+.tableWrapper {
+  border: 2px solid #aaa;
+  border-radius: 4px;
+  overflow: hidden;
+  display: inline-block;
+}
+table {
+  border-collapse: collapse;
+  padding: 0px;
+  table-layout: fixed;
+  width: 100%;
+}
+td,
 th {
   font-weight: lighter;
-}
-th,
-td {
-  padding: 2px 8px;
-  border: 1px solid #ddd;
+  padding: 8px 12px;
+  border-top: 1px solid var(--light-border);
+  border-bottom: 1px solid var(--light-border);
   text-align: right;
+}
+tbody tr {
+  background-color: var(--tint-color);
+}
+tbody tr:nth-of-type(even) td {
+  background-color: var(--darker-tint-color);
+}
+tbody tr:nth-of-type(odd) td {
+  background-color: var(--tint-color);
+}
+tbody tr:first-child * {
+  border-top: 0px solid var(--light-border);
+}
+tbody tr:last-child td {
+  border-bottom: 0px solid var(--light-border);
+}
+tbody tr th {
+  background-color: var(--lighter-tint-color);
 }

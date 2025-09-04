@@ -11,6 +11,9 @@
   margin-right: 96px;
   min-width: 500px;
 }
+.hybridContainer {
+  font-family: var(--sans-font);
+}
 .hybridContainer div {
   display: flex;
   flex-direction: column;
@@ -18,7 +21,7 @@
 }
 .hybridContainer div input {
   height: 26px;
-  border: 1px solid #333;
+  border: 2px solid #333;
   border-radius: 4px;
 }
 .hybridContainer div label {
@@ -40,6 +43,7 @@
   flex-grow: 2;
   width: 75%;
   min-width: 500px;
+  font-family: var(--sans-font);
 }
 .fertContainer div {
   display: flex;
@@ -88,24 +92,28 @@ hr {
   margin-right: 40px;
   display: flex;
   flex-direction: row;
+  font-size: 24px;
 }
 .weatherRow {
   margin-bottom: 32px;
   width: 14.25%;
 }
 .weatherBox {
-  border: 1px solid #2b2b2b;
+  border: 2px solid var(--dark-border);
   padding: 8px;
   margin: 4px;
   border-radius: 4px;
   background: var(--lighter-background-color);
   text-align: center;
+  font-family: var(--sans-font);
+  justify-content: flex-start;
   transition: background-color 0.2s;
 }
 .weatherBox:hover {
   background-color: var(--darker-background-color);
 }
 .weatherItem {
+  margin: 16px 0px;
   padding: 0px 4px;
   display: flex;
   flex-direction: row;
@@ -116,9 +124,8 @@ hr {
 .blueItem {
   color: rgb(45, 45, 191);
 }
-.bolded {
-  font-weight: bold;
-  margin-right: 10px;
+.weatherSubItem {
+  margin-right: 10%;
 }
 .weeklySection {
   align-items: center;
@@ -131,9 +138,19 @@ hr {
 .date {
   font-size: 24px;
   margin: 0px 8px;
+  font-weight: lighter;
 }
 .irrigationLabel {
   margin-right: 12px;
+  font-family: var(--sans-font);
+}
+.irrigationField select {
+  border: 3px solid var(--primary-color);
+}
+.irrigationField select:active,
+.irrigationField select:focus,
+.irrigationField select:focus-within {
+  border: 3px solid #444;
 }
 .graphContainer {
   display: flex;
@@ -145,6 +162,7 @@ hr {
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-evenly;
+  align-items: center;
 }
 .divRow {
   display: flex;
@@ -161,30 +179,33 @@ hr {
   flex-direction: column;
   justify-content: space-evenly;
   max-width: 100%;
+  font-family: var(--sans-font);
 }
 .inputButton {
   margin-left: auto;
   padding: 0 6px;
 }
 .title {
-  font-size: 36px;
-  text-decoration: underline;
+  font-size: 48px;
   margin: 36px auto;
   font-weight: bold;
   text-align: center;
 }
 
-.history {
-  display: table;
+/* .historyTable {
   border-collapse: collapse;
-}
+} */
 .historyLabel {
   text-align: left;
-  font-weight: bold;
 }
 .historyData {
-  padding: 0 10px;
   text-align: right;
+}
+.sansFont {
+  font-family: var(--sans-font);
+}
+.serifFont {
+  font-family: var(--serif-font);
 }
 .infoContainer {
   display: flex;
@@ -192,16 +213,11 @@ hr {
   justify-content: space-between;
   width: 100%;
 }
-.costTable {
+/* .costTable {
   border-collapse: collapse;
-}
-.costRow {
-  padding: 6px;
-}
+} */
 .costLabel {
   text-align: left;
-  padding: 6px;
-  padding-right: 8px;
 }
 .costData {
   text-align: right;
@@ -217,13 +233,75 @@ hr {
 .continueButton {
   border-radius: 6px;
   border: none;
-  background-color: #007e26;
-  color: white;
+  background-color: var(--primary-color);
+  color: var(--lighter-background-color);
   padding: 10px 14px;
-  font-size: 16px;
+  font-size: 20px;
   cursor: pointer;
+  font-family: var(--sans-font);
   transition: background-color 0.2s;
 }
 .continueButton:hover {
-  background-color: #00611d;
+  background-color: var(--darkened-primary-color);
+}
+
+/* FINAL PAGE CSS */
+.finalSelection {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+}
+/* .infoRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  font-family: var(--sans-font);
+} */
+.graphContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.graphSubContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.finalInfoContainer {
+  display: inline-block;
+  margin: 28px;
+  width: 500px;
+  height: auto;
+  box-sizing: border-box;
+}
+.finalInfoContainer div {
+  width: 100%;
+}
+.downloadButton {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  background-color: var(--primary-color);
+  margin: 12px auto;
+  padding: 8px 20px;
+  border-radius: 6px;
+  text-align: center;
+  color: var(--lighter-background-color);
+  font-family: var(--sans-font);
+  font-weight: bold;
+  font-size: 22px;
+  align-items: center;
+  border: 2px solid var(--primary-color);
+  transition: background-color 0.2s, border 0.2s;
+}
+.downloadButton:hover {
+  background-color: var(--darkened-primary-color);
+  border: 2px solid var(--darkened-primary-color)
+  transition: background-color 0.2s, border 0.2s;
+}
+.downloadIcon {
+  height: 24px;
+  width: auto;
+  margin-right: 20px;
 }

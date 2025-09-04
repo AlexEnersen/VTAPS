@@ -98,7 +98,7 @@ class GameProfile(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     hybrid = models.CharField(max_length=8, choices=HYBRID_CHOICES, null=True, default=None)
     seeding_rate = models.IntegerField(choices=SEEDING_CHOICES, default=10000)
-    team_id = models.IntegerField(null=True, blank=True)
+    team_id = models.IntegerField(null=True, blank=False)
     week = models.IntegerField(default=0)
     fert_id = models.IntegerField(default=-1, blank=False)
     computing = models.BooleanField(default=False)

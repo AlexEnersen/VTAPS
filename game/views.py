@@ -59,7 +59,7 @@ except Exception as error:
     if environment == 'prod':
         logger.info('error:', error)
     else:
-        print("Error:", error)
+        print('Error:', error)
 
 def runGame(request, game_id=None):
     game_url = f'/game/{game_id}' if game_id is not None else '/game'
@@ -184,7 +184,7 @@ def weeklySelection(request, game):
     
     if game.week > 1:
         gameOutputs = downloadOutputs(gamePath)
-        context['aquaspy_graph'] = plotAquaSpy(date, start_day, gameInputs, gameOutputs)
+        context['aquaspy_graph'] = plotAquaSpy(date, start_day, gameInputs, gameOutputs)[0]
         context['root_depth_graph'] = plotOneAttribute(date, start_day, gameOutputs['OPG_content'], 'RDPD', 'Inches (in)', 'Root Depth')
         context['growth_stage_graph'] = plotOneAttribute(date, start_day, gameOutputs['OPG_content'], 'GSTD', 'Stage', 'Growth Stage')
         context['nitrogen_stress_graph'] = plotOneAttribute(date, start_day, gameOutputs['OPG_content'], 'NSTD', 'N Stress', 'Nitrogen Stress')
@@ -265,7 +265,7 @@ def finalResults(request, game):
     context['yield'] = finalYield
 
     
-    context['aquaspy_graph'] = plotAquaSpy(date, start_day, gameInputs, gameOutputs)
+    context['aquaspy_graph'], yAxis = plotAquaSpy(date, start_day, gameInputs, gameOutputs)
     context['nitrogen_stress_graph'] = plotOneAttribute(date, start_day, gameOutputs['OPG_content'], 'NSTD', 'N Stress', 'Nitrogen Stress')
 
 
@@ -283,11 +283,11 @@ def finalResults(request, game):
 
     WNIPI_yield = ((finalYield / controlFinalYield) - 1)
     WNIPI_irr = (1 + (sum(history['irr']) / sum(controlHistory['et'])))
-    WNIPI_fert = (1 + (sum(history['fert']) / 201.44))
-    WNIPI_total = (WNIPI_yield / (WNIPI_irr * WNIPI_fert))
+    WNIPI_N = getNitrogenUptake(date, controlGameOutputs)
+    WNIPI_total = (WNIPI_yield / (WNIPI_irr * WNIPI_N))
     context['WNIPI'] = round(WNIPI_total, 2)
 
-    context['control_aquaspy_graph'] = plotAquaSpy(date, start_day, controlGameInputs, controlGameOutputs)
+    context['control_aquaspy_graph'] = plotAquaSpy(date, start_day, controlGameInputs, controlGameOutputs, yAxis)[0]
     context['control_nitrogen_stress_graph'] = plotOneAttribute(date, start_day, controlGameOutputs['OPG_content'], 'NSTD', 'N Stress', 'Nitrogen Stress')
 
 
@@ -467,7 +467,7 @@ def getWeather(date, gameInputs):
         if environment == 'prod':
             logger.info(error)
         else:
-            print("getWeather error:", error)
+            print('getWeather error:', error)
 
 # def getRecap(date, gameInputs):
 #     dateFound = False
@@ -499,7 +499,7 @@ def getWeather(date, gameInputs):
 #         if environment == 'prod':
 #             logger.info(error)
 #         else:
-#             print("getWeather error:", error)
+#             print('getWeather error:', error)
 
 def mmToInches(mm):
     inches = round(float(0.0393701 * mm), 2)
@@ -570,7 +570,7 @@ def getFinalYield(gameOutputs):
             finalYield = round(float(items[-2]) / 62.77, 1)
             return finalYield
 
-def plotAquaSpy(date, start_day, gameInputs, gameOutputs):
+def plotAquaSpy(date, start_day, gameInputs, gameOutputs, yAxis=-1):
     
     day = int(date[len(date) - 3:])
 
@@ -658,15 +658,18 @@ def plotAquaSpy(date, start_day, gameInputs, gameOutputs):
     ax.set_xlabel('Days since planting')
     ax.set_ylabel("Soil Water Limits")
     ax.set_title("Soil Water", fontsize=16)
-    ax.set_ylim([0, 1.4])
+    if yAxis != -1:
+        ax.set_ylim([0, yAxis])
     imgdata = io.StringIO()
     fig.savefig(imgdata, format='svg')
     imgdata.seek(0)
     data = imgdata.getvalue()
 
+    yAxis = plt.ylim()[1]
+
     plt.close(fig)
 
-    return data
+    return data, yAxis
 
 def plotWaterLayers(date, start_day, gameOutputs):
     day = int(date[len(date) - 3:])
@@ -809,14 +812,31 @@ def getHistory(date, start_day, gameInputs, gameOutputs):
         elif currDay >= day:
             break
         else:
-            history['et'].append(float(items[10]))
+            history['et'].append(mmToInches(float(items[10])))
             if currDay >= day - 7:
-                recentHistory['et'].append(float(items[10]))
+                recentHistory['et'].append(mmToInches(float(items[10])))
     
     return {"history": history, "recentHistory": recentHistory}
 
 
+def getNitrogenUptake(date, gameOutputs):
+    day = int(date[len(date) - 3:])
+    reading = False
+    day = 0
+    nitrogenUptake = 0
 
+    for line in gameOutputs['OPN_content']:
+        items = list(filter(None, line.split(" ")))
+        if len(items) <= 5:
+            continue 
+        elif not reading and items[0] == "@YEAR":
+            reading = True
+        elif reading:
+            nitrogenUptake = float(items[5])
+            if int(items[1]) == day:
+                return nitrogenUptake
+        
+    return nitrogenUptake
 
 # def getWeatherHistory(date, start_day, gameInputs, gameOutputs):
 #     day = int(date[len(date) - 3:])
@@ -947,7 +967,6 @@ def downloadOutputs(gamePath):
         for name in zipFile.namelist():
             content = zipFile.read(name).decode('utf-8').split("\n")
             name = name.split("\\")[1]
-            print("NAME:", name)
             with open(f'exampleOutput/{name}', 'w') as f:
                 f.write("\n".join(content))
 
@@ -963,5 +982,8 @@ def downloadOutputs(gamePath):
             elif name[-4:] == '.OEB':
                 data['OEB_name'] = name
                 data['OEB_content'] = content
+            elif name[-4:] == '.OPN':
+                data['OPN_name'] = name
+                data['OPN_content'] = content
 
     return data

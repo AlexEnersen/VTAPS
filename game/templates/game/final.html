@@ -1,81 +1,51 @@
-{% extends "game/base.html" %} {% block content %}
-<style>
-  .finalSelection {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-  }
-  .row {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-  }
-  .graphContainer {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-  }
-  .graphSubContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;    
-  }
-  /* .graph {
-    width: 500px;
-    height: auto;
-  } */
-  .finalInfoContainer {
-    display: inline-block;
-    border: 2px solid black;
-    padding: 6px 12px;
-    margin: 28px;
-    width: 360px;
-    height: auto;
-    box-sizing: border-box;
-  }
-</style>
-
+{% extends "game/base.html" %} {% block content %} {% load static %}
 <div class="finalSelection">
   <div class="finalInfoContainer">
-    <div class="row">
-      <p>Irrigation Cost:</p>
-      <p>${{irr_cost|floatformat:2}}</p>
+    <div class="tableWrapper">
+      <table>
+        <tr class="infoRow">
+          <td class="alignLeft">Irrigation Cost:</td>
+          <td>${{irr_cost|floatformat:2}}</td>
+        </tr>
+        <tr class="infoRow">
+          <td class="alignLeft">Fertilizer Cost:</td>
+          <td>${{fert_cost|floatformat:2}}</td>
+        </tr>
+        <tr class="infoRow">
+          <td class="alignLeft">Other Costs:</td>
+          <td>${{other_costs|floatformat:2}}</td>
+        </tr>
+        <tr class="infoRow">
+          <td class="alignLeft">Total Cost:</td>
+          <td>${{total_cost|floatformat:2}}</td>
+        </tr>
+        <tr class="infoRow">
+          <td class="bold alignLeft">Total Yield:</td>
+          <td class="bold">{{yield|floatformat:2}}b</td>
+        </tr>
+        <tr class="infoRow">
+          <td class="bold alignLeft">Cost per Bushel:</td>
+          <td class="bold">${{bushel_cost|floatformat:2}}/b</td>
+        </tr>
+        <tr class="infoRow">
+          <td class="bold alignLeft">WNIPI:</td>
+          <td class="bold">{{WNIPI|floatformat:2}}</td>
+        </tr>
+      </table>
     </div>
-    <div class="row">
-      <p>Fertilizer Cost:</p>
-      <p>${{fert_cost|floatformat:2}}</p>
-    </div>
-    <div class="row">
-      <p>Other Costs:</p>
-      <p>${{other_costs|floatformat:2}}</p>
-    </div>
-    <div class="row">
-      <p>Total Cost:</p>
-      <p>${{total_cost|floatformat:2}}</p>
-    </div>
-    <div class="row">
-      <p class="bold">Total Yield:</p>
-      <p class="bold">{{yield|floatformat:2}}b</p>
-    </div>
-    <div class="row">
-      <p class="bold">Cost per Bushel:</p>
-      <p class="bold">${{bushel_cost|floatformat:2}}/b</p>
-    </div>
-    <div class="row">
-      <p class="bold">WNIPI:</p>
-      <p class="bold">{{WNIPI|floatformat:2}}</p>
-    </div>
+    <a class="downloadButton">
+      <img class="downloadIcon" src="{% static 'images/download-icon.svg' %}" alt="" />
+      Download
+    </a>
   </div>
   <div class="graphContainer">
     <div class="graphSubContainer">
       <h1 class="underline">Results</h1>
       <div class="graph">{{ aquaspy_graph | safe }}</div>
-      <!-- <div class="graph">{{ nitrogen_stress_graph | safe }}</div> -->
     </div>
     <div class="graphSubContainer">
       <h1 class="underline">Control</h1>
       <div class="graph">{{ control_aquaspy_graph | safe }}</div>
-      <!-- <div class="graph">{{ control_nitrogen_stress_graph | safe }}</div> -->
     </div>
   </div>
 </div>

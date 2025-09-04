@@ -1,6 +1,6 @@
 *Soil Carbon Balance Summary
 
-*DSSAT Cropping System Model Ver. 4.8.2.000 -release  SEP 02, 2025 14:03:48
+*DSSAT Cropping System Model Ver. 4.8.2.000 -release  SEP 04, 2025 02:01:40
 !                             <----------------- Initial State Variables ----------------><------------------ Final State Variables -----------------><----------- Added ----------><---------------- Lost ---------------->
 !                             <-------- SOM-C -------><-------- FOM-C -------><-----CH4--><-------- SOM-C -------><-------- FOM-C -------><-----CH4--><---OM---><Senesced><-HarvRes><----------------- GHG ----------------><--Balance->
 !                                     Surf        Soil        Surf        Soil     Storage        Surf        Soil        Surf        Soil     Storage 
