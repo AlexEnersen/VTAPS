@@ -272,13 +272,13 @@ hr {
 .finalInfoContainer {
   display: inline-block;
   margin: 28px;
-  width: 500px;
+  max-width: 500px;
   height: auto;
   box-sizing: border-box;
   
 }
 .finalInfoContainer div {
-  width: 100%;
+  width: 99%;
 }
 .downloadButton {
   display: flex;
@@ -295,6 +295,8 @@ hr {
   font-size: 22px;
   align-items: center;
   border: 2px solid var(--primary-color);
+  text-decoration: none;
+  max-width: inherit;
   transition: background-color 0.2s, border 0.2s;
 }
 .downloadButton:hover {
@@ -306,4 +308,7 @@ hr {
   height: 24px;
   width: auto;
   margin-right: 20px;
+}
+.finalTable {
+  width: 100%;
 }

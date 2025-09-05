@@ -102,6 +102,7 @@ class GameProfile(models.Model):
     week = models.IntegerField(default=0)
     fert_id = models.IntegerField(default=-1, blank=False)
     computing = models.BooleanField(default=False)
+    finished = models.BooleanField(default=False)
 
 class FertilizerEntries1(models.Model):
     fertilizer = models.IntegerField(blank=False, default=0, choices=FERT_CHOICES_1)

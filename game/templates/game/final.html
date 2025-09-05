@@ -2,7 +2,7 @@
 <div class="finalSelection">
   <div class="finalInfoContainer">
     <div class="tableWrapper">
-      <table>
+      <table class="finalTable">
         <tr class="infoRow">
           <td class="alignLeft">Irrigation Cost:</td>
           <td>${{irr_cost|floatformat:2}}</td>
@@ -33,9 +33,29 @@
         </tr>
       </table>
     </div>
-    <a class="downloadButton">
+    <div class="tableWrapper">
+      <table class="finalTable">
+        <tr class="infoRow">
+          <td class="alignLeft">Total Rainfall:</td>
+          <td>{{rain_amount|floatformat:2}}in.</td>
+        </tr>
+        <tr class="infoRow">
+          <td class="alignLeft">Total ET:</td>
+          <td>{{et_amount|floatformat:2}}in.</td>
+        </tr>
+        <tr class="infoRow">
+          <td class="alignLeft">Total Irrigation:</td>
+          <td>{{irr_amount|floatformat:2}}in.</td>
+        </tr>
+        <tr class="infoRow">
+          <td class="alignLeft">Total Fertilizer:</td>
+          <td>{{fert_amount|floatformat:0}}lbs.</td>
+        </tr>
+      </table>
+    </div>
+    <a class="downloadButton" href="/game/download">
       <img class="downloadIcon" src="{% static 'images/download-icon.svg' %}" alt="" />
-      Download
+      Download Results
     </a>
   </div>
   <div class="graphContainer">

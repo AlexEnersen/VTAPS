@@ -20,6 +20,8 @@ import watchtower, logging
 from .functions.functions import *
 from .functions.fileSearch import *
 import pandas as pd
+import csv
+from django.http import HttpResponseRedirect
 
 environment = os.environ['ENV']
 
@@ -97,8 +99,8 @@ def runGame(request, game_id=None):
             context['fert_form'] = fert_form
             return render(request, "game/init.html", context)
         else:
-            if gameProfile.week < 24:
-            # if gameProfile.week <= 1:
+            # if gameProfile.week < 24:
+            if gameProfile.week <= 1 and not gameProfile.finished:
                 context = weeklySelection(request, gameProfile)
                 if context is None:
                     return redirect(game_url)
@@ -275,7 +277,9 @@ def finalResults(request, game):
         controlGameInputs['MZX_content'] = f.read().split("\n")
 
     controlGamePath = gamePath + 'control'
-    computeDSSAT(game.hybrid, controlGameInputs, controlGamePath)
+     
+    if checkBucket(controlGamePath) == False:
+        computeDSSAT(game.hybrid, controlGameInputs, controlGamePath)
     controlGameOutputs = downloadOutputs(controlGamePath)
 
     controlFinalYield = getFinalYield(controlGameOutputs)
@@ -287,11 +291,59 @@ def finalResults(request, game):
     WNIPI_total = (WNIPI_yield / (WNIPI_irr * WNIPI_N))
     context['WNIPI'] = round(WNIPI_total, 2)
 
+    context['irr_amount'] = sum(history['irr'])
+    context['fert_amount'] = sum(history['fert'])
+    context['et_amount'] = sum(history['et'])
+    context['rain_amount'] = sum(history['rain'])
+
     context['control_aquaspy_graph'] = plotAquaSpy(date, start_day, controlGameInputs, controlGameOutputs, yAxis)[0]
     context['control_nitrogen_stress_graph'] = plotOneAttribute(date, start_day, controlGameOutputs['OPG_content'], 'NSTD', 'N Stress', 'Nitrogen Stress')
 
+    game.finished = True
+    game.save()
+
+    csv = createCSV(game.team_id, context['irr_amount'], context['fert_amount'], context['yield'], context['bushel_cost'], context['WNIPI'])
+    s3.put_object(
+        Bucket="finalresultsbucket",
+        Key=f"{gamePath}/final_summary.csv",
+        Body=csv,
+        ContentType="text/csv",
+        ContentDisposition=f'attachment; filename="vtaps_game_{game.id}_summary.csv"',
+    )
 
     return context
+
+def downloadResults(request, game_id=None):
+    try:
+        if game_id is None:   
+            game_id = request.session.get('game_id', None) 
+        game = Game.objects.get(id=game_id)      
+    except Game.DoesNotExist:
+        return redirect("/")
+    
+    if request.user.is_authenticated:
+        user = request.user
+    else:
+        user = None
+
+    try:
+        gameProfile = GameProfile.objects.get(game=game, user=user)
+        if not gameProfile.finished:
+            return redirect("/")  
+    except GameProfile.DoesNotExist:
+        return redirect("/")
+      
+    gamePath = f"id-{gameProfile.id}"
+    key = f"{gamePath}/final_summary.csv"
+
+
+    presigned = s3.generate_presigned_url(
+        ClientMethod="get_object",
+        Params={"Bucket": "finalresultsbucket", "Key": key},
+        ExpiresIn=60
+    )
+    return HttpResponseRedirect(presigned)
+
     
 def getDate(text):
     onDate = False
@@ -660,6 +712,8 @@ def plotAquaSpy(date, start_day, gameInputs, gameOutputs, yAxis=-1):
     ax.set_title("Soil Water", fontsize=16)
     if yAxis != -1:
         ax.set_ylim([0, yAxis])
+    else:
+        ax.set_ylim(bottom=0)
     imgdata = io.StringIO()
     fig.savefig(imgdata, format='svg')
     imgdata.seek(0)
@@ -884,25 +938,24 @@ def computeDSSAT(hybrid, gameInputs, gamePath):
 
 def checkOutputs(gamePath):
 
-    bucket = None
     timeout = time.time() + 60*5
 
     while time.time() < timeout:
-        try:
-            bucket = s3.list_objects_v2(
-                Bucket='outputvtapsbucket',
-                Prefix =gamePath,
-                MaxKeys=100 )
-        except Exception as error:
-            if environment == 'prod':
-                logger.info('error:', error)
-            else:
-                print('error:', error)
-            
-        if bucket['KeyCount'] > 0:
+        if checkBucket(gamePath):
             return True
+        time.sleep(0.1)
     
     return False
+
+def checkBucket(gamePath):
+
+    key = f'{gamePath}/{gamePath}.zip'
+
+    try:
+        s3.head_object(Bucket='outputvtapsbucket', Key=key)
+        return True
+    except:
+        return False
 
 def uploadInputs(gameInputs, gamePath):
 
@@ -959,31 +1012,43 @@ def downloadOutputs(gamePath):
     outputStatus = checkOutputs(gamePath)
     if outputStatus is False:
         return False
+    
+    try:
+        zip_buffer = io.BytesIO()
+        s3.download_fileobj('outputvtapsbucket', f"{gamePath}/{gamePath}.zip", zip_buffer)
+        zip_buffer.seek(0) 
+        data = {}
+        with zipfile.ZipFile(zip_buffer) as zipFile:
+            for name in zipFile.namelist():
+                content = zipFile.read(name).decode('utf-8').split("\n")
+                name = name.split("\\")[1]
+                # with open(f'exampleOutput/{name}', 'w') as f:
+                #     f.write("\n".join(content))
 
-    zip_buffer = io.BytesIO()
-    s3.download_fileobj('outputvtapsbucket', f"{gamePath}/{gamePath}.zip", zip_buffer)
-    data = {}
-    with zipfile.ZipFile(zip_buffer) as zipFile:
-        for name in zipFile.namelist():
-            content = zipFile.read(name).decode('utf-8').split("\n")
-            name = name.split("\\")[1]
-            with open(f'exampleOutput/{name}', 'w') as f:
-                f.write("\n".join(content))
+                if name[-4:] == '.OPG':
+                    data['OPG_name'] = name
+                    data['OPG_content'] = content
+                elif name[-4:] == '.OOV':
+                    data['OOV_name'] = name
+                    data['OOV_content'] = content
+                elif name[-4:] == '.OSW':
+                    data['OSW_name'] = name
+                    data['OSW_content'] = content
+                elif name[-4:] == '.OEB':
+                    data['OEB_name'] = name
+                    data['OEB_content'] = content
+                elif name[-4:] == '.OPN':
+                    data['OPN_name'] = name
+                    data['OPN_content'] = content
 
-            if name[-4:] == '.OPG':
-                data['OPG_name'] = name
-                data['OPG_content'] = content
-            elif name[-4:] == '.OOV':
-                data['OOV_name'] = name
-                data['OOV_content'] = content
-            elif name[-4:] == '.OSW':
-                data['OSW_name'] = name
-                data['OSW_content'] = content
-            elif name[-4:] == '.OEB':
-                data['OEB_name'] = name
-                data['OEB_content'] = content
-            elif name[-4:] == '.OPN':
-                data['OPN_name'] = name
-                data['OPN_content'] = content
+        return data
+    except:
+        return False
+    
+def createCSV(team_id, irr_total, fert_total, final_yield, final_bushel_cost, final_wnipi):
+    buf = io.StringIO(newline='')
+    writer = csv.writer(buf)
+    writer.writerow(["Team ID", "Irrigation Total", "Fertilizer Total", "Final Yield", "Cost Per Bushel", "WNIPI Score"])
+    writer.writerow([team_id, irr_total, fert_total, final_yield, final_bushel_cost, final_wnipi])
+    return buf.getvalue().encode("utf-8-sig")
 
-    return data
