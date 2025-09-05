@@ -27,7 +27,7 @@ def reset(response):
         del response.session['game_id']
     # Teacher.objects.all().delete()
     # Student.objects.all().delete()
-    GameProfile.objects.all().delete()
+    # GameProfile.objects.all().delete()
 
     # print(User.objects.filter(is_superuser = False, teacher__isnull = True))
 
