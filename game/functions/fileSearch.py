@@ -1,7 +1,6 @@
 def setSeedingRate(text, seedingRate):
     ## 4046.86 square-meters in 1 acre
     newPop = round(float(seedingRate) / 4046.86, 1)
-    print("NEW POP:", newPop)
     planting = 0
     for i, line in enumerate(text):
 

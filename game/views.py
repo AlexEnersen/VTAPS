@@ -137,11 +137,13 @@ def weeklySelection(request, game):
     context = {}
     fert_entry = -1
 
+    print("WEEK:", game.week)
+
     if request.method == "POST":
+        print("POSTING:", request.POST)
         if game.computing:
             return None
-        game.week += 1
-        if (game.week == 1):
+        if (game.week == 0) or not game.initialized or 'hybrid' in request.POST:
 
             request.session['start_date'] = start_date
             game.hybrid = request.POST['hybrid']
@@ -159,21 +161,22 @@ def weeklySelection(request, game):
             altForecast = True
             gameInputs['forecast_content'] = altForecastWeather(gameInputs['WTH_content']) if altForecast else forecastWeather(gameInputs['WTH_content'])
             uploadInputs(gameInputs, gamePath)
+            game.initialized = True
+            game.week = 0
 
         else:
             game.computing = True
             game.save()
             gameInputs = downloadInputs(gamePath)
-            
-            date = str(int(start_date) + (((game.week)-1) * 7))
 
             fertilizerQuantity = request.POST.get('fertilizer')
             irrigationQuantity = getIrrigation(request)
             
             gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fertilizerQuantity, int(date)-7)
-            gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], irrigationQuantity, fertilizerQuantity, int(date)-7, game.week-1)
+            gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], irrigationQuantity, fertilizerQuantity, int(date)-7, game.week)
             computeDSSAT(game.hybrid, gameInputs, gamePath)
 
+        game.week += 1
         game.save()
         return None
     

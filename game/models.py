@@ -101,6 +101,7 @@ class GameProfile(models.Model):
     team_id = models.IntegerField(null=True, blank=False)
     week = models.IntegerField(default=0)
     fert_id = models.IntegerField(default=-1, blank=False)
+    initialized = models.BooleanField(default=False)
     computing = models.BooleanField(default=False)
     finished = models.BooleanField(default=False)
 
