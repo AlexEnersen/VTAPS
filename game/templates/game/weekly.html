@@ -230,7 +230,7 @@
   </div>
   {% endif %}
 
-  <form action="" method="post" class="formRow">
+  <form action="" method="post" class="formRow" onsubmit="this.querySelector('.continueButton').disabled = true;">
     <div class="subRow">
       <div class="inputRow">
         <p class="irrigationLabel">Monday Irrigation:</p>
@@ -249,7 +249,7 @@
       </div>
       {% endif %}
     </div>
-
+    
     <input type="submit" value="Continue" class="continueButton" />
   </form>
   {% if week > 1 %}

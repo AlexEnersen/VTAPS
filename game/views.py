@@ -138,6 +138,8 @@ def weeklySelection(request, game):
     fert_entry = -1
 
     if request.method == "POST":
+        if game.computing:
+            return None
         game.week += 1
         if (game.week == 1):
 
@@ -159,6 +161,8 @@ def weeklySelection(request, game):
             uploadInputs(gameInputs, gamePath)
 
         else:
+            game.computing = True
+            game.save()
             gameInputs = downloadInputs(gamePath)
             
             date = str(int(start_date) + (((game.week)-1) * 7))
@@ -168,24 +172,20 @@ def weeklySelection(request, game):
             
             gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fertilizerQuantity, int(date)-7)
             gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], irrigationQuantity, fertilizerQuantity, int(date)-7, game.week-1)
-
             computeDSSAT(game.hybrid, gameInputs, gamePath)
-            # game.computing = True
 
         game.save()
         return None
     
     gameInputs = downloadInputs(gamePath)
     
-    # if game.computing:
-    #     game.computing = False
-    #     game.save()
-    #     context['computing'] = True
-    #     context['recap'] = getRecap(date, gameInputs)
-    #     return context
-    
     if game.week > 1:
         gameOutputs = downloadOutputs(gamePath)
+        if gameOutputs is False:
+            time.sleep(2)
+            return None
+        game.computing = False
+        game.save()
         context['aquaspy_graph'] = plotAquaSpy(date, start_day, gameInputs, gameOutputs)[0]
         context['root_depth_graph'] = plotOneAttribute(date, start_day, gameOutputs['OPG_content'], 'RDPD', 'Inches (in)', 'Root Depth')
         context['growth_stage_graph'] = plotOneAttribute(date, start_day, gameOutputs['OPG_content'], 'GSTD', 'Stage', 'Growth Stage')
@@ -708,8 +708,8 @@ def plotAquaSpy(date, start_day, gameInputs, gameOutputs, yAxis=-1):
     ax.fill_between(limitRange, ulimitArray, llimitArray, alpha=alpha)
     ax.plot(waterRange, waterArray, color="black")
     ax.set_xlabel('Days since planting')
-    ax.set_ylabel("Soil Water Limits")
-    ax.set_title("Soil Water", fontsize=16)
+    ax.set_ylabel("Soil Water")
+    ax.set_title("Soil Water Growth Factor", fontsize=16)
     if yAxis != -1:
         ax.set_ylim([0, yAxis])
     else:
@@ -761,7 +761,7 @@ def plotWaterLayers(date, start_day, gameOutputs):
     for layer in desiredLayers:           
         ax.plot(layer)
     ax.set_xlabel('Days since planting')
-    ax.set_ylabel("Soil Water Amount")
+    ax.set_ylabel("Soil Water By Layer")
     ax.set_yticks([])
     ax.legend(legendLayers, loc="upper right", bbox_to_anchor = (1.25, 1))
     # plt.yticks(range(1, layerNum+1), soilVolumes)
