@@ -166,7 +166,6 @@ def weeklySelection(request, game):
 
             altForecast = True
             # gameInputs['forecast_content'] = altForecastWeather(gameInputs['WTH_content']) if altForecast else forecastWeather(gameInputs['WTH_content'])
-            print([])
             gameInputs['forecast_content'] = gameInputs['WTH_content']
             uploadInputs(gameInputs, gamePath)
             game.initialized = True
@@ -954,7 +953,7 @@ def computeDSSAT(hybrid, gameInputs, gamePath):
 
 def checkOutputs(gamePath):
 
-    timeout = time.time() + 60*10
+    timeout = time.time() + (60*10)
 
     while time.time() < timeout:
         if checkBucket(gamePath):

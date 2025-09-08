@@ -10,8 +10,6 @@ from game.models import GameProfile
 
 def home(response):    
     game_id = response.session.get("game_id", None)
-    print("user:", hasattr(response.user, "teacher")) 
-    print("user:", hasattr(response.user, "student")) 
     if hasattr(response.user, "student"):
         return redirect('/student')
     elif hasattr(response.user, "teacher"):

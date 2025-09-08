@@ -19,7 +19,6 @@ def teacherHome(response):
     if response.user in User.objects.filter(is_superuser=True):
         form = SuperuserForm()
         if response.method == 'POST':
-            print("EMAIL:", response.POST['email'])
             user = User.objects.get(email = response.POST['email'])
             teacher = user.teacher
             teacher.authorized = True
@@ -43,7 +42,6 @@ def teacherHome(response):
                 game.delete()
             else:
                 userGames.append(Game.objects.get(id = game))
-        print(teacher.confirmed)
         return render(response, "teacher/t_home.html", {"user": user, "games": userGames})
 
 def teacherRegister(response):
@@ -176,7 +174,6 @@ def createGame(response, id):
                 student.activation_key = activation_key
                 student.key_expires = time.time() + (60 * 60 * 24 * 7)
                 student.save()
-                print("SENDING...")
                 message = EmailMultiAlternatives("Hello from VTAPS!", "VTAPS Confirmation", "enersen1995@gmail.com", [player], connection=connection)
                 message.attach_alternative(f"<p>Hello, {player}. Your teacher has added you to a VTAPS game.<br></br>Click <a href='{'http://localhost:8000' if environment == 'dev' else 'https://vtaps.org'}/student/confirm/{activation_key}'> here</a> to make an account with VTAPS.org</p>", "text/html")
                 message.send()

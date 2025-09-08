@@ -59,7 +59,6 @@ def studentConfirm(response, activation_key):
     else:
         try:
             if student.key_expires > time.time():
-                print("User password:", user.password)
                 if user.has_usable_password() is False:
                     form = ConfirmStudentForm()
                     context = {"form": form}
