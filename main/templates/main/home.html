@@ -13,7 +13,19 @@
   <body>
     <div class="headerContainer">
       <a class="headerLink" href="/">
-        <img class="headerImage" src="{% static 'images/VTAPS.png' %}" alt="VTAPS" />
+        <img class="headerImage" src="{% static 'images/VTAPS Logo.png' %}" alt="VTAPS" />
+      </a>
+      <a class="headerLink" href="/">
+        <img class="headerImage" src="{% static 'images/UNL-TAPS Logo.png' %}" alt="VTAPS" />
+      </a>
+      <a class="headerLink smallerHeaderLink" href="/">
+        <img class="headerImage smallHeaderImage" src="{% static 'images/4H Extension Logo.jpg' %}" alt="VTAPS" />
+      </a>
+      <a class="headerLink" href="/">
+        <img class="headerImage" src="{% static 'images/DWEE Logo.jpg' %}" alt="VTAPS" />
+      </a>
+      <a class="headerLink" href="/">
+        <img class="headerImage" src="{% static 'images/NARD Logo.jpg' %}" alt="VTAPS" />
       </a>
     </div>
     {% csrf_token %}
@@ -31,7 +43,7 @@
         <a class="homeLink" href="/game"><h1>Play Single Player Game</h1></a>
         {% else %}
         <a class="homeLink" href="/game"><h1>Return Player Game</h1></a>
-        <a class="link button" href="/reset">RESET GAME</a>
+        <a class="resetLink" href="/reset">RESET GAME</a>
 
         {% endif %}
       </div>
