@@ -631,6 +631,7 @@ def getFinalYield(gameOutputs):
             readingVariables = True
         elif readingVariables and items[0].startswith('Yield'):
             finalYield = round(float(items[-2]) / 62.77, 1)
+            finalYield = finalYield * 0.854                     #Based on Rintu's Calibration (9/8/2025)
             return finalYield
 
 def plotAquaSpy(date, start_day, gameInputs, gameOutputs, yAxis=-1):
