@@ -76,7 +76,7 @@ def runGame(request, game_id=None):
             game.save()
         else:
             return redirect("/")
-        
+
     if request.user.is_authenticated:
         user = request.user
     else:
@@ -137,10 +137,7 @@ def weeklySelection(request, game):
     context = {}
     fert_entry = -1
 
-    print("WEEK:", game.week)
-
     if request.method == "POST":
-        print("POSTING:", request.POST)
         if game.computing:
             return None
         if (game.week == 0) or not game.initialized or 'hybrid' in request.POST:
@@ -156,10 +153,15 @@ def weeklySelection(request, game):
             game.fert_id = fertilizer_init.id
 
             gameInputs['WTH_name'] = "NEME0000.WTH"
-            gameInputs['WTH_content'] = yearlyRandomizer()
+            # gameInputs['WTH_content'] = yearlyRandomizer()
+            file = open("weather_files/NEME1201.WTH")
+            gameInputs['WTH_content'] = forecastWeather(file.read().split("\n"))
+            file.close()
 
             altForecast = True
-            gameInputs['forecast_content'] = altForecastWeather(gameInputs['WTH_content']) if altForecast else forecastWeather(gameInputs['WTH_content'])
+            # gameInputs['forecast_content'] = altForecastWeather(gameInputs['WTH_content']) if altForecast else forecastWeather(gameInputs['WTH_content'])
+            print([])
+            gameInputs['forecast_content'] = gameInputs['WTH_content']
             uploadInputs(gameInputs, gamePath)
             game.initialized = True
             game.week = 0
@@ -506,15 +508,16 @@ def getWeather(date, gameInputs):
                 elif (int(weatherDay) - int(day)) == 6:
                     weatherDateConversion = "Sunday: " + weatherDateConversion
 
-                rainQuant = mmToInches(float(items[4]))
+                rainQuant = mmToInches(float(items[3]))
                 if rainQuant < 0:
                     rainQuant = 0
                 
-                weatherData = {"day": weatherDateConversion, "tHigh": round((float(items[2]) * (9/5)) + 32, 1), "tLow": round((float(items[3]) * (9/5)) + 32, 1), "pRain": rainQuant}
+                weatherData = {"day": weatherDateConversion, "tHigh": round((float(items[1]) * (9/5)) + 32, 1), "tLow": round((float(items[2]) * (9/5)) + 32, 1), "pRain": rainQuant}
 
                 weatherInfo.append(weatherData)
 
                 if int(weatherDay) - int(day) >= 6:
+                    print("OH?")
                     dateFound = False
                     return weatherInfo
     
@@ -628,6 +631,8 @@ def getFinalYield(gameOutputs):
 def plotAquaSpy(date, start_day, gameInputs, gameOutputs, yAxis=-1):
     
     day = int(date[len(date) - 3:])
+
+    start_day = int(start_day)
 
     rootArray = getRootDepth(date, gameOutputs)
     if not rootArray:
@@ -799,6 +804,7 @@ def getRootDepth(date, gameOutputs):
 def getHistory(date, start_day, gameInputs, gameOutputs):
     
     day = int(date[len(date) - 3:])
+    date = int(date) - 7
     history = {"rain": [0.0], "et": [0.0], "irr": [0.0], "fert": [0.0]}
     recentHistory = {"rain": [0.0], "et": [0.0], "irr": [0.0], "fert": [0.0]}
 
@@ -815,7 +821,7 @@ def getHistory(date, start_day, gameInputs, gameOutputs):
         elif currDay >= day:
             break
         else:
-            rain = mmToInches(float(items[4]))
+            rain = mmToInches(float(items[3]))
             history['rain'].append(rain)
             if currDay >= day - 7:
                 recentHistory['rain'].append(rain)
@@ -1055,3 +1061,27 @@ def createCSV(team_id, irr_total, fert_total, final_yield, final_bushel_cost, fi
     writer.writerow([team_id, irr_total, fert_total, final_yield, final_bushel_cost, final_wnipi])
     return buf.getvalue().encode("utf-8-sig")
 
+def getRainiest():
+    weatherFiles = os.listdir("weather_files")
+    finalName = ""
+    finalSum = 0
+    for file in weatherFiles:
+        fullPath = os.path.join("weather_files", file)
+        with open(fullPath, 'r') as file:
+            content = file.read().split("\n")
+            tempSum = 0
+
+            for line in content:
+                items = line.split(" ")
+                print("BEFORE INT?")
+                try:
+                    int(items[0])
+                    print("FLOATED???")
+                    tempSum += float(items[4])
+                except:
+                    nonline = True
+            if tempSum > finalSum:
+                finalSum = tempSum
+                finalName = fullPath
+    print("FINALNAME:", finalName)
+    print("FINALSUM: ", finalSum)

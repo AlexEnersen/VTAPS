@@ -116,10 +116,10 @@ class IrrigationEntries(models.Model):
     thursday = models.FloatField(choices=IRRIGATION_CHOICES, default=0)
 
 class FertilizerInit(models.Model):
-    week1 = models.IntegerField("Pre-plant Nitrogen, Week 1 (lbs/acre)", blank=False, default=0, choices=FERT_CHOICES_1)
-    week6 = models.IntegerField("Side-Dress Nitrogen, Week 6 (lbs/acre)", blank=False, default=0, choices=FERT_CHOICES_1)
-    week9 = models.IntegerField("V9 Fertigation Nitrogen, Week 9 (lbs/acre)", blank=False, default=0, choices=FERT_CHOICES_2)
-    week10 = models.IntegerField("V12 Fertigation Nitrogen, Week 10 (lbs/acre)", blank=False, default=0, choices=FERT_CHOICES_2)
+    week1 = models.IntegerField("Pre-plant Nitrogen, Week 1 (lbs/acre)", blank=False, null=True, choices=FERT_CHOICES_1)
+    week6 = models.IntegerField("Side-Dress Nitrogen, Week 6 (lbs/acre)", blank=False, null=True, choices=FERT_CHOICES_1)
+    week9 = models.IntegerField("V9 Fertigation Nitrogen, Week 9 (lbs/acre)", blank=False, null=True, choices=FERT_CHOICES_2)
+    week10 = models.IntegerField("V12 Fertigation Nitrogen, Week 10 (lbs/acre)", blank=False, null=True, choices=FERT_CHOICES_2)
     week12 = models.IntegerField("VT Fertigation Nitrogen, Week 12 (lbs/acre)", blank=False, default=0, choices=FERT_CHOICES_2)
     week14 = models.IntegerField("R2 Fertigation Nitrogen, Week 14 (lbs/acre)", blank=False, default=0, choices=FERT_CHOICES_2)
     week15 = models.IntegerField("R3 Fertigation Nitrogen, Week 15 (lbs/acre)", blank=False, default=0, choices=FERT_CHOICES_2)

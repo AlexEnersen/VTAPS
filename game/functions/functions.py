@@ -14,7 +14,7 @@ if environment == 'prod':
 
 monthRanges = [32, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366]
 
-def forecastWeather(weather_text):    
+def forecastWeather(weather_text):  
 
     lowArray = []
     highArray = []
@@ -23,6 +23,11 @@ def forecastWeather(weather_text):
 
     for line in weather_text:
         items = list(filter(None, line.split(" ")))
+        print("ITEMS:", items)
+
+        if len(items) < 1:
+            continue
+
         weatherDate = items[0]
 
         if not weatherDate.isnumeric():
@@ -30,23 +35,33 @@ def forecastWeather(weather_text):
             
         weatherDay = weatherDate[len(weatherDate) - 3:]
 
-        highArray.append(round((float(items[2]) * (9/5)) + 32, 1))
-        lowArray.append(round((float(items[3]) * (9/5)) + 32, 1))
-        rainArray.append(float(items[4].strip()))
+        # high = str(round(float(items[2]) * (9/5) + 32, 1))
+        # low = str(round(float(items[3]) * (9/5) + 32, 1))
+        # rain = str(round(float(items[4])))
 
-        if len(lowArray) >= 21:
-            highArray.pop(0)
-            lowArray.pop(0)
-            rainArray.pop(0)
+        high = str(round(float(items[2]), 1))
+        low = str(round(float(items[3]), 1))
+        rain = str(round(float(items[4]), 1))
+
+        # highArray.append(round((float(items[2]) * (9/5)) + 32, 1))
+        # lowArray.append(round((float(items[3]) * (9/5)) + 32, 1))
+        # rainArray.append(float(items[4].strip()))
+
+        # if len(lowArray) >= 21:
+        #     highArray.pop(0)
+        #     lowArray.pop(0)
+        #     rainArray.pop(0)
             
-        high_forecast = str(round(forecastData(highArray), 1))
-        low_forecast = str(round(forecastData(lowArray), 1 ))
-        rain_forecast = str(abs(round(forecastData(rainArray), 2)))
+        # high_forecast = str(round(forecastData(highArray), 1))
+        # low_forecast = str(round(forecastData(lowArray), 1 ))
+        # rain_forecast = str(abs(round(forecastData(rainArray), 2)))
         
-        if high_forecast < low_forecast:
-            low_forecast = str(round(float(high_forecast) - 1, 1))
+        # if high_forecast < low_forecast:
+        #     low_forecast = str(round(float(high_forecast) - 1, 1))
         
-        weather_string = weatherDay + " " + high_forecast + " " + low_forecast + " " + rain_forecast
+        # weather_string = weatherDay + " " + high_forecast + " " + low_forecast + " " + rain_forecast
+
+        weather_string = weatherDay + " " + high + " " + low + " " + rain
         
         forecast_text.append(weather_string)
 
