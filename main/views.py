@@ -34,3 +34,6 @@ def reset(response):
     # non_superusers = User.objects.filter(is_superuser = False, teacher__isnull = True   )
     # non_superusers.delete()
     return redirect("/")
+
+def downloadResults(response):
+    return redirect("/")

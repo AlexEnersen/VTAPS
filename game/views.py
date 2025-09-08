@@ -100,7 +100,7 @@ def runGame(request, game_id=None):
             context['fert_form'] = fert_form
             return render(request, "game/init.html", context)
         else:
-            if gameProfile.week < 24 and not gameProfile.finished:
+            if gameProfile.week < 22 and not gameProfile.finished:
             # if gameProfile.week <= 1 and not gameProfile.finished:
                 context = weeklySelection(request, gameProfile)
                 if context is None:
@@ -316,7 +316,7 @@ def finalResults(request, game):
     csv = createCSV(game.team_id, context['irr_amount'], context['fert_amount'], context['yield'], context['bushel_cost'], context['WNIPI'])
     s3.put_object(
         Bucket="finalresultsbucket",
-        Key=f"{gamePath}/final_summary.csv",
+        Key=f"{gamePath}/final_summary-{game.team_id}.csv",
         Body=csv,
         ContentType="text/csv",
         ContentDisposition=f'attachment; filename="vtaps_game_{game.id}_summary.csv"',
