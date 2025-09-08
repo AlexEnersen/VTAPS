@@ -88,7 +88,7 @@ body {
   border: 1px solid black;
 }
 .header {
-  font-size: 48px;
+  font-size: 64px;
   text-align: center;
   text-decoration: underline;
 }
@@ -156,4 +156,18 @@ tbody tr th {
 }
 em {
   font-weight: normal;
+}
+.homeLink {
+  margin: 0 auto;
+  font-size: 18px;
+  padding: 8px 48Px;
+  border-radius: 4px;
+  background-color: var(--primary-color);
+  text-decoration: none;
+  color: var(--lighter-background-color);
+  transition: background-color 0.2s;
+}
+.homeLink:hover {
+  background-color: var(--darkened-primary-color);
+  transition: background-color 0.2s;
 }
