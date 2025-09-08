@@ -66,6 +66,7 @@ except Exception as error:
 def runGame(request, game_id=None):
     game_url = f'/game/{game_id}' if game_id is not None else '/game'
     context = {'game_url': game_url}
+    
     try:
         if game_id is None:   
             game_id = request.session.get('game_id', None) 
@@ -158,7 +159,7 @@ def weeklySelection(request, game):
 
             gameInputs['WTH_name'] = "NEME0000.WTH"
             # gameInputs['WTH_content'] = yearlyRandomizer()
-            file = open("weather_files/NEME1201.WTH")
+            file = open("weather_files/NEME1901.WTH")
             gameInputs['WTH_content'] = forecastWeather(file.read().split("\n"))
             file.close()
 
@@ -299,7 +300,7 @@ def finalResults(request, game):
     WNIPI_irr = (1 + (sum(history['irr']) / sum(controlHistory['et'])))
     WNIPI_N = getNitrogenUptake(date, controlGameOutputs)
     WNIPI_total = (WNIPI_yield / (WNIPI_irr * WNIPI_N))
-    context['WNIPI'] = round(WNIPI_total, 2)
+    context['WNIPI'] = round(WNIPI_total, 4)
 
     context['irr_amount'] = sum(history['irr'])
     context['fert_amount'] = sum(history['fert'])
@@ -1076,12 +1077,11 @@ def getRainiest():
             tempSum = 0
 
             for line in content:
-                items = line.split(" ")
-                try:
-                    int(items[0])
+                items = list(filter(None, line.split(" ")))
+                if len(items) > 5 and items[0].isnumeric():
                     tempSum += float(items[4])
-                except:
-                    nonline = True
+
             if tempSum > finalSum:
                 finalSum = tempSum
                 finalName = fullPath
+    print("RAINIEST NAME:", finalName)
