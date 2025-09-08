@@ -99,7 +99,7 @@ class GameProfile(models.Model):
     hybrid = models.CharField(max_length=8, choices=HYBRID_CHOICES, null=True, default=None)
     seeding_rate = models.IntegerField(choices=SEEDING_CHOICES, default=10000)
     team_id = models.IntegerField(null=True, blank=False)
-    week = models.IntegerField(default=0)
+    week = models.IntegerField(default=11)
     fert_id = models.IntegerField(default=-1, blank=False)
     initialized = models.BooleanField(default=False)
     computing = models.BooleanField(default=False)

@@ -132,7 +132,7 @@ def weeklySelection(request, game):
 
     start_date = str(int(getDate(gameInputs['MZX_content'])))
     start_day = int(start_date[len(start_date) - 3:])
-    date = str(int(start_date) + (((game.week)-1) * 7))
+    date = str(int(start_date) + (((game.week)) * 7))
 
     context = {}
     fert_entry = -1
@@ -140,7 +140,7 @@ def weeklySelection(request, game):
     if request.method == "POST":
         if game.computing:
             return None
-        if (game.week == 0) or not game.initialized or 'hybrid' in request.POST:
+        if (game.week == 11) or not game.initialized or 'hybrid' in request.POST:
 
             request.session['start_date'] = start_date
             game.hybrid = request.POST['hybrid']
@@ -149,6 +149,10 @@ def weeklySelection(request, game):
             game.team_id = request.POST['team_id']
 
             fertilizer_init = FertilizerInit(week1 = request.POST['week1'], week6 = request.POST['week6'], week9 = request.POST['week9'], week10 = request.POST['week10'], week12 = request.POST['week12'], week14 = request.POST['week14'], week15 = request.POST['week15'])
+            gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], request.POST['week1'], int(start_date) + (1 * 7))
+            gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], request.POST['week6'], int(start_date) + (6 * 7))
+            gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], request.POST['week9'], int(start_date) + (9 * 7))
+            gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], request.POST['week10'], int(start_date) + (10 * 7))
             fertilizer_init.save()
             game.fert_id = fertilizer_init.id
 
@@ -164,7 +168,8 @@ def weeklySelection(request, game):
             gameInputs['forecast_content'] = gameInputs['WTH_content']
             uploadInputs(gameInputs, gamePath)
             game.initialized = True
-            game.week = 0
+            game.week = 11
+            gameInputs = downloadInputs(gamePath)
 
         else:
             game.computing = True
@@ -176,7 +181,7 @@ def weeklySelection(request, game):
             
             gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fertilizerQuantity, int(date)-7)
             gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], irrigationQuantity, fertilizerQuantity, int(date)-7, game.week)
-            computeDSSAT(game.hybrid, gameInputs, gamePath)
+        computeDSSAT(game.hybrid, gameInputs, gamePath)
 
         game.week += 1
         game.save()
@@ -184,7 +189,7 @@ def weeklySelection(request, game):
     
     gameInputs = downloadInputs(gamePath)
     
-    if game.week > 1:
+    if game.week > 11:
         gameOutputs = downloadOutputs(gamePath)
         if gameOutputs is False:
             time.sleep(2)
@@ -517,7 +522,6 @@ def getWeather(date, gameInputs):
                 weatherInfo.append(weatherData)
 
                 if int(weatherDay) - int(day) >= 6:
-                    print("OH?")
                     dateFound = False
                     return weatherInfo
     
@@ -1073,15 +1077,11 @@ def getRainiest():
 
             for line in content:
                 items = line.split(" ")
-                print("BEFORE INT?")
                 try:
                     int(items[0])
-                    print("FLOATED???")
                     tempSum += float(items[4])
                 except:
                     nonline = True
             if tempSum > finalSum:
                 finalSum = tempSum
                 finalName = fullPath
-    print("FINALNAME:", finalName)
-    print("FINALSUM: ", finalSum)

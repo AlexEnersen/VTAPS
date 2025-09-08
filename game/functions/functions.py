@@ -23,7 +23,6 @@ def forecastWeather(weather_text):
 
     for line in weather_text:
         items = list(filter(None, line.split(" ")))
-        print("ITEMS:", items)
 
         if len(items) < 1:
             continue
