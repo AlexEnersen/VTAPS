@@ -1,6 +1,10 @@
 {% extends "game/base.html" %} {% block content %}
 <div>
-  <form action="" method="post">
+  <form
+    action=""
+    method="post"
+    onsubmit="this.querySelector('.continueButton').disabled = true;"
+  >
     {% csrf_token %}
     <div class="formContainer">
       <div class="hybridForm">

@@ -140,6 +140,7 @@ def weeklySelection(request, game):
 
     if request.method == "POST":
         if game.computing:
+            time.sleep(3)
             return None
         if (game.week == 11) or not game.initialized or 'hybrid' in request.POST:
 
@@ -193,7 +194,7 @@ def weeklySelection(request, game):
     if game.week > 11:
         gameOutputs = downloadOutputs(gamePath)
         if gameOutputs is False:
-            time.sleep(2)
+            time.sleep(3)
             return None
         game.computing = False
         game.save()
@@ -953,7 +954,7 @@ def computeDSSAT(hybrid, gameInputs, gamePath):
 
 def checkOutputs(gamePath):
 
-    timeout = time.time() + 60*5
+    timeout = time.time() + 60*10
 
     while time.time() < timeout:
         if checkBucket(gamePath):
