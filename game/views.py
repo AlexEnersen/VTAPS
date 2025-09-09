@@ -601,6 +601,7 @@ def plotOneAttribute(date, start_day, content, attribute, yaxis, title):
             days.append(int(adjusted_day))
             if attribute == "RDPD":
                 attribute_values.append(mmToInches(float(items[index]) * 1000))
+                print("ATT VALUES:", attribute_values)
             else:
                 attribute_values.append(float(items[index]))
 
