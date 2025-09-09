@@ -12,7 +12,6 @@ import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('agg')
 import io
-import shutil
 import zipfile
 import boto3
 import environ
