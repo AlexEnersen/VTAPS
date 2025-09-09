@@ -600,7 +600,7 @@ def plotOneAttribute(date, start_day, content, attribute, yaxis, title):
             adjusted_day = int(items[1]) - start_day
             days.append(int(adjusted_day))
             if attribute == "RDPD":
-                attribute_values.append(mmToInches(float(items[index])) * 100)
+                attribute_values.append(mmToInches(float(items[index]) * 1000))
             else:
                 attribute_values.append(float(items[index]))
 
@@ -803,7 +803,7 @@ def getRootDepth(date, gameOutputs):
         elif not reading and items[0] == "@YEAR":
             reading = True
         elif reading:
-            rootArray.append(mmToInches(float(items[33]) * 100))
+            rootArray.append(mmToInches(float(items[33]) * 1000))
             if int(items[1]) == day:
                 return rootArray
         
