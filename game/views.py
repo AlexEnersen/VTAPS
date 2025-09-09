@@ -727,8 +727,8 @@ def plotAquaSpy(date, start_day, gameInputs, gameOutputs, yAxis=-1):
     ax.fill_between(limitRange, ulimitArray, llimitArray, alpha=alpha)
     ax.plot(waterRange, waterArray, color="black")
     ax.set_xlabel('Days since planting')
-    ax.set_ylabel("Soil Water")
-    ax.set_title("Soil Water Growth Factor", fontsize=16)
+    ax.set_ylabel("Soil Water (in)")
+    ax.set_title("Cumulative Soil Water", fontsize=16)
     if yAxis != -1:
         ax.set_ylim([0, yAxis])
     else:
@@ -780,11 +780,10 @@ def plotWaterLayers(date, start_day, gameOutputs):
     for layer in desiredLayers:           
         ax.plot(layer)
     ax.set_xlabel('Days since planting')
-    ax.set_ylabel("Soil Water By Layer")
-    ax.set_yticks([])
+    ax.set_ylabel("Soil Water Layer")
     ax.legend(legendLayers, loc="upper right", bbox_to_anchor = (1.25, 1))
     # plt.yticks(range(1, layerNum+1), soilVolumes)
-    ax.set_title("Soil Water", fontsize=16)
+    ax.set_title("Soil Water By Depth", fontsize=16)
     imgdata = io.StringIO()
     fig.savefig(imgdata, format='svg')
     imgdata.seek(0)
@@ -805,7 +804,7 @@ def getRootDepth(date, gameOutputs):
         elif not reading and items[0] == "@YEAR":
             reading = True
         elif reading:
-            rootArray.append(float(items[33]) * 100 * 0.393701)
+            rootArray.append(float(items[33]) * 10 * 0.393701)
             if int(items[1]) == day:
                 return rootArray
         
