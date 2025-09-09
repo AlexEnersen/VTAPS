@@ -1,3 +1,6 @@
+.introText {
+  margin-bottom: 24px;
+}
 .formContainer {
   display: flex;
   flex-direction: row;
@@ -231,6 +234,7 @@ hr {
   margin-top: 36px;
 }
 .continueButton {
+  display: inline-block;
   border-radius: 6px;
   text-decoration: none;
   border: none;
