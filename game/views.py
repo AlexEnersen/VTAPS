@@ -99,6 +99,7 @@ def runGame(request, game_id=None):
             context['fert_form'] = fert_form
             return render(request, "game/init.html", context)
         else:
+            print("PROFILE WEEK:", gameProfile.week)
             if gameProfile.week < 22 and not gameProfile.finished:
             # if gameProfile.week <= 1 and not gameProfile.finished:
                 context = weeklySelection(request, gameProfile)
