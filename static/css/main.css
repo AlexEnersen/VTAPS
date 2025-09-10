@@ -83,7 +83,6 @@ select:focus-within {
   display: flex;
   flex-direction: row;
 }
-
 body {
   min-height: 100vh;
   width: 100%;

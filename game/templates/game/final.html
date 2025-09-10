@@ -4,6 +4,26 @@
     <div class="tableWrapper">
       <table class="finalTable">
         <tr class="infoRow">
+          <td class="alignLeft">Total Rainfall:</td>
+          <td>{{rain_amount|floatformat:2}} in.</td>
+        </tr>
+        <tr class="infoRow">
+          <td class="alignLeft">Total ET:</td>
+          <td>{{et_amount|floatformat:2}} in.</td>
+        </tr>
+        <tr class="infoRow">
+          <td class="alignLeft bold">Total Irrigation:</td>
+          <td class="bold">{{irr_amount|floatformat:2}} in.</td>
+        </tr>
+        <tr class="infoRow">
+          <td class="alignLeft bold">Total Nitrogen:</td>
+          <td class="bold">{{fert_amount|floatformat:0}} lbs.</td>
+        </tr>
+      </table>
+    </div>
+    <div class="tableWrapper">
+      <table class="finalTable">
+        <tr class="infoRow">
           <td class="alignLeft">Irrigation Cost:</td>
           <td>${{irr_cost|floatformat:2}}</td>
         </tr>
@@ -20,36 +40,16 @@
           <td>${{total_cost|floatformat:2}}</td>
         </tr>
         <tr class="infoRow">
-          <td class="bold alignLeft">Total Yield:</td>
-          <td class="bold">{{yield|floatformat:2}}b</td>
+          <td class="bold alignLeft">Yield:</td>
+          <td class="bold">{{yield|floatformat:2}} bu</td>
         </tr>
         <tr class="infoRow">
           <td class="bold alignLeft">Cost per Bushel:</td>
-          <td class="bold">${{bushel_cost|floatformat:2}}/b</td>
+          <td class="bold">${{bushel_cost|floatformat:2}}/bu</td>
         </tr>
         <tr class="infoRow">
           <td class="bold alignLeft">Efficiency (WNIPI):</td>
           <td class="bold">{{WNIPI|floatformat:4}}</td>
-        </tr>
-      </table>
-    </div>
-    <div class="tableWrapper">
-      <table class="finalTable">
-        <tr class="infoRow">
-          <td class="alignLeft">Total Rainfall:</td>
-          <td>{{rain_amount|floatformat:2}}in.</td>
-        </tr>
-        <tr class="infoRow">
-          <td class="alignLeft">Total ET:</td>
-          <td>{{et_amount|floatformat:2}}in.</td>
-        </tr>
-        <tr class="infoRow">
-          <td class="alignLeft bold">Total Irrigation:</td>
-          <td class="bold">{{irr_amount|floatformat:2}}in.</td>
-        </tr>
-        <tr class="infoRow">
-          <td class="alignLeft bold">Total Fertilizer:</td>
-          <td class="bold">{{fert_amount|floatformat:0}}lbs.</td>
         </tr>
       </table>
     </div>

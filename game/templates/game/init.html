@@ -14,7 +14,57 @@
       <div class="fertForm">
         <h1 class="fertilizerH1">Fertilizer Pre-Selection</h1>
         <p class="italic">Can be changed later</p>
-        <div class="fertContainer">{{ fert_form }}</div>
+        <div class="fertContainer">
+          <div class="fertRow">
+            <div>{{ fert_form.week1.label_tag }}</div>
+            <div class="fertSelectRow">
+              <div class="fertSelect">{{ fert_form.week1 }}</div>
+              <div>lbs/acre</div>
+            </div>
+          </div>
+          <div class="fertRow">
+            <div>{{ fert_form.week6.label_tag }}</div>
+            <div class="fertSelectRow">
+              <div class="fertSelect">{{ fert_form.week6 }}</div>
+              <div>lbs/acre</div>
+            </div>
+          </div>
+          <div class="fertRow">
+            <div>{{ fert_form.week9.label_tag }}</div>
+            <div class="fertSelectRow">
+              <div class="fertSelect">{{ fert_form.week9 }}</div>
+              <div>lbs/acre</div>
+            </div>
+          </div>
+          <div class="fertRow">
+            <div>{{ fert_form.week10.label_tag }}</div>
+            <div class="fertSelectRow">
+              <div class="fertSelect">{{ fert_form.week10 }}</div>
+              <div>lbs/acre</div>
+            </div>
+          </div>
+          <div class="fertRow">
+            <div>{{ fert_form.week12.label_tag }}</div>
+            <div class="fertSelectRow">
+              <div class="fertSelect">{{ fert_form.week12 }}</div>
+              <div>lbs/acre</div>
+            </div>
+          </div>
+          <div class="fertRow">
+            <div>{{ fert_form.week14.label_tag }}</div>
+            <div class="fertSelectRow">
+              <div class="fertSelect">{{ fert_form.week14 }}</div>
+              <div>lbs/acre</div>
+            </div>
+          </div>
+          <div class="fertRow">
+            <div>{{ fert_form.week15.label_tag }}</div>
+            <div class="fertSelectRow">
+              <div class="fertSelect">{{ fert_form.week15 }}</div>
+              <div>lbs/acre</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <input class="continueButton" type="submit" value="Continue" />

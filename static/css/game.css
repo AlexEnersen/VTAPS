@@ -43,19 +43,29 @@
   font-size: 16px;
 }
 .fertContainer {
-  flex-grow: 2;
-  width: 75%;
+  /* flex-grow: 2; */
+  width: 100%;
   min-width: 500px;
   font-family: var(--sans-font);
 }
-.fertContainer div {
+.fertRow {
   display: flex;
   flex-direction: row;
+  align-items: center;
   justify-content: space-between;
 }
-.fertContainer div select {
+.fertSelectRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+.fertSelect {
   margin: 4px 0;
   width: 64px;
+  margin-right: 8px;
+}
+.fertSelect select {
+  width: 100%;
 }
 .bolded {
   font-weight: bold;

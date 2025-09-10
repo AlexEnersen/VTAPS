@@ -99,9 +99,8 @@ def runGame(request, game_id=None):
             context['fert_form'] = fert_form
             return render(request, "game/init.html", context)
         else:
-            print("PROFILE WEEK:", gameProfile.week)
             if gameProfile.week < 22 and not gameProfile.finished:
-            # if gameProfile.week <= 1 and not gameProfile.finished:
+            # if gameProfile.week <= 12 and not gameProfile.finished:
                 context = weeklySelection(request, gameProfile)
                 if context is None:
                     return redirect(game_url)
@@ -118,7 +117,8 @@ def runGame(request, game_id=None):
         gameProfile.save()
         if game_id is None:
             request.session['game_id'] = game.id
-        return render(request, "game/intro.html", context)
+        # return render(request, "game/intro.html", context)
+        return redirect(game_url)
 
 def weeklySelection(request, game):
     context = {}
@@ -602,7 +602,6 @@ def plotOneAttribute(date, start_day, content, attribute, yaxis, title):
             days.append(int(adjusted_day))
             if attribute == "RDPD":
                 attribute_values.append(mmToInches(float(items[index]) * 1000))
-                print("ATT VALUES:", attribute_values)
             else:
                 attribute_values.append(float(items[index]))
 
@@ -637,7 +636,7 @@ def getFinalYield(gameOutputs):
             readingVariables = True
         elif readingVariables and items[0].startswith('Yield'):
             finalYield = round(float(items[-2]) / 62.77, 1)
-            finalYield = finalYield * 0.854                     #Based on Rintu's Calibration (9/8/2025)
+            finalYield = finalYield / 0.845                     #Based on Rintu's Calibration (9/8/2025)
             return finalYield
 
 def plotAquaSpy(date, start_day, gameInputs, gameOutputs, yAxis=-1):
@@ -725,8 +724,11 @@ def plotAquaSpy(date, start_day, gameInputs, gameOutputs, yAxis=-1):
 
     fig, ax = plt.subplots()
 
-    ax.fill_between(limitRange, ulimitArray, llimitArray, alpha=alpha)
+    # ax.plot(limitRange, ulimitArray, color="indigo")
+    # ax.plot(limitRange, llimitArray, color="goldenrod")
     ax.plot(waterRange, waterArray, color="black")
+    ax.legend(["Soil Water"])
+    ax.fill_between(limitRange, ulimitArray, llimitArray, alpha=alpha)
     ax.set_xlabel('Days since planting')
     ax.set_ylabel("Soil Water (in)")
     ax.set_title("Cumulative Soil Water", fontsize=16)
@@ -782,6 +784,7 @@ def plotWaterLayers(date, start_day, gameOutputs):
         ax.plot(layer)
     ax.set_xlabel('Days since planting')
     ax.set_ylabel("Soil Water Layer")
+    ax.set_yticks([])
     ax.legend(legendLayers, loc="upper right", bbox_to_anchor = (1.25, 1))
     # plt.yticks(range(1, layerNum+1), soilVolumes)
     ax.set_title("Soil Water By Depth", fontsize=16)
