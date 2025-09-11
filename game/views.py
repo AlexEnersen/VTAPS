@@ -912,7 +912,8 @@ def getNitrogenUptake(date, gameOutputs):
             reading = True
         elif reading:
             if int(items[1]) == day:
-                return float(items[5]) * 8.92
+                # return float(items[5]) * 8.92
+                return float(items[5])
         
     return nitrogenUptake
 
