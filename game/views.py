@@ -99,8 +99,8 @@ def runGame(request, game_id=None):
             context['fert_form'] = fert_form
             return render(request, "game/init.html", context)
         else:
-            if gameProfile.week < 22 and not gameProfile.finished:
-            # if gameProfile.week <= 12 and not gameProfile.finished:
+            if gameProfile.week < 22 and not gameProfile.finished:              ##### NORMAL MODE
+            # if gameProfile.week <= 12 and not gameProfile.finished:           ##### FINAL PAGE    DEBUG MODE
                 context = weeklySelection(request, gameProfile)
                 if context is None:
                     return redirect(game_url)
@@ -303,7 +303,8 @@ def finalResults(request, game):
 
     WNIPI_yield = ((finalYield / controlFinalYield) - 1)
     WNIPI_irr = (1 + (sum(history['irr']) / sum(controlHistory['et'])))
-    WNIPI_N = (1 + (sum(history['fert']) / getNitrogenUptake(date, controlGameOutputs)))
+    N_uptake = getNitrogenUptake(date, controlGameOutputs)
+    WNIPI_N = (1 + (sum(history['fert']) / (N_uptake if N_uptake == 0 else 201)))
     WNIPI_total = (WNIPI_yield / (WNIPI_irr * WNIPI_N))
     context['WNIPI'] = round(WNIPI_total, 4)
     print("WNIPI:", context['WNIPI'])

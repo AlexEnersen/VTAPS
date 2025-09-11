@@ -78,27 +78,27 @@ def reset(response):
     # non_superusers.delete()
     return redirect("/")
 
-def downloadResults(response):
-    dataFrames = []
+# def downloadResults(response):
+#     dataFrames = []
 
-    keys = []
-    paginator = s3.get_paginator("list_objects_v2")
-    for page in paginator.paginate(Bucket='finalresultsbucket'):
-        for obj in page.get("Contents", []) or []:
-            key = obj["Key"]
-            keys.append(key)
+#     keys = []
+#     paginator = s3.get_paginator("list_objects_v2")
+#     for page in paginator.paginate(Bucket='finalresultsbucket'):
+#         for obj in page.get("Contents", []) or []:
+#             key = obj["Key"]
+#             keys.append(key)
 
-    for key in keys:
-        obj = s3.get_object(Bucket='finalresultsbucket', Key=key)
-        csv_str = obj["Body"].read().decode("utf-8")
-        df = pd.read_csv(StringIO(csv_str))
-        print("DF:", df)
-        dataFrames.append(df)
+#     for key in keys:
+#         obj = s3.get_object(Bucket='finalresultsbucket', Key=key)
+#         csv_str = obj["Body"].read().decode("utf-8")
+#         df = pd.read_csv(StringIO(csv_str))
+#         print("DF:", df)
+#         dataFrames.append(df)
 
-    outputDir = f'../finalResults'    
+#     outputDir = f'../finalResults'    
 
-    os.makedirs(outputDir, exist_ok=True)
-    singleCSV = pd.concat(dataFrames, ignore_index=True).sort_values(by="Team ID")
-    singleCSV.to_csv(f"{outputDir}/Day 2 Raw Results.csv", index=False)
+#     os.makedirs(outputDir, exist_ok=True)
+#     singleCSV = pd.concat(dataFrames, ignore_index=True).sort_values(by="Team ID")
+#     singleCSV.to_csv(f"{outputDir}/Day 2 Raw Results.csv", index=False)
     
-    return redirect("/")
+#     return redirect("/")
