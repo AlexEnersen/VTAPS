@@ -303,9 +303,10 @@ def finalResults(request, game):
 
     WNIPI_yield = ((finalYield / controlFinalYield) - 1)
     WNIPI_irr = (1 + (sum(history['irr']) / sum(controlHistory['et'])))
-    WNIPI_N = getNitrogenUptake(date, controlGameOutputs)
+    WNIPI_N = (1 + (sum(history['fert']) / getNitrogenUptake(date, controlGameOutputs)))
     WNIPI_total = (WNIPI_yield / (WNIPI_irr * WNIPI_N))
     context['WNIPI'] = round(WNIPI_total, 4)
+    print("WNIPI:", context['WNIPI'])
 
     context['irr_amount'] = sum(history['irr'])
     context['fert_amount'] = sum(history['fert'])
@@ -908,9 +909,8 @@ def getNitrogenUptake(date, gameOutputs):
         elif not reading and items[0] == "@YEAR":
             reading = True
         elif reading:
-            nitrogenUptake = float(items[5])
             if int(items[1]) == day:
-                return nitrogenUptake
+                return float(items[5]) * 8.92
         
     return nitrogenUptake
 

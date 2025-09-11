@@ -78,34 +78,27 @@ def reset(response):
     # non_superusers.delete()
     return redirect("/")
 
-def downloadResults(response, team_id):
-    csvFiles = listCSV(team_id)
+def downloadResults(response):
     dataFrames = []
-    for key in csvFiles:
-        obj = s3.get_object(Bucket='finalresultsbucket', Key=key)
-        csv_str = obj["Body"].read().decode("utf-8")
-        df = pd.read_csv(StringIO(csv_str))
-        df["source_file"] = key
-        dataFrames.append(df)
 
-    outputDir = f'../finalResults/{team_id}'    
-
-    os.makedirs(outputDir, exist_ok=True)
-    singleCSV = pd.concat(dataFrames, ignore_index=True)
-    singleCSV.to_csv(f"{outputDir}/{team_id}.csv", index=False)
-
-    averageCSV = singleCSV.select_dtypes(include="number").mean().round(4)
-    averageCSV.to_csv(f"{outputDir}/{team_id}-average.csv", index=False)
-    
-    return redirect("/")
-
-def listCSV(team_id) -> list[str]:
-    suffix = f"final_summary-{team_id}.csv"
     keys = []
     paginator = s3.get_paginator("list_objects_v2")
     for page in paginator.paginate(Bucket='finalresultsbucket'):
         for obj in page.get("Contents", []) or []:
             key = obj["Key"]
-            if key.endswith(suffix):
-                keys.append(key)
-    return keys
+            keys.append(key)
+
+    for key in keys:
+        obj = s3.get_object(Bucket='finalresultsbucket', Key=key)
+        csv_str = obj["Body"].read().decode("utf-8")
+        df = pd.read_csv(StringIO(csv_str))
+        print("DF:", df)
+        dataFrames.append(df)
+
+    outputDir = f'../finalResults'    
+
+    os.makedirs(outputDir, exist_ok=True)
+    singleCSV = pd.concat(dataFrames, ignore_index=True).sort_values(by="Team ID")
+    singleCSV.to_csv(f"{outputDir}/Day 2 Raw Results.csv", index=False)
+    
+    return redirect("/")
