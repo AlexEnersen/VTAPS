@@ -304,7 +304,7 @@ def finalResults(request, game):
     WNIPI_yield = ((finalYield / controlFinalYield) - 1)
     WNIPI_irr = (1 + (sum(history['irr']) / sum(controlHistory['et'])))
     N_uptake = getNitrogenUptake(date, controlGameOutputs)
-    WNIPI_N = (1 + (sum(history['fert']) / (N_uptake if N_uptake == 0 else 201)))
+    WNIPI_N = (1 + (sum(history['fert']) / (N_uptake if N_uptake > 0 else 201)))
     WNIPI_total = (WNIPI_yield / (WNIPI_irr * WNIPI_N))
     context['WNIPI'] = round(WNIPI_total, 4)
     print("WNIPI:", context['WNIPI'])
