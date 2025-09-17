@@ -151,15 +151,15 @@ def weeklySelection(request, game):
             game.team_id = request.POST['team_id']
 
             fertilizer_init = FertilizerInit(week1 = request.POST['week1'], week6 = request.POST['week6'], week9 = request.POST['week9'], week10 = request.POST['week10'], week12 = request.POST['week12'], week14 = request.POST['week14'], week15 = request.POST['week15'])
-            gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], request.POST['week1'], int(start_date) + (0 * 7))
-            gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], request.POST['week6'], int(start_date) + (5 * 7))
-            gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], request.POST['week9'], int(start_date) + (8 * 7))
-            gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], request.POST['week10'], int(start_date) + (9 * 7))
-            gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], [0.75], 0, int(start_date) + (6 * 7), 7)
-            gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], [0.75], 0, int(start_date) + (7 * 7), 8)
-            gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], [0.75], 0, int(start_date) + (8 * 7), 9)
-            gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], [0.75], 0, int(start_date) + (9 * 7), 10)
-            gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], [0.75], 0, int(start_date) + (10 * 7), 11)
+            # gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], request.POST['week1'], int(start_date) + (0 * 7))
+            # gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], request.POST['week6'], int(start_date) + (5 * 7))
+            # gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], request.POST['week9'], int(start_date) + (8 * 7))
+            # gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], request.POST['week10'], int(start_date) + (9 * 7))
+            # gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], [0.75], 0, int(start_date) + (6 * 7), 7)
+            # gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], [0.75], 0, int(start_date) + (7 * 7), 8)
+            # gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], [0.75], 0, int(start_date) + (8 * 7), 9)
+            # gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], [0.75], 0, int(start_date) + (9 * 7), 10)
+            # gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], [0.75], 0, int(start_date) + (10 * 7), 11)
             fertilizer_init.save()
             game.fert_id = fertilizer_init.id
 
