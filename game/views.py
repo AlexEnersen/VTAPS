@@ -687,6 +687,7 @@ def plotAquaSpy(date, start_day, gameInputs, gameOutputs, yAxis=-1):
             soilArray.append({'upperLimit': float(items[index]), 'lowerLimit': float(items[index2]), "depth": int(items[0])})
             if int(items[0]) > rootArray[-1]:
                 break
+    # print("SOIL ARRAY:", )
 
     readingWater = False
     index2 = -1
@@ -709,7 +710,7 @@ def plotAquaSpy(date, start_day, gameInputs, gameOutputs, yAxis=-1):
         elif len(items) > 1 and readingWater:
             if int(items[1]) < int(start_day):
                 continue
-            elif int(items[1]) > day:
+            elif int(items[1]) > day-8:
                 break
             else:
                 depthTracker = 0
@@ -730,6 +731,7 @@ def plotAquaSpy(date, start_day, gameInputs, gameOutputs, yAxis=-1):
                     depthTracker += soilDepth
 
                 rootDay += 1
+                print("")
                 waterArray.append(round(sum(currentArray), 3) / modifier)
                 ulimitArray.append(round(sum(ulimitTempArray), 3) / modifier)
                 llimitArray.append(round(sum(llimitTempArray), 3) / modifier)
