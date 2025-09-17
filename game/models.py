@@ -99,7 +99,7 @@ class GameProfile(models.Model):
     hybrid = models.CharField(max_length=8, choices=HYBRID_CHOICES, null=True, default=None)
     seeding_rate = models.IntegerField(choices=SEEDING_CHOICES, default=10000)
     team_id = models.IntegerField(null=True, blank=False)
-    week = models.IntegerField(default=11)
+    week = models.IntegerField(default=0)
     fert_id = models.IntegerField(default=-1, blank=False)
     initialized = models.BooleanField(default=False)
     computing = models.BooleanField(default=False)
@@ -116,10 +116,10 @@ class IrrigationEntries(models.Model):
     thursday = models.FloatField(choices=IRRIGATION_CHOICES, default=0)
 
 class FertilizerInit(models.Model):
-    week1 = models.IntegerField("Week 1, Pre-plant Nitrogen", blank=False, null=True, choices=FERT_CHOICES_1)
-    week6 = models.IntegerField("Week 6, Side-Dress Nitrogen", blank=False, null=True, choices=FERT_CHOICES_1)
-    week9 = models.IntegerField("Week 9, V9 Fertigation Nitrogen", blank=False, null=True, choices=FERT_CHOICES_2)
-    week10 = models.IntegerField("Week 10, V12 Fertigation Nitrogen", blank=False, null=True, choices=FERT_CHOICES_2)
+    week1 = models.IntegerField("Week 1, Pre-plant Nitrogen", blank=False, default=0, choices=FERT_CHOICES_1)
+    week6 = models.IntegerField("Week 6, Side-Dress Nitrogen", blank=False, default=0, choices=FERT_CHOICES_1)
+    week9 = models.IntegerField("Week 9, V9 Fertigation Nitrogen", blank=False, default=0, choices=FERT_CHOICES_2)
+    week10 = models.IntegerField("Week 10, V12 Fertigation Nitrogen", blank=False, default=0, choices=FERT_CHOICES_2)
     week12 = models.IntegerField("Week 12, VT Fertigation Nitrogen", blank=False, default=0, choices=FERT_CHOICES_2)
     week14 = models.IntegerField("Week 14, R2 Fertigation Nitrogen", blank=False, default=0, choices=FERT_CHOICES_2)
     week15 = models.IntegerField("Week 15, R3 Fertigation Nitrogen", blank=False, default=0, choices=FERT_CHOICES_2)

@@ -142,7 +142,7 @@ def weeklySelection(request, game):
         if game.computing:
             time.sleep(3)
             return None
-        if (game.week == 11) or not game.initialized or 'hybrid' in request.POST:
+        if (game.week == 0) or not game.initialized or 'hybrid' in request.POST:
 
             request.session['start_date'] = start_date
             game.hybrid = request.POST['hybrid']
@@ -174,7 +174,7 @@ def weeklySelection(request, game):
             gameInputs['forecast_content'] = gameInputs['WTH_content']
             uploadInputs(gameInputs, gamePath)
             game.initialized = True
-            game.week = 11
+            game.week = 0
             gameInputs = downloadInputs(gamePath)
 
         else:
@@ -195,7 +195,7 @@ def weeklySelection(request, game):
     
     gameInputs = downloadInputs(gamePath)
     
-    if game.week > 11:
+    if game.week > 0:
         gameOutputs = downloadOutputs(gamePath)
         if gameOutputs is False:
             time.sleep(3)
@@ -298,18 +298,31 @@ def finalResults(request, game):
         computeDSSAT(game.hybrid, controlGameInputs, controlGamePath)
     controlGameOutputs = downloadOutputs(controlGamePath)
 
-    controlFinalYield = getFinalYield(controlGameOutputs)
     controlHistory = getHistory(date, start_day, controlGameInputs, controlGameOutputs)['history']
 
+    controlFinalYield = getFinalYield(controlGameOutputs)
     WNIPI_yield = ((finalYield / controlFinalYield) - 1)
-    WNIPI_irr = (1 + (sum(history['irr']) / sum(controlHistory['et'])))
-    N_uptake = getNitrogenUptake(date, controlGameOutputs)
-    # WNIPI_N = (1 + (sum(history['fert']) / (N_uptake if N_uptake > 0 else 201)))
-    # WNIPI_N = (1 + (N_uptake / 8.92))
-    WNIPI_N = N_uptake
-    WNIPI_total = (WNIPI_yield / (WNIPI_irr * WNIPI_N))
+    # print("YIELD:", finalYield)
+    # print("CONTROL YIELD:", controlFinalYield)
+    # print("WNIPI YIELD:", WNIPI_yield)
+
+    final_irr = sum(history['irr'])
+    control_et = sum(controlHistory['et'])
+    WNIPI_irr = (1 + (final_irr / control_et))
+    # print("IRRIGATION:", final_irr)
+    # print("CONTROL ET:", control_et)
+    # print("WNIPI IRRIGATION:", WNIPI_irr)
+
+    final_fert = sum(history['fert'])
+    control_fert_uptake = getNitrogenUptake(date, controlGameOutputs)
+    WNIPI_fert = (1 + (final_fert / control_fert_uptake))
+    # print("FERTILIZER:", final_fert)
+    # print("CONTROL FERTILIZER:", control_fert_uptake)
+    # print("WNIPI FERTILIZER:", WNIPI_fert)
+
+    WNIPI_total = (WNIPI_yield / (WNIPI_irr * WNIPI_fert))
     context['WNIPI'] = round(WNIPI_total, 4)
-    print("WNIPI:", context['WNIPI'])
+    # print("FINAL WNIPI:", context['WNIPI'])
 
     context['irr_amount'] = sum(history['irr'])
     context['fert_amount'] = sum(history['fert'])
@@ -902,8 +915,7 @@ def getHistory(date, start_day, gameInputs, gameOutputs):
 def getNitrogenUptake(date, gameOutputs):
     day = int(date[len(date) - 3:])
     reading = False
-    day = 0
-    nitrogenUptake = 0
+    nitrogenUptake = 0.00000001
 
     for line in gameOutputs['OPN_content']:
         items = list(filter(None, line.split(" ")))
@@ -912,7 +924,7 @@ def getNitrogenUptake(date, gameOutputs):
         elif not reading and items[0] == "@YEAR":
             reading = True
         elif reading:
-            nitrogenUptake = float(items[5])
+            nitrogenUptake = (float(items[5]) * 8.92) + 0.0000001
             if int(items[1]) == day:
                 return nitrogenUptake
         

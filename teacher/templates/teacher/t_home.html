@@ -1,4 +1,4 @@
-{% extends "t_base.html" %} {% block content %}
+{% extends "t_base.html" %} {% block content %} {% load static %}
 <div>
     <style>
         .gameList {
@@ -17,10 +17,15 @@
         {% if user.teacher.authorized %}
             <h2>Current Games</h2>
             <div class="gameList">
+                <a class="teacherGameLink createLink">   
+                    <img class="createIcon" src="{% static 'images/create-icon.svg' %}" alt="create" />
+                    <p class="createLinkText" href="/teacher/newGame">Create New Game</p>
+                </a>
                 {% for game in games %}
-                    <a href={{ game.url }} class="game">{{game.name}}</a>
+                    <a href={{ game.url }} class="teacherGameLink" >
+                        <p class="gameLink">{{game.name}}</p>
+                    </a>
                 {% endfor %}
-                <a href="/teacher/newGame">Create New Game</a>
             </div>
         {% elif user.teacher.confirmed %}
             <p>Your email needs to be confirmed by our administrator.</p>
@@ -28,7 +33,7 @@
             <h2>You still haven't confirmed your email yet</h2>
             <h3>Click <a href="/teacher/sendEmail">here</a> to send it again</h3>
         {% endif %}
-        <a class="home_button" href="/teacher/logout"><h1>Logout</h1></a>
+            <a href="/teacher/logout">Logout</a>
 
     {% else %}
         <div class="accountAuth">

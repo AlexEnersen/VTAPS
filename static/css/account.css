@@ -25,3 +25,48 @@
 .newGameContainer {
   width: 256px;
 }
+
+.teacherGameLink {
+  border: 1px solid var(--dark-border);
+  text-decoration: none;
+  border-radius: 4px;
+  width: 300px;
+  height: auto;
+  padding: 12px;
+  cursor: pointer;
+  margin: 4px 0;
+  background: var(--lighter-background-color);
+  transition: background-color 0.2s;
+}
+.teacherGameLink:hover {
+  background-color: var(--darker-background-color);
+}
+.gameLink {
+  color: var(--text-color);
+  font-size: 24px;
+}
+
+.createLink {
+  padding: 8px 16px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  color: var(--lighter-background-color);
+  font-weight: bold;
+  background-color: #666;
+  transition: background-color 0.2s;
+}
+.createLink:hover {
+  background-color: #444;
+  transition: background-color 0.2s;
+}
+.createLinkText {
+  color: var(--lighter-background-color);
+  font-size: 24px;
+}
+.createIcon {
+  height: 80%;
+  max-height: 42px;
+  width: auto;
+}
