@@ -174,3 +174,17 @@ def yearlyRandomizer():
                 newWeather += line
 
     return newWeather.split("\n")[5:]
+
+def changeWeatherYear(weatherText, year):
+    newText = []
+    for line in weatherText:
+        items = line.split(" ")
+        items = [x for x in items if x]
+        if len(items) == 0 or not items[0].isnumeric():
+            newText.append(line)
+            continue
+        newDate = str(year) + items[0][4:7]
+        newLine = newDate + line[7:]
+        newText.append(newLine)
+
+    return newText

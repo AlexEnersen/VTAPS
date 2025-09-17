@@ -163,15 +163,17 @@ def weeklySelection(request, game):
             fertilizer_init.save()
             game.fert_id = fertilizer_init.id
 
-            gameInputs['WTH_name'] = "NEME0000.WTH"
+            gameInputs['WTH_name'] = "NEME2001.WTH"
             # gameInputs['WTH_content'] = yearlyRandomizer()
             file = open("weather_files/NEME1901.WTH")
-            gameInputs['WTH_content'] = forecastWeather(file.read().split("\n"))
+            fileContents = file.read().split("\n")
+            # gameInputs['WTH_content'] = fileContents
+            gameInputs['WTH_content'] = changeWeatherYear(fileContents, 2020)
             file.close()
 
             altForecast = True
             # gameInputs['forecast_content'] = altForecastWeather(gameInputs['WTH_content']) if altForecast else forecastWeather(gameInputs['WTH_content'])
-            gameInputs['forecast_content'] = gameInputs['WTH_content']
+            gameInputs['forecast_content'] = forecastWeather(fileContents)
             uploadInputs(gameInputs, gamePath)
             game.initialized = True
             game.week = 0
@@ -194,12 +196,12 @@ def weeklySelection(request, game):
         return None
     
     gameInputs = downloadInputs(gamePath)
+    gameOutputs = downloadOutputs(gamePath)
+    if gameOutputs is False:
+        time.sleep(3)
+        return None
     
-    if game.week > 0:
-        gameOutputs = downloadOutputs(gamePath)
-        if gameOutputs is False:
-            time.sleep(3)
-            return None
+    if game.week > 1:
         game.computing = False
         game.save()
         context['aquaspy_graph'] = plotAquaSpy(date, start_day, gameInputs, gameOutputs)[0]
@@ -208,17 +210,17 @@ def weeklySelection(request, game):
         context['nitrogen_stress_graph'] = plotOneAttribute(date, start_day, gameOutputs['OPG_content'], 'NSTD', 'N Stress', 'Nitrogen Stress')
         context['water_layer_graph'] = plotWaterLayers(date, start_day, gameOutputs)
         
-        historyDict = getHistory(date, start_day, gameInputs, gameOutputs)
-        history = historyDict['history']
-        recentHistory = historyDict['recentHistory']
-        context['weekly_rain'] = round(sum(recentHistory['rain']), 2)
-        context['total_rain'] = round(sum(history['rain']), 2)
-        context['weekly_et'] = round(sum(recentHistory['et']), 2)
-        context['total_et'] = round(sum(history['et']), 2)
-        context['weekly_irr'] = round(sum(recentHistory['irr']), 2)
-        context['total_irr'] = round(sum(history['irr']), 2)
-        context['weekly_fert'] = round(sum(recentHistory['fert']), 2)
-        context['total_fert'] = round(sum(history['fert']), 2)
+    historyDict = getHistory(date, start_day, gameInputs, gameOutputs)
+    history = historyDict['history']
+    recentHistory = historyDict['recentHistory']
+    context['weekly_rain'] = round(sum(recentHistory['rain']), 2)
+    context['total_rain'] = round(sum(history['rain']), 2)
+    context['weekly_et'] = round(sum(recentHistory['et']), 2)
+    context['total_et'] = round(sum(history['et']), 2)
+    context['weekly_irr'] = round(sum(recentHistory['irr']), 2)
+    context['total_irr'] = round(sum(history['irr']), 2)
+    context['weekly_fert'] = round(sum(recentHistory['fert']), 2)
+    context['total_fert'] = round(sum(history['fert']), 2)
         
 
     gameInputs['MZX_content'] = gameInputs['MZX_content']
@@ -608,7 +610,7 @@ def plotOneAttribute(date, start_day, content, attribute, yaxis, title):
         items = list(filter(None, line.split(" ")))
         if len(items) <= 3 and not readingStress:
             continue
-        elif (readingStress and len(items) == 0) or (readingStress and int(items[1]) > day):
+        elif (readingStress and len(items) == 0) or (readingStress and int(items[1]) > day-8):
             break
         elif len(items) > 3 and not readingStress:
             if (items[0] == "@YEAR"):
@@ -687,7 +689,6 @@ def plotAquaSpy(date, start_day, gameInputs, gameOutputs, yAxis=-1):
             soilArray.append({'upperLimit': float(items[index]), 'lowerLimit': float(items[index2]), "depth": int(items[0])})
             if int(items[0]) > rootArray[-1]:
                 break
-    # print("SOIL ARRAY:", )
 
     readingWater = False
     index2 = -1
@@ -731,10 +732,9 @@ def plotAquaSpy(date, start_day, gameInputs, gameOutputs, yAxis=-1):
                     depthTracker += soilDepth
 
                 rootDay += 1
-                print("")
-                waterArray.append(round(sum(currentArray), 3) / modifier)
-                ulimitArray.append(round(sum(ulimitTempArray), 3) / modifier)
-                llimitArray.append(round(sum(llimitTempArray), 3) / modifier)
+                waterArray.append(round(sum(currentArray) / modifier, 3))
+                ulimitArray.append(round(sum(ulimitTempArray) / modifier, 3))
+                llimitArray.append(round(sum(llimitTempArray) / modifier, 3))
 
     limitRange = range(1, len(ulimitArray)+1)
     waterRange = range(1, len(waterArray)+1)
@@ -787,7 +787,7 @@ def plotWaterLayers(date, start_day, gameOutputs):
         elif len(items) > 1 and readingWater:
             if int(items[1]) < int(start_day):
                 continue
-            elif int(items[1]) > day:
+            elif int(items[1]) > day-8:
                 break
             else:
                 for index2, layer in enumerate(waterLayers):
@@ -853,7 +853,7 @@ def getHistory(date, start_day, gameInputs, gameOutputs):
         elif currDay >= day:
             break
         else:
-            rain = mmToInches(float(items[3]))
+            rain = mmToInches(float(items[4]))
             history['rain'].append(rain)
             if currDay >= day - 7:
                 recentHistory['rain'].append(rain)
@@ -1080,6 +1080,9 @@ def downloadOutputs(gamePath):
                 elif name[-4:] == '.OPN':
                     data['OPN_name'] = name
                     data['OPN_content'] = content
+                # elif name == 'WARNING.OUT':
+                #     for line in content:
+                #         print(line)
 
         return data
     except:
