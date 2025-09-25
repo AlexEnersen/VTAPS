@@ -685,7 +685,7 @@ def plotAquaSpy(date, start_day, gameInputs, gameOutputs, yAxis=-1):
         if len(items) == 0 and not readingSoil:
             continue
         elif len(items) > 0 and not readingSoil:
-            if (items[0] == '*NENP230018'):
+            if (items[0] == '*UNNP230018'):
                 readingFile = True
                 continue
             elif (readingFile and items[0] == "@" and items[1] == "SLB"):
@@ -749,6 +749,8 @@ def plotAquaSpy(date, start_day, gameInputs, gameOutputs, yAxis=-1):
     alpha=0.7
 
     fig, ax = plt.subplots()
+
+
 
     # ax.plot(limitRange, ulimitArray, color="indigo")
     # ax.plot(limitRange, llimitArray, color="goldenrod")
