@@ -4,16 +4,11 @@ from django.conf import settings
 from teacher.models import Game
 
 HYBRID_CHOICES = [
-    ('MZCER048', 'MZCER048')
-    # ('BRPI0202', 'BRPI0202'),
-    # ('EBPL8501', 'EBPL8501'),
-    # ('FLSC8101', 'FLSC8101'),
-    # ('GAGR0201', 'GAGR0201'),
-    # ('GHWA0401', 'GHWA0401'),
-    # ('IBWA8301', 'IBWA8301'),
-    # ('IUAF9901', 'IUAF9901'),
-    # ('SIAZ9601', 'SIAZ9601'),
-    # ('UFGA8201', 'UFGA8201')
+    ('IB2074 Channel213-19VTPRIB', 'Channel213-19VTPRIB'),
+    ('PC0006 Fontanelle 11D637', 'Fontanelle 11D637'),
+    ('IB2073 Pioneer 0801AM', 'Pioneer 0801AM'),
+    ('IB2072 Pioneer 1197AM', 'Pioneer 1197AM'),
+    ('IB1071 Pioneer 1366AML', 'Pioneer 1366AML'),
 ]
 
 SEEDING_CHOICES = [
@@ -96,7 +91,7 @@ FERT_CHOICES_2 = [
 class GameProfile(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
-    hybrid = models.CharField(max_length=8, choices=HYBRID_CHOICES, null=True, default=None)
+    hybrid = models.CharField(max_length=30, choices=HYBRID_CHOICES, null=True, default=None)
     seeding_rate = models.IntegerField(choices=SEEDING_CHOICES, default=10000)
     team_id = models.IntegerField(null=True, blank=False)
     week = models.IntegerField(default=0)

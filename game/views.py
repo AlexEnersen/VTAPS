@@ -99,8 +99,8 @@ def runGame(request, game_id=None):
             context['fert_form'] = fert_form
             return render(request, "game/init.html", context)
         else:
-            if gameProfile.week < 22 and not gameProfile.finished:              ##### NORMAL MODE
-            # if gameProfile.week <= 12 and not gameProfile.finished:           ##### FINAL PAGE    DEBUG MODE
+            # if gameProfile.week < 22 and not gameProfile.finished:              ##### NORMAL MODE
+            if gameProfile.week <= 1 and not gameProfile.finished:           ##### FINAL PAGE    DEBUG MODE
                 context = weeklySelection(request, gameProfile)
                 if context is None:
                     return redirect(game_url)
@@ -145,9 +145,13 @@ def weeklySelection(request, game):
         if (game.week == 0) or not game.initialized or 'hybrid' in request.POST:
 
             request.session['start_date'] = start_date
+
             game.hybrid = request.POST['hybrid']
+            gameInputs['MZX_content'] = setHybrid(gameInputs['MZX_content'], game.hybrid)
+
             game.seeding_rate = request.POST['seeding_rate']
             gameInputs['MZX_content'] = setSeedingRate(gameInputs['MZX_content'], game.seeding_rate)
+
             game.team_id = request.POST['team_id']
 
             fertilizer_init = FertilizerInit(week1 = request.POST['week1'], week6 = request.POST['week6'], week9 = request.POST['week9'], week10 = request.POST['week10'], week12 = request.POST['week12'], week14 = request.POST['week14'], week15 = request.POST['week15'])
@@ -283,7 +287,8 @@ def finalResults(request, game):
 
     context['bushel_cost'] = round(context['total_cost']/finalYield, 2)
     context['yield'] = finalYield
-
+    context['hybrid'] = " ".join(game.hybrid.split(" ")[1:])
+    print("CONTEXT HYBRID:", context['hybrid'])
     
     context['aquaspy_graph'], yAxis = plotAquaSpy(date, start_day, gameInputs, gameOutputs)
     context['nitrogen_stress_graph'] = plotOneAttribute(date, start_day, gameOutputs['OPG_content'], 'NSTD', 'N Stress', 'Nitrogen Stress')
@@ -964,11 +969,14 @@ def computeDSSAT(hybrid, gameInputs, gamePath):
     uploadInputs(gameInputs, gamePath) 
     zip_buffer = io.BytesIO()
 
+    subHybrid = list(filter(None, hybrid.split(" ")))[0]
+    commandString = "../../DSCSM048 %s A %s" % (subHybrid, gameInputs['MZX_name'])
+
     with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
         zip_file.writestr(gameInputs['MZX_name'], "\n".join(gameInputs['MZX_content']))
         zip_file.writestr(gameInputs['SOL_name'], "\n".join(gameInputs['SOL_content']))
         zip_file.writestr(gameInputs['WTH_name'], "\n".join(gameInputs['WTH_content']))
-        zip_file.writestr('command.ps1', "../../DSCSM048 %s A %s" % (hybrid, gameInputs['MZX_name']))
+        zip_file.writestr('command.ps1', commandString)
 
     zip_buffer.seek(0)     
 
@@ -1080,6 +1088,9 @@ def downloadOutputs(gamePath):
                 elif name[-4:] == '.OPN':
                     data['OPN_name'] = name
                     data['OPN_content'] = content
+                elif name[-4:] == '.INP':
+                    for line in content:
+                        print("INP LINE:", line)
                 # elif name == 'WARNING.OUT':
                 #     for line in content:
                 #         print(line)
@@ -1114,3 +1125,20 @@ def getRainiest():
                 finalSum = tempSum
                 finalName = fullPath
     print("RAINIEST NAME:", finalName)
+
+def setHybrid(content, hybrid):
+    isCultivar = False
+    newContent = []
+    for line in content:
+        items =  list(filter(None, line.split(" ")))
+        if isCultivar:
+            newLine = f" 1 MZ {hybrid}"
+            newContent.append(newLine)
+            isCultivar = False
+        else:
+            newContent.append(line)
+
+        if len(items) == 4 and items[2] == 'INGENO':
+            isCultivar = True
+
+    return newContent
