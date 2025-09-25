@@ -298,7 +298,9 @@ def finalResults(request, game):
     controlGameInputs = gameInputs.copy()
     with open(controlGameInputs['MZX_name'], 'r') as f:
         controlGameInputs['MZX_content'] = f.read().split("\n")
-
+        controlGameInputs['MZX_content'] = setHybrid(controlGameInputs['MZX_content'], game.hybrid)
+        gameInputs['MZX_content'] = setSeedingRate(gameInputs['MZX_content'], game.seeding_rate)
+ 
     controlGamePath = gamePath + 'control'
      
     if checkBucket(controlGamePath) == False:
@@ -1088,9 +1090,9 @@ def downloadOutputs(gamePath):
                 elif name[-4:] == '.OPN':
                     data['OPN_name'] = name
                     data['OPN_content'] = content
-                elif name[-4:] == '.INP':
-                    for line in content:
-                        print("INP LINE:", line)
+                # elif name[-4:] == '.INP':
+                #     for line in content:
+                #         print("INP LINE:", line)
                 # elif name == 'WARNING.OUT':
                 #     for line in content:
                 #         print(line)
