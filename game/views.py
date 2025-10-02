@@ -169,7 +169,7 @@ def weeklySelection(request, game):
 
             gameInputs['WTH_name'] = "NEME2001.WTH"
             # gameInputs['WTH_content'] = yearlyRandomizer()
-            file = open("weather_files/NEME1901.WTH")
+            file = open("weather_files/NEME1201.WTH")
             fileContents = file.read().split("\n")
             # gameInputs['WTH_content'] = fileContents
             gameInputs['WTH_content'] = changeWeatherYear(fileContents, 2020)
@@ -923,7 +923,6 @@ def getHistory(date, start_day, gameInputs, gameOutputs):
         if currDay < start_day:
             continue
         elif currDay >= day:
-            print("cUuUuUuUrRrRrEnT DaY:", currDay, ", and DAY:", day)
             break
         else:
             history['et'].append(mmToInches(float(items[10])))
@@ -1123,7 +1122,7 @@ def createCSV(team_id, irr_total, fert_total, final_yield, final_bushel_cost, fi
 def getRainiest():
     weatherFiles = os.listdir("weather_files")
     finalName = ""
-    finalSum = 0
+    finalSum = 99999
     for file in weatherFiles:
         fullPath = os.path.join("weather_files", file)
         with open(fullPath, 'r') as file:
@@ -1135,10 +1134,10 @@ def getRainiest():
                 if len(items) > 5 and items[0].isnumeric():
                     tempSum += float(items[4])
 
-            if tempSum > finalSum:
+            if tempSum < finalSum:
                 finalSum = tempSum
                 finalName = fullPath
-    print("RAINIEST NAME:", finalName)
+    print("UNRANIEST NAME:", finalName)
 
 def setHybrid(content, hybrid):
     isCultivar = False
