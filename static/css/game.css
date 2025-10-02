@@ -225,6 +225,7 @@ hr {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-items: flex-start;
   width: 100%;
 }
 /* .costTable {
@@ -244,7 +245,8 @@ hr {
   justify-content: space-between;
   margin-top: 36px;
 }
-.continueButton {
+.continueButton
+.ctaButton {
   display: inline-block;
   border-radius: 6px;
   text-decoration: none;

@@ -1,25 +1,13 @@
 {% extends "t_base.html" %} {% block content %} {% load static %}
 <div>
-    <style>
-        .gameList {
-            display: flex;
-            flex-direction: column
-        }
-        .game {
-            border: 1px solid black;
-            margin: 4px;
-            height: 60px;
-            width: 280px;
-        }
-    </style>
     {% if user.is_authenticated %}
         <h1>Welcome {{user.username}}</h1>
         {% if user.teacher.authorized %}
             <h2>Current Games</h2>
             <div class="gameList">
-                <a class="teacherGameLink createLink">   
+                <a class="teacherGameLink createLink" href="/teacher/newGame">   
                     <img class="createIcon" src="{% static 'images/create-icon.svg' %}" alt="create" />
-                    <p class="createLinkText" href="/teacher/newGame">Create New Game</p>
+                    <p class="createLinkText" >Create New Game</p>
                 </a>
                 {% for game in games %}
                     <a href={{ game.url }} class="teacherGameLink" >
@@ -33,13 +21,13 @@
             <h2>You still haven't confirmed your email yet</h2>
             <h3>Click <a href="/teacher/sendEmail">here</a> to send it again</h3>
         {% endif %}
-            <a href="/teacher/logout">Logout</a>
+            <a class="logoutButton" href="/teacher/logout">Logout</a>
 
     {% else %}
         <div class="accountAuth">
-            <h1>Teacher Account</h1>
-            <a class="home_button" href="/teacher/register"><h1>Register</h1></a>
-            <a class="home_button" href="/teacher/login"><h1>Login</h1></a>
+            <h1 class="header">Teacher Account</h1>
+            <a class="logoutButton homeButton" href="/teacher/login"><h1>Login</h1></a>
+            <a class="ctaButton homeButton homeButtonMain" href="/teacher/register"><h1>Register</h1></a>
         </div>
     {% endif %}
     {% endblock %}

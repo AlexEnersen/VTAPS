@@ -1,25 +1,35 @@
 {% extends "t_base.html" %} {% block content %}
 <div class="accountWrapper">
-  <h1>New Game</h1>
-  <h3>Current Players</h3>
-  {% for player in game.players %}
-  <div>{{player}}</div>
-  {% endfor %}
-  <h3>Add Players</h3>
-  <form method="post" class="column newGameContainer">
-      {% csrf_token %}
-      <label for="gameName">Game Title:</label>
-      <input type="text" id="gameName" name="gameName" placeholder="{{game.name}}"/>
-      <label for="players"></label>
-      <textarea
-        id="players"
-        name="players"
-        class="newGameTextBox"
-        placeholder="student1@gmail.com&#10;student2@gmail.com&#10;student3@gmail.com"
-      ></textarea>
-      <input type="submit" value="Add Players" />
-      <a href="{{game.url2}}">Create Game</a>
-  </form>
-  <a href="/teacher">Done</a>
+  <div class="row newGameContainer">
+    <div class="newGameSubContainer">
+      <h1>New Game</h1>
+      <p>Class Code: {{game.code}}</p>
+      <a class="secondaryButton" href="/teacher">Back</a>
+    </div>
+    <div class="newGameSubContainer">
+      <h3>Add Players</h3>
+      <form method="post" class="column">
+        {% csrf_token %}
+        <div class="row">
+          <label for="gameName" class="gameNameLabel">Game Title:</label>
+          <input
+            type="text"
+            id="gameName"
+            name="gameName"
+            class="gameName"
+            placeholder="{{game.name}}"
+          />
+        </div>
+        <label for="players"></label>
+        <textarea
+          id="players"
+          name="players"
+          class="newGameTextBox"
+          placeholder="student1@gmail.com&#10;student2@gmail.com&#10;student3@gmail.com"
+        ></textarea>
+        <input type="submit" value="Add Players" class="ctaButton"/>
+      </form>
+    </div>
+  </div>
 </div>
 {% endblock %}

@@ -37,11 +37,16 @@ def teacherHome(response):
         user.games = [game for game in user.games if game is not None]
         user.save()
         userGames = []
-        for game in user.games:
-            if game == None:
-                game.delete()
-            else:
-                userGames.append(Game.objects.get(id = game))
+        toDelete = []
+        for index, game in enumerate(user.games):
+            try:
+                gameObject = Game.objects.get(id = game)
+                userGames.append(gameObject)
+            except:
+                toDelete.append(index)
+        for dIndex in reversed(toDelete):
+            del user.games[dIndex]
+        user.save()
         return render(response, "teacher/t_home.html", {"user": user, "games": userGames})
 
 def teacherRegister(response):
@@ -85,31 +90,68 @@ def newGame(response):
 
     game = Game()
     game.save()
+    game.url = f"/teacher/game/{game.id}"
     teacher.games.append(game.id)
-    
-    
-    game.url = f"/teacher/editGame/{game.id}/"
-    game.url2 = f"/teacher/createGame/{game.id}/"
-    game.save()
 
+    while True:
+        code = ''.join(random.choice(string.digits) for _ in range(6))
+        if not Game.objects.filter(code=code).exists():
+            game.code = code
+            game.save()
+            break
+    
+    
     teacher.save()
 
     return redirect(game.url)
 
-def editGame(response, id):
+def game(response, id):
+    context = {}
     game = Game.objects.get(id = id)
-    if response.method == 'POST':
-        addedPlayers = response.POST['players'].split("\n")
-        for player in addedPlayers:
-            if player not in game.players:
-                game.players.append(player)
-
-        if response.POST.get('gameName') is not None:
+    if game.created == False:
+        if response.method == 'POST':
+            game.players = response.POST['players'].split("\n")
             game.name = response.POST['gameName']
-    
+            game.created = True
+            game.save()
+            return redirect(f"/teacher/game/{game.id}")
+        context = editGame(game)
+        return render(response, 'game/newgame.html', context)
+    elif game.passwordsFinished == False:
+        context = passwordPage(game)
+        return render(response, 'game/password_page.html', context)
+
+
+def editGame(game):
+    context = {}
+
+    game.name = "New Game"
     game.save()
 
-    return render(response, 'game/newgame.html', {"game": game})
+    context['game'] = game
+    return context
+
+
+def passwordPage(game):
+    context = {'players': [], "code": game.code}
+    for player in game.players:
+        if len(player) == 0:
+            continue
+        player = player.strip()  
+        characters = string.ascii_letters + string.digits
+        newPassword = ''.join(random.choice(characters) for _ in range(10))
+        print("PASS:", newPassword)
+        newUser = User(hiddenName=player, username=f"{player}-{game.id}", email=f"{player}-{game.id}@fakemail.com", password=newPassword)
+        newUser.save()
+        newPlayer = Student(user=newUser, code=game.code)
+        newPlayer.games.append(game.id)
+        newPlayer.save()
+        context['players'].append(newUser)
+        print("ADDING PLAYER:", newUser)
+    game.passwordsFinished = True
+    game.save()
+    return context
+
 
 def sendConfirmationEmail(user):
     try:

@@ -18,5 +18,7 @@ class Game(models.Model):
     name = models.CharField(max_length = 256, default=False)
     players = ArrayField(models.CharField(max_length = 256), default=list, blank=True)
     url = models.CharField(max_length = 256, default=False)
-    url2 = models.CharField(max_length = 256, default=False)
+
+    code = models.CharField(blank=True)
     created = models.BooleanField(default = False)
+    passwordsFinished = models.BooleanField(default = False)

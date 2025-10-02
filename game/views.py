@@ -251,13 +251,12 @@ def weeklySelection(request, game):
     total_irrigation_cost = getTotalIrrigationCost(gameInputs['MZX_content'], date)
     total_fertilizer_cost = getTotalFertilizerCost(gameInputs['MZX_content'], date)
 
+    context['seed_cost'] = round(getSeedCost(game.hybrid, game.seeding_rate), 2)
     context['irr_cost'] = round(total_irrigation_cost, 2)
     context['fert_cost'] = round(total_fertilizer_cost, 2)
-
-    # Insurance + Insecticide + Seeds
     context['other_costs'] = round(742.79, 2)
 
-    context['total_cost'] = round(context['irr_cost'] + context['fert_cost'] + context['other_costs'], 2)
+    context['total_cost'] = round(context['seed_cost'] + context['irr_cost'] + context['fert_cost'] + context['other_costs'], 2)
     context['bushel_cost'] = round(context['total_cost']/230, 2)
     
     return context
@@ -277,10 +276,11 @@ def finalResults(request, game):
     total_irrigation_cost = round(getTotalIrrigationCost(gameInputs['MZX_content'], date), 2)
     total_fertilizer_cost = round(getTotalFertilizerCost(gameInputs['MZX_content'], date), 2)
 
+    context['seed_cost'] = round(getSeedCost(game.hybrid, game.seeding_rate), 2)
     context['irr_cost'] = total_irrigation_cost
     context['fert_cost'] = total_fertilizer_cost
     context['other_costs'] = round(742, 2)
-    context['total_cost'] = round(total_irrigation_cost + total_fertilizer_cost + context['other_costs'], 2)
+    context['total_cost'] = round(context['seed_cost'] + context['irr_cost'] + context['fert_cost'] + context['other_costs'], 2)
 
     finalYield = getFinalYield(gameOutputs)
     history = getHistory(date, start_day, gameInputs, gameOutputs)['history']
@@ -288,7 +288,6 @@ def finalResults(request, game):
     context['bushel_cost'] = round(context['total_cost']/finalYield, 2)
     context['yield'] = finalYield
     context['hybrid'] = " ".join(game.hybrid.split(" ")[1:])
-    print("CONTEXT HYBRID:", context['hybrid'])
     
     context['aquaspy_graph'], yAxis = plotAquaSpy(date, start_day, gameInputs, gameOutputs)
     context['nitrogen_stress_graph'] = plotOneAttribute(date, start_day, gameOutputs['OPG_content'], 'NSTD', 'N Stress', 'Nitrogen Stress')
@@ -298,8 +297,8 @@ def finalResults(request, game):
     controlGameInputs = gameInputs.copy()
     with open(controlGameInputs['MZX_name'], 'r') as f:
         controlGameInputs['MZX_content'] = f.read().split("\n")
-        controlGameInputs['MZX_content'] = setHybrid(controlGameInputs['MZX_content'], game.hybrid)
-        gameInputs['MZX_content'] = setSeedingRate(gameInputs['MZX_content'], game.seeding_rate)
+    controlGameInputs['MZX_content'] = setHybrid(controlGameInputs['MZX_content'], game.hybrid)
+    controlGameInputs['MZX_content'] = setSeedingRate(controlGameInputs['MZX_content'], game.seeding_rate)
  
     controlGamePath = gamePath + 'control'
      
@@ -311,27 +310,27 @@ def finalResults(request, game):
 
     controlFinalYield = getFinalYield(controlGameOutputs)
     WNIPI_yield = ((finalYield / controlFinalYield) - 1)
-    # print("YIELD:", finalYield)
-    # print("CONTROL YIELD:", controlFinalYield)
-    # print("WNIPI YIELD:", WNIPI_yield)
+    print("YIELD:", finalYield)
+    print("CONTROL YIELD:", controlFinalYield)
+    print("WNIPI YIELD:", WNIPI_yield)
 
     final_irr = sum(history['irr'])
     control_et = sum(controlHistory['et'])
     WNIPI_irr = (1 + (final_irr / control_et))
-    # print("IRRIGATION:", final_irr)
-    # print("CONTROL ET:", control_et)
-    # print("WNIPI IRRIGATION:", WNIPI_irr)
+    print("IRRIGATION:", final_irr)
+    print("CONTROL ET:", control_et)
+    print("WNIPI IRRIGATION:", WNIPI_irr)
 
     final_fert = sum(history['fert'])
     control_fert_uptake = getNitrogenUptake(date, controlGameOutputs)
     WNIPI_fert = (1 + (final_fert / control_fert_uptake))
-    # print("FERTILIZER:", final_fert)
-    # print("CONTROL FERTILIZER:", control_fert_uptake)
-    # print("WNIPI FERTILIZER:", WNIPI_fert)
+    print("FERTILIZER:", final_fert)
+    print("CONTROL FERTILIZER:", control_fert_uptake)
+    print("WNIPI FERTILIZER:", WNIPI_fert)
 
     WNIPI_total = (WNIPI_yield / (WNIPI_irr * WNIPI_fert))
     context['WNIPI'] = round(WNIPI_total, 4)
-    # print("FINAL WNIPI:", context['WNIPI'])
+    print("FINAL WNIPI:", context['WNIPI'])
 
     context['irr_amount'] = sum(history['irr'])
     context['fert_amount'] = sum(history['fert'])
@@ -525,7 +524,7 @@ def getWeather(date, gameInputs):
             
             weatherDay = items[0][len(items[0]) - 3:]
 
-            if weatherDay == day:
+            if weatherDay == str(int(day)-7):
                 dateFound = True
 
             if dateFound:
@@ -633,10 +632,12 @@ def plotOneAttribute(date, start_day, content, attribute, yaxis, title):
 
     #REFERENCE FOR CODE TO DISPLAY GRAPH IN TEMPLATE: https://stackoverflow.com/questions/40534715/how-to-embed-matplotlib-graph-in-django-webpage
     fig, ax = plt.subplots()
-    ax.plot(attribute_values)
+    ax.plot(range(1, len(attribute_values)+1), attribute_values)
     # ax.legend(loc='upper left')
     ax.set_xlabel('Days since planting')
     ax.set_ylabel(yaxis)
+    for d in range(7, len(attribute_values), 7):
+        ax.axvline(x=d, color="gray", linestyle=":", linewidth=1)
     if attribute == 'RDPD':
         ax.invert_yaxis()
     if attribute == 'GSTD':
@@ -718,7 +719,7 @@ def plotAquaSpy(date, start_day, gameInputs, gameOutputs, yAxis=-1):
         elif len(items) > 1 and readingWater:
             if int(items[1]) < int(start_day):
                 continue
-            elif int(items[1]) > day-8:
+            elif int(items[1]) >= day-7:
                 break
             else:
                 depthTracker = 0
@@ -739,13 +740,14 @@ def plotAquaSpy(date, start_day, gameInputs, gameOutputs, yAxis=-1):
                     depthTracker += soilDepth
 
                 rootDay += 1
+                
                 waterArray.append(round(sum(currentArray) / modifier, 3))
                 ulimitArray.append(round(sum(ulimitTempArray) / modifier, 3))
                 llimitArray.append(round(sum(llimitTempArray) / modifier, 3))
 
     limitRange = range(1, len(ulimitArray)+1)
     waterRange = range(1, len(waterArray)+1)
-    
+
     alpha=0.7
 
     fig, ax = plt.subplots()
@@ -760,6 +762,10 @@ def plotAquaSpy(date, start_day, gameInputs, gameOutputs, yAxis=-1):
     ax.set_xlabel('Days since planting')
     ax.set_ylabel("Soil Water (in)")
     ax.set_title("Cumulative Soil Water", fontsize=16)
+
+    for d in range(7, len(waterRange), 7):
+        ax.axvline(x=d, color="gray", linestyle=":", linewidth=1)
+
     if yAxis != -1:
         ax.set_ylim([0, yAxis])
     else:
@@ -794,9 +800,9 @@ def plotWaterLayers(date, start_day, gameOutputs):
                 index = items.index("SW1D")
                 readingWater = True
         elif len(items) > 1 and readingWater:
-            if int(items[1]) < int(start_day):
+            if int(items[1]) <= int(start_day):
                 continue
-            elif int(items[1]) > day-8:
+            elif int(items[1]) > day-7:
                 break
             else:
                 for index2, layer in enumerate(waterLayers):
@@ -809,7 +815,10 @@ def plotWaterLayers(date, start_day, gameOutputs):
     box = ax.get_position()
     ax.set_position([box.x0, box.y0, box.width * 0.85, box.height])
     for layer in desiredLayers:           
-        ax.plot(layer)
+        ax.plot(range(1, len(layer)+1, 1), layer)
+        
+    for d in range(7, len(desiredLayers[0]), 7):
+        ax.axvline(x=d, color="gray", linestyle=":", linewidth=1)
     ax.set_xlabel('Days since planting')
     ax.set_ylabel("Soil Water Layer")
     ax.set_yticks([])
@@ -844,7 +853,7 @@ def getRootDepth(date, gameOutputs):
 
 def getHistory(date, start_day, gameInputs, gameOutputs):
     
-    day = int(date[len(date) - 3:])
+    day = int(date[len(date) - 3:])-7
     date = int(date) - 7
     history = {"rain": [0.0], "et": [0.0], "irr": [0.0], "fert": [0.0]}
     recentHistory = {"rain": [0.0], "et": [0.0], "irr": [0.0], "fert": [0.0]}
@@ -914,6 +923,7 @@ def getHistory(date, start_day, gameInputs, gameOutputs):
         if currDay < start_day:
             continue
         elif currDay >= day:
+            print("cUuUuUuUrRrRrEnT DaY:", currDay, ", and DAY:", day)
             break
         else:
             history['et'].append(mmToInches(float(items[10])))
@@ -1146,3 +1156,7 @@ def setHybrid(content, hybrid):
             isCultivar = True
 
     return newContent
+
+def getSeedCost(hybrid, seeding_rate):
+    seedCosts = {'IB2074 Channel213-19VTPRIB': 288.00, 'PC0006 Fontanelle 11D637': 255.00, 'IB2073 Pioneer 0801AM': 225.00, 'IB2072 Pioneer 1197AM': 224.00, 'IB1071 Pioneer 1366AML': 295.00}
+    return (seedCosts[hybrid]/80000) * seeding_rate

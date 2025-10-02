@@ -10,11 +10,13 @@ class RegisterStudentForm(UserCreationForm):
     class Meta:
         model = User
         widgets = {'password': forms.PasswordInput()}
-        fields = ["username", "email"]
+        fields = ["username"]
 
 
 class LoginStudentForm(AuthenticationForm):
-    password = forms.PasswordInput()
+    class_code = forms.CharField(max_length=16, label="Class Code")
+    local_username = forms.CharField(max_length=64, label="Username")
+    password = forms.CharField(widget=forms.PasswordInput)
 
 class ConfirmStudentForm(forms.Form):
     password = forms.CharField(

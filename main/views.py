@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.sessions.models import Session
 from django.contrib.auth import get_user_model
 from main.models import User
-from teacher.models import Teacher
+from teacher.models import Teacher, Game
 from student.models import Student
 from game.models import GameProfile
 import boto3
@@ -68,14 +68,16 @@ def reset(response):
     currentGames.delete()
     if game_id:
         del response.session['game_id']
+
     # Teacher.objects.all().delete()
     # Student.objects.all().delete()
     # GameProfile.objects.all().delete()
+    # Game.objects.all().delete()
 
     # print(User.objects.filter(is_superuser = False, teacher__isnull = True))
+    non_superusers = User.objects.filter(is_superuser = False)
+    non_superusers.delete()
 
-    # non_superusers = User.objects.filter(is_superuser = False, teacher__isnull = True   )
-    # non_superusers.delete()
     return redirect("/")
 
 def downloadResults(response):

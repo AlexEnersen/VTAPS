@@ -6,10 +6,10 @@ from django.conf import settings
 
 class Student(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-
     confirmed = models.BooleanField(default = False)        #Email Confirmed
 
     games = ArrayField(models.CharField(max_length = 256), default=list, blank=True)
+    code = models.CharField(max_length=6, blank=True)
 
     activation_key = models.CharField(max_length=40, default=None, null=True, unique=True)
     key_expires = models.IntegerField(default=time.time, blank=True)
