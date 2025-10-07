@@ -57,7 +57,7 @@ try:
         s3_secret_key = env('S3_SECRET_ACCESS_KEY')
 
     client_config = Config(
-        max_pool_connections=1
+        max_pool_connections=100
     )
 
     s3 = boto3.client("s3", aws_access_key_id=s3_access_key, aws_secret_access_key=s3_secret_key, config=client_config)
