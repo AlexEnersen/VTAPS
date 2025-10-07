@@ -298,7 +298,7 @@ def finalResults(request, game):
 
 
     controlGameInputs = gameInputs.copy()
-    with open(f'mzx_files/cleaned/{controlGameInputs['MZX_name']}', 'r') as f:
+    with open(f"mzx_files/cleaned/{controlGameInputs['MZX_name']}", 'r') as f:
         controlGameInputs['MZX_content'] = f.read().split("\n")
     controlGameInputs['MZX_content'] = setHybrid(controlGameInputs['MZX_content'], game.hybrid)
     controlGameInputs['MZX_content'] = setSeedingRate(controlGameInputs['MZX_content'], game.seeding_rate)
