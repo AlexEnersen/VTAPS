@@ -68,8 +68,9 @@ ALLOWED_HOSTS = ['127.0.0.1', 'localhost', ".awsapprunner.com", "vtaps.org"]
 
 CSRF_COOKIE_DOMAIN = 'vtaps.org'
 
-CSRF_TRUSTED_ORIGINS=['http://127.0.0.1', 'http://localhost', 'https://vtaps.org']
+CSRF_TRUSTED_ORIGINS=['http://127.0.0.1', 'http://localhost:8000', 'https://vtaps.org']
 
+SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
 
 

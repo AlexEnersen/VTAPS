@@ -21,6 +21,8 @@ from .functions.fileSearch import *
 import pandas as pd
 import csv
 from django.http import HttpResponseRedirect
+from botocore.config import Config
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
 
 environment = os.environ['ENV']
 
@@ -54,7 +56,11 @@ try:
         s3_access_key = env('S3_ACCESS_KEY_ID')
         s3_secret_key = env('S3_SECRET_ACCESS_KEY')
 
-    s3 = boto3.client("s3", aws_access_key_id=s3_access_key, aws_secret_access_key=s3_secret_key)
+    client_config = Config(
+        max_pool_connections=3
+    )
+
+    s3 = boto3.client("s3", aws_access_key_id=s3_access_key, aws_secret_access_key=s3_secret_key, config=client_config)
         
 except Exception as error:
     if environment == 'prod':
@@ -62,6 +68,8 @@ except Exception as error:
     else:
         print('Error:', error)
 
+@csrf_exempt 
+@csrf_protect
 def runGame(request, game_id=None):
     game_url = f'/game/{game_id}' if game_id is not None else '/game'
     context = {'game_url': game_url}
@@ -104,7 +112,6 @@ def runGame(request, game_id=None):
                 context = weeklySelection(request, gameProfile)
                 if context is None:
                     return redirect(game_url)
-                # elif "computing" in context or "computing" not in context:
                 # elif "computing" in context:
                 #     return render(request, "game/standby.html", context)
                 else:
@@ -127,9 +134,11 @@ def weeklySelection(request, game):
             
     gameInputs = {}
 
-    with open("UNLI2309.MZX", 'r') as f:
+    filename = 'UNLI2422.MZX'
+
+    with open(f'mzx_files/cleaned/{filename}', 'r') as f:
         gameInputs['MZX_content'] = f.read().split("\n")
-        gameInputs['MZX_name'] = 'UNLI2309.MZX'
+        gameInputs['MZX_name'] = filename
 
     start_date = str(int(getDate(gameInputs['MZX_content'])))
     start_day = int(start_date[len(start_date) - 3:])
@@ -137,11 +146,8 @@ def weeklySelection(request, game):
 
     context = {}
     fert_entry = -1
-
+    
     if request.method == "POST":
-        if game.computing:
-            time.sleep(3)
-            return None
         if (game.week == 0) or not game.initialized or 'hybrid' in request.POST:
 
             request.session['start_date'] = start_date
@@ -167,7 +173,7 @@ def weeklySelection(request, game):
             fertilizer_init.save()
             game.fert_id = fertilizer_init.id
 
-            gameInputs['WTH_name'] = "NEME2001.WTH"
+            gameInputs['WTH_name'] = "NEME2401.WTH"
             # gameInputs['WTH_content'] = yearlyRandomizer()
             file = open("weather_files/NEME1201.WTH")
             fileContents = file.read().split("\n")
@@ -190,11 +196,10 @@ def weeklySelection(request, game):
 
             fertilizerQuantity = request.POST.get('fertilizer')
             irrigationQuantity = getIrrigation(request)
-            
-            gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fertilizerQuantity, int(date)-7)
+            if not fertilizerQuantity == None:
+                gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fertilizerQuantity, int(date)-7)
             gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], irrigationQuantity, fertilizerQuantity, int(date)-7, game.week)
         computeDSSAT(game.hybrid, gameInputs, gamePath)
-
         game.week += 1
         game.save()
         return None
@@ -243,7 +248,6 @@ def weeklySelection(request, game):
     fform = FertilizerEntriesForm1(initial = {'fertilizer': fert_entry}) if game.week <= 6 else FertilizerEntriesForm2(initial = {'fertilizer': fert_entry})
     if fform.is_valid():
         fform.save()
-
     context['fform'] = fform
 
     context['weather'] = getWeather(date, gameInputs)
@@ -258,7 +262,6 @@ def weeklySelection(request, game):
 
     context['total_cost'] = round(context['seed_cost'] + context['irr_cost'] + context['fert_cost'] + context['other_costs'], 2)
     context['bushel_cost'] = round(context['total_cost']/230, 2)
-    
     return context
 
 def finalResults(request, game):
@@ -295,7 +298,7 @@ def finalResults(request, game):
 
 
     controlGameInputs = gameInputs.copy()
-    with open(controlGameInputs['MZX_name'], 'r') as f:
+    with open(f'mzx_files/cleaned/{controlGameInputs['MZX_name']}', 'r') as f:
         controlGameInputs['MZX_content'] = f.read().split("\n")
     controlGameInputs['MZX_content'] = setHybrid(controlGameInputs['MZX_content'], game.hybrid)
     controlGameInputs['MZX_content'] = setSeedingRate(controlGameInputs['MZX_content'], game.seeding_rate)
@@ -415,9 +418,9 @@ def addIrrigation(text, irrigationQuantity, fertilizerQuantity, date, week):
             quantity = inchesToMM(quantity)
             beforeSpaces = " " * (6 - len(quantity))
             if index == 0:
-                newString = " 1 %s IR001%s%s" % (date, beforeSpaces, quantity)
+                newString = " 1 %s IR004%s%s" % (date, beforeSpaces, quantity)
             elif index == 1:
-                newString = " 1 %s IR001%s%s" % (date+3, beforeSpaces, quantity)
+                newString = " 1 %s IR004%s%s" % (date+3, beforeSpaces, quantity)
             irrigationLines.append(newString)
 
     for i, line in enumerate(text):
@@ -458,20 +461,21 @@ def getTotalIrrigationCost(text, date):
 
         
 def addFertilizer(text, fertilizerQuantity, date):
-
-    if fertilizerQuantity == None or int(fertilizerQuantity) == 0:
+    fertilizerQuantity = round(float(fertilizerQuantity) * 1.12085)
+    
+    if fertilizerQuantity == None or fertilizerQuantity == 0:
         return text
 
     onFertilizer = False
 
-    beforeSpaces = " " * (6-len(fertilizerQuantity))
+    beforeSpaces = " " * (6-len(str(fertilizerQuantity)))
 
 
     for i, line in enumerate(text):
         if (line.startswith("@F")):
             onFertilizer = True
         if (onFertilizer and line == ""):
-            newString = " 1 %s FE001 AP001    10%s%s   -99   -99   -99   -99   -99 -99" % (str(date), beforeSpaces, fertilizerQuantity)
+            newString = " 1 %s FE036 AP004     3%s%s     0     0     0     0   -99 -99" % (str(date), beforeSpaces, fertilizerQuantity)
             text.insert(i, newString)
             onFertilizer = False
             return text
@@ -498,9 +502,9 @@ def getTotalFertilizerCost(text, date):
                     startIndex += 1
                     continue
                 if (i - startIndex < 3):
-                    totalFertilizerCost += (float(lines[5]) * 0.6) + 8.50
+                    totalFertilizerCost += (float(lines[5]) * 0.6 / 1.12085) + 8.50
                 else:
-                    totalFertilizerCost += (float(lines[5]) * 0.6) + 1.25
+                    totalFertilizerCost += (float(lines[5]) * 0.6 / 1.12085) + 1.25
             else:
                 break
 
@@ -907,7 +911,7 @@ def getHistory(date, start_day, gameInputs, gameOutputs):
 
         elif (onFertilizer):
             if (int(items[1]) < int(date)):
-                fertilizer = float(items[5])
+                fertilizer = float(items[5]) / 1.12085
                 history['fert'].append(fertilizer)
                 if (int(items[1]) >= int(date) - 7):
                     recentHistory['fert'].append(fertilizer)
@@ -1020,13 +1024,14 @@ def checkBucket(gamePath):
 
 def uploadInputs(gameInputs, gamePath):
 
+    filename = 'UNLI2422.MZX'
     zip_buffer = io.BytesIO()
 
     with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
         if 'MZX_name' not in gameInputs:
-            with open("UNLI2309.MZX", 'r') as f:
+            with open(f'mzx_files/cleaned/{filename}', 'r') as f:
                 contents = f.read()
-                zip_file.writestr("UNLI2309.MZX", contents)
+                zip_file.writestr(filename, contents)
         else:
             zip_file.writestr(gameInputs['MZX_name'], "\n".join(gameInputs['MZX_content']))
         
@@ -1101,13 +1106,15 @@ def downloadOutputs(gamePath):
                 elif name[-4:] == '.OPN':
                     data['OPN_name'] = name
                     data['OPN_content'] = content
-                # elif name[-4:] == '.INP':
-                #     for line in content:
-                #         print("INP LINE:", line)
+                elif name[-4:] == '.INP':
+                    for line in content:
+                        print("INP LINE:", line)
                 # elif name == 'WARNING.OUT':
                 #     for line in content:
                 #         print(line)
 
+        for line in data['OPG_content']:
+            print("DOWNLOAD OPG LINE:", line)
         return data
     except:
         return False
@@ -1157,5 +1164,5 @@ def setHybrid(content, hybrid):
     return newContent
 
 def getSeedCost(hybrid, seeding_rate):
-    seedCosts = {'IB2074 Channel213-19VTPRIB': 288.00, 'PC0006 Fontanelle 11D637': 255.00, 'IB2073 Pioneer 0801AM': 225.00, 'IB2072 Pioneer 1197AM': 224.00, 'IB1071 Pioneer 1366AML': 295.00}
-    return (seedCosts[hybrid]/80000) * seeding_rate
+    seedCosts = {'IB2074 Channel213-19VTPRIB': 3.38, 'PC0006 Fontanelle 11D637': 3.28, 'IB2073 Pioneer 0801AM': 2.81, 'IB2072 Pioneer 1197AM': 2.94, 'IB1071 Pioneer 1366AML': 3.04, 'IB1073 Pioneer 1185': 3.25}
+    return (seedCosts[hybrid]) * (seeding_rate/1000)

@@ -186,5 +186,4 @@ def changeWeatherYear(weatherText, year):
         newDate = str(year) + items[0][4:7]
         newLine = newDate + line[7:]
         newText.append(newLine)
-
     return newText

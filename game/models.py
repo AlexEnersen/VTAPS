@@ -9,6 +9,7 @@ HYBRID_CHOICES = [
     ('IB2073 Pioneer 0801AM', 'Pioneer 0801AM'),
     ('IB2072 Pioneer 1197AM', 'Pioneer 1197AM'),
     ('IB1071 Pioneer 1366AML', 'Pioneer 1366AML'),
+    ('IB1073 Pioneer 1185', 'Pioneer 1185')
 ]
 
 SEEDING_CHOICES = [
