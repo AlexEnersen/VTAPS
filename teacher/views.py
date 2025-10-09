@@ -12,6 +12,7 @@ import time
 from django.http import HttpResponse    
 import os
 from django.contrib.auth import get_user_model
+from uuid import uuid4
 
 environment = os.environ['ENV']
 
@@ -140,14 +141,11 @@ def passwordPage(game):
         player = player.strip()  
         characters = string.ascii_letters + string.digits
         newPassword = ''.join(random.choice(characters) for _ in range(10))
-        print("PASS:", newPassword)
-        newUser = User(hiddenName=player, username=f"{player}-{game.id}", email=f"{player}-{game.id}@fakemail.com", password=newPassword)
-        newUser.save()
-        newPlayer = Student(user=newUser, code=game.code)
-        newPlayer.games.append(game.id)
+        newUser = User.objects.create_user(username=uuid4().hex, password=newPassword)
+        newPlayer = Student(username=player, code=game.code, user=newUser)
+        newPlayer.game = game.id
         newPlayer.save()
-        context['players'].append(newUser)
-        print("ADDING PLAYER:", newUser)
+        context['players'].append({'username': player, 'password': newPassword})
     game.passwordsFinished = True
     game.save()
     return context

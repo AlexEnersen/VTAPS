@@ -8,6 +8,7 @@ class Teacher(models.Model):
 
     confirmed = models.BooleanField(default = False)        #Email Confirmed
     authorized = models.BooleanField(default = False)       #Authorized by superuser
+    email = models.EmailField(max_length = 256, unique=True, blank=True, null=False)
 
     games = ArrayField(models.CharField(max_length = 256), default=list, blank=True)
 

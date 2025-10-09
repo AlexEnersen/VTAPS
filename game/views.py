@@ -1113,8 +1113,6 @@ def downloadOutputs(gamePath):
                 #     for line in content:
                 #         print(line)
 
-        for line in data['OPG_content']:
-            print("DOWNLOAD OPG LINE:", line)
         return data
     except:
         return False

@@ -243,6 +243,11 @@ em {
   transition: border 0.2s;
 }
 
+.logoutButton {
+  margin-top: 24px;
+  font-size: 24px;
+}
+
 .homeButton {
   font-size: 12px;
   margin: 16px 0;

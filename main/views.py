@@ -73,10 +73,10 @@ def reset(response):
     # Student.objects.all().delete()
     # GameProfile.objects.all().delete()
     # Game.objects.all().delete()
-
-    # print(User.objects.filter(is_superuser = False, teacher__isnull = True))
     # non_superusers = User.objects.filter(is_superuser = False)
     # non_superusers.delete()
+    
+    # print(User.objects.filter(is_superuser = False, teacher__isnull = True))
 
     return redirect("/")
 

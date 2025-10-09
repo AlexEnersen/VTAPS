@@ -103,6 +103,11 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware'
 ]
 
+AUTHENTICATION_BACKENDS = [
+    'VTAPS.auth_backends.ClassScopedBackend',
+    "django.contrib.auth.backends.ModelBackend",  # keep default for admin/staff
+]
+
 ROOT_URLCONF = 'VTAPS.urls'
 
 TEMPLATES = [

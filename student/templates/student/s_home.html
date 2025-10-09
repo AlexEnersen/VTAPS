@@ -1,15 +1,12 @@
 {% extends "s_base.html" %} {% block content %}
 <div>
     <h1>Student Account</h1>
-    {% if student.confirmed%}
-    <p>Hello {{user.username}}</p>
+    <p>Hello {{student.username}}</p>
     {% for game in games %}
-        <a href="{% url 'game' game.id %}">{{game.name}}</p>
+        <a href="{% url 'game' game.id %}" class="gameLinkContainer">
+            <p class="gameLink">{{game.name}}</p>
+        </a>
     {% endfor %}
-    <a class="home_button" href="/student/logout">Logout</a>
-    {% else %}
-    <a class="home_button" href="/student/register"><h1>Register</h1></a>
-    <a class="home_button" href="/student/login"><h1>Login</h1></a>
-    {% endif %}
+    <a class="logoutButton" href="/student/logout">Logout</a>
     {% endblock %}
 </div>

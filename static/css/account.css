@@ -18,11 +18,11 @@
   font-size: 18px;
 }
 
-.teacherGameLink {
+.gameLinkContainer {
   border: 1px solid var(--dark-border);
   text-decoration: none;
   border-radius: 4px;
-  width: 300px;
+  width: 420px;
   height: auto;
   padding: 12px;
   cursor: pointer;
@@ -30,16 +30,15 @@
   background: var(--lighter-background-color);
   transition: background-color 0.2s;
 }
-.teacherGameLink:hover {
+.gameLinkContainer:hover {
   background-color: var(--darker-background-color);
 }
 .gameLink {
   color: var(--text-color);
-  font-size: 24px;
+  font-size: 32px;
 }
 
 .createLink {
-  padding: 8px 16px;
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
@@ -55,7 +54,7 @@
 }
 .createLinkText {
   color: var(--lighter-background-color);
-  font-size: 24px;
+  font-size: 32px;
 }
 .createIcon {
   height: 80%;

@@ -5,12 +5,12 @@
         {% if user.teacher.authorized %}
             <h2>Current Games</h2>
             <div class="gameList">
-                <a class="teacherGameLink createLink" href="/teacher/newGame">   
+                <a class="gameLinkContainer createLink" href="/teacher/newGame">   
                     <img class="createIcon" src="{% static 'images/create-icon.svg' %}" alt="create" />
                     <p class="createLinkText" >Create New Game</p>
                 </a>
                 {% for game in games %}
-                    <a href={{ game.url }} class="teacherGameLink" >
+                    <a href={{ game.url }} class="gameLinkContainer" >
                         <p class="gameLink">{{game.name}}</p>
                     </a>
                 {% endfor %}
