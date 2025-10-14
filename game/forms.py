@@ -6,7 +6,7 @@ from .models import IrrigationEntries, FertilizerEntries1, FertilizerEntries2, G
 class GameProfileForm(ModelForm):
     class Meta:
         model = GameProfile
-        fields = ['hybrid', 'seeding_rate', 'team_id']
+        fields = ['hybrid', 'seeding_rate']
 
 class IrrigationEntriesForm(ModelForm):
     class Meta:

@@ -1,5 +1,13 @@
 {% extends "game/base.html" %} {% block content %}
 <div class="weeklySection">
+  {% csrf_token %} {% if game_id != None %}
+  <div class="gameAccountHeader">
+    <div class="row center">
+      <p class="className">Room: {{ game_name }}</p>
+    </div>
+    <a href="/student/logout" class="logoutButton">Logout</a>
+  </div>
+  {% endif %}
   <p class="title">Week {{week}}/21</p>
   <div class="divRow">
     <div class="column weatherRow">
@@ -232,7 +240,12 @@
     </div>
   </div>
 
-  <form action="" method="post" class="formRow" onsubmit="this.querySelector('.continueButton').disabled = true;">
+  <form
+    action=""
+    method="post"
+    class="formRow"
+    onsubmit="this.querySelector('.continueButton').disabled = true;"
+  >
     <div class="subRow">
       <div class="inputRow">
         <p class="irrigationLabel">Monday Irrigation:</p>
@@ -251,7 +264,7 @@
       </div>
       {% endif %}
     </div>
-    
+
     <input type="submit" value="Continue" class="continueButton" />
   </form>
   {% if week > 1 %}

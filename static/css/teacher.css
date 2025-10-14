@@ -1,0 +1,49 @@
+.gameSummaryTable {
+  border: 2px solid black;
+  border-collapse: collapse;
+  margin-bottom: 24px;
+  max-width: 50%;
+}
+
+.gameSummaryRow {
+  width: 100%;
+}
+
+.nullWrapper tr {
+  background-color: grey;
+}
+
+.gameSummaryHeader {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.gameSummaryCell {
+  border-right: 1px solid black;
+  font-size: 20px;
+}
+
+.weekColumn {
+  display: flex;
+  flex-direction: column;
+  margin-left: 20px;
+  justify-content: flex-end;
+  height: 100%;
+}
+
+.weekChangeField {
+  font-size: 20px;
+  padding: 6px 12px;
+}
+
+.weekChangeField select {
+  height: 40px;
+}
+
+.weekButton {
+  border-radius: 6px;
+  font-size: 20px;
+  margin-left: 12px;
+  padding: 6px 12px;
+  font-weight: normal;
+}

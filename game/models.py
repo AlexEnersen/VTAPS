@@ -9,7 +9,7 @@ HYBRID_CHOICES = [
     ('IB2073 Pioneer 0801AM', 'Pioneer 0801AM'),
     ('IB2072 Pioneer 1197AM', 'Pioneer 1197AM'),
     ('IB1071 Pioneer 1366AML', 'Pioneer 1366AML'),
-    ('IB1073 Pioneer 1185', 'Pioneer 1185')
+    ('IB1073 Pioneer 1185', 'Pioneer 1185AM')
 ]
 
 SEEDING_CHOICES = [
@@ -94,7 +94,6 @@ class GameProfile(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     hybrid = models.CharField(max_length=30, choices=HYBRID_CHOICES, null=True, default=None)
     seeding_rate = models.IntegerField(choices=SEEDING_CHOICES, default=10000)
-    team_id = models.IntegerField(null=True, blank=False)
     week = models.IntegerField(default=0)
     fert_id = models.IntegerField(default=-1, blank=False)
     initialized = models.BooleanField(default=False)

@@ -3,11 +3,13 @@
   <div class="row newGameContainer">
     <div class="newGameSubContainer">
       <h1>New Game</h1>
-      <p>Class Code: {{game.code}}</p>
-      <a class="secondaryButton" href="/teacher">Back</a>
+      <div class="newGameColumn">
+        <p>Class Code: {{game.code}}</p>
+        <a class="secondaryButton" href="/teacher">Back</a>
+      </div>
     </div>
     <div class="newGameSubContainer">
-      <h3>Add Players</h3>
+      <h1>Add Players</h1>
       <form method="post" class="column">
         {% csrf_token %}
         <div class="row">

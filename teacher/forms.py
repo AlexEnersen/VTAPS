@@ -1,9 +1,10 @@
 from django import forms
+from django.forms import ModelForm
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
 from main.models import User
-from .models import Teacher
+from .models import Teacher, WeekEntries
 
 class RegisterTeacherForm(UserCreationForm):
     
@@ -22,7 +23,10 @@ class RegisterTeacherForm(UserCreationForm):
 class LoginTeacherForm(AuthenticationForm):
     password = forms.PasswordInput()
 
-
-
 class SuperuserForm(forms.Form):
     email = forms.CharField(label="email")
+
+class WeekForm(ModelForm):
+    class Meta:
+        model = WeekEntries
+        fields = '__all__'

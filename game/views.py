@@ -71,9 +71,6 @@ except Exception as error:
 @csrf_exempt 
 @csrf_protect
 def runGame(request, game_id=None):
-    game_url = f'/game/{game_id}' if game_id is not None else '/game'
-    context = {'game_url': game_url}
-    
     try:
         if game_id is None:   
             game_id = request.session.get('game_id', None) 
@@ -84,6 +81,9 @@ def runGame(request, game_id=None):
             game.save()
         else:
             return redirect("/")
+
+    game_url = f'/game/{game_id}' if game_id is not None else '/game'
+    context = {'game_url': game_url, "game_id": game_id, "game_name": game.name}
 
     if request.user.is_authenticated:
         user = request.user
@@ -107,7 +107,11 @@ def runGame(request, game_id=None):
             context['fert_form'] = fert_form
             return render(request, "game/init.html", context)
         else:
-            if gameProfile.week < 22 and not gameProfile.finished:              ##### NORMAL MODE
+            if gameProfile.week > game.weekLimit:
+                context['game_id'] = game_id
+                context['game_name'] = game.name
+                return render(request, "game/caughtup.html", context)
+            elif gameProfile.week < 22 and not gameProfile.finished:              ##### NORMAL MODE
             # if gameProfile.week <= 1 and not gameProfile.finished:            ##### FINAL PAGE    DEBUG MODE
                 context = weeklySelection(request, gameProfile)
                 if context is None:
@@ -115,6 +119,8 @@ def runGame(request, game_id=None):
                 # elif "computing" in context:
                 #     return render(request, "game/standby.html", context)
                 else:
+                    context['game_id'] = game_id
+                    context['game_name'] = game.name
                     return render(request, "game/weekly.html", context)
             else:
                 context = finalResults(request, gameProfile)
@@ -124,8 +130,8 @@ def runGame(request, game_id=None):
         gameProfile.save()
         if game_id is None:
             request.session['game_id'] = game.id
-        # return render(request, "game/intro.html", context)
-        return redirect(game_url)
+        return render(request, "game/intro.html", context)
+        # return redirect(game_url)
 
 def weeklySelection(request, game):
     context = {}
@@ -157,8 +163,6 @@ def weeklySelection(request, game):
 
             game.seeding_rate = request.POST['seeding_rate']
             gameInputs['MZX_content'] = setSeedingRate(gameInputs['MZX_content'], game.seeding_rate)
-
-            game.team_id = request.POST['team_id']
 
             fertilizer_init = FertilizerInit(week1 = request.POST['week1'], week6 = request.POST['week6'], week9 = request.POST['week9'], week10 = request.POST['week10'], week12 = request.POST['week12'], week14 = request.POST['week14'], week15 = request.POST['week15'])
             # gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], request.POST['week1'], int(start_date) + (0 * 7))

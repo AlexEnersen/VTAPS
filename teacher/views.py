@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
-from .forms import LoginTeacherForm, RegisterTeacherForm, SuperuserForm
+from .forms import LoginTeacherForm, RegisterTeacherForm, SuperuserForm, WeekForm
 from .models import Teacher, Game
 from student.models import Student
+from game.models import GameProfile
 from main.models import User
 from django.core import mail
 from django.core.mail import EmailMultiAlternatives
@@ -111,7 +112,11 @@ def game(response, id):
     game = Game.objects.get(id = id)
     if game.created == False:
         if response.method == 'POST':
-            game.players = response.POST['players'].split("\n")
+            players = []
+            for player in response.POST['players'].split("\n"):
+                player = player.replace("\r", "")
+                players.append(player)
+            game.players = players
             game.name = response.POST['gameName']
             game.created = True
             game.save()
@@ -120,7 +125,17 @@ def game(response, id):
         return render(response, 'game/newgame.html', context)
     elif game.passwordsFinished == False:
         context = passwordPage(game)
+        game.passwordsFinished = True
+        game.save()
         return render(response, 'game/password_page.html', context)
+    else:
+        if response.method == 'POST':
+            week = response.POST['week']
+            game.weekLimit = week
+            game.save()
+            return redirect(f"/teacher/game/{game.id}")
+        context = gamePage(game)
+        return render(response, 'game/student_page.html', context)
 
 
 def editGame(game):
@@ -136,18 +151,42 @@ def editGame(game):
 def passwordPage(game):
     context = {'players': [], "code": game.code}
     for player in game.players:
-        if len(player) == 0:
+        if len(player) <= 0:
             continue
+        
         player = player.strip()  
         characters = string.ascii_letters + string.digits
         newPassword = ''.join(random.choice(characters) for _ in range(10))
+
         newUser = User.objects.create_user(username=uuid4().hex, password=newPassword)
+        newUser.save()
         newPlayer = Student(username=player, code=game.code, user=newUser)
         newPlayer.game = game.id
         newPlayer.save()
+
         context['players'].append({'username': player, 'password': newPassword})
     game.passwordsFinished = True
     game.save()
+    return context
+
+def gamePage(game):
+    context = {'players': [], 'code': game.code}
+
+    weekForm = WeekForm(initial = {'week': game.weekLimit})
+    context['week_form'] = weekForm
+    context['week_limit'] = game.weekLimit
+
+    for player in game.players:
+        playerInfo = {'username': player}
+        student = Student.objects.get(username=player, code=game.code)
+        try:
+            gameProfile = GameProfile.objects.get(game=game, user=student.user)
+            playerInfo['week'] = gameProfile.week
+        except:
+            playerInfo['week'] = 0
+        
+        context['players'].append(playerInfo)
+
     return context
 
 

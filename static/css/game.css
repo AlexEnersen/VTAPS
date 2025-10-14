@@ -245,8 +245,7 @@ hr {
   justify-content: space-between;
   margin-top: 36px;
 }
-.continueButton
-.ctaButton {
+.continueButton .ctaButton {
   display: inline-block;
   border-radius: 6px;
   text-decoration: none;
@@ -292,7 +291,6 @@ hr {
   max-width: 500px;
   height: auto;
   box-sizing: border-box;
-  
 }
 .finalInfoContainer div {
   width: 99%;
@@ -328,4 +326,19 @@ hr {
 }
 .finalTable {
   width: 100%;
+}
+
+.gameAccountHeader {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin: -36px 0;
+}
+
+.className {
+  font-size: 52px;
+  text-decoration: none;
+  justify-content: flex-start;
 }

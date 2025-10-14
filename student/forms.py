@@ -51,3 +51,21 @@ class LoginStudentForm(forms.Form):
     
     def get_user(self):
         return self.user_cache
+    
+class NewPasswordForm(forms.Form):
+    password = forms.CharField(
+        label="New password",
+        widget=forms.PasswordInput(attrs={"autocomplete": "new-password"})
+    )
+    confirm_password = forms.CharField(
+        label="Confirm password",
+        widget=forms.PasswordInput(attrs={"autocomplete": "new-password"})
+    )
+
+    def clean(self):
+        cleaned = super().clean()
+        p1 = cleaned.get("password")
+        p2 = cleaned.get("confirm_password")
+        if p1 and p2 and p1 != p2:
+            self.add_error("confirm_password", "Passwords do not match.")
+        return cleaned
