@@ -1,38 +1,44 @@
 {% extends "t_base.html" %} {% block content %}
 <div class="accountWrapper">
-  <h1 class="header">Players</h1>
-  <div class="column">
-    <p class="weekChangeField">Code: {{code}}</p>
-    <p class="weekChangeField">Week Limit: {{week_limit}}</p>
-    <form method="post" class="row center">
-      {% csrf_token %}
-      <p class="weekChangeField">{{week_form.week}}</p>
-      <input
-        class="continueButton weekButton"
-        type="submit"
-        value="Change Week Limit"
-      />
-    </form>
-    <table class="gameSummaryTable">
-      <tr class="gameSummaryRow">
-        <th class="gameSummaryCell gameSummaryHeader">Player</th>
-        <th class="gameSummaryCell gameSummaryHeader">Week</th>
-        <th class="gameSummaryCell gameSummaryHeader">Caught Up</th>
-      </tr>
-      {% for player in players %} {% if player.week > week_limit %}
-      <tr class="gameSummaryRow">
-        <td class="gameSummaryCell">{{player.username}}</td>
-        <td class="gameSummaryCell">{{player.week}}</td>
-        <td class="gameSummaryCell">X</td>
-      </tr>
-      {% else %}
-      <tr class="gameSummaryRow">
-        <td class="gameSummaryCell">{{player.username}}</td>
-        <td class="gameSummaryCell">{{player.week}}</td>
-        <td class="gameSummaryCell"></td>
-      </tr>
-      {% endif %} {% endfor %}
-    </table>
+  <div class="teacherGamePage">
+    <div class="teacherGameColumn">
+      <h1 class="header">Players</h1>
+      <table class="gameSummaryTable">
+        <tr class="gameSummaryRow">
+          <th class="gameSummaryCell gameSummaryHeader">Player</th>
+          <th class="gameSummaryCell gameSummaryHeader">Week</th>
+          <th class="gameSummaryCell gameSummaryHeader">Caught Up</th>
+        </tr>
+        {% for player in players %} {% if player.week > week_limit %}
+        <tr class="gameSummaryRow">
+          <td class="gameSummaryCell">{{player.username}}</td>
+          <td class="gameSummaryCell">{{player.week}}</td>
+          <td class="gameSummaryCell">X</td>
+        </tr>
+        {% else %}
+        <tr class="gameSummaryRow">
+          <td class="gameSummaryCell">{{player.username}}</td>
+          <td class="gameSummaryCell">{{player.week}}</td>
+          <td class="gameSummaryCell"></td>
+        </tr>
+        {% endif %} {% endfor %}
+      </table>
+      <p class="weekChangeField">Code: {{code}}</p>
+      <p class="weekChangeField">Week Limit: {{week_limit}}</p>
+      <form method="post" class="row center weekChangeField">
+        {% csrf_token %}
+        <p class="weekChangeField">{{week_form.week}}</p>
+        <input
+          class="continueButton weekButton"
+          type="submit"
+          value="Change Week Limit"
+        />
+      </form>
+    </div>
+    <div class="teacherGameColumn center">
+      <h1 class="header">Graphs</h1>
+      <div>{{ group_cost_graph | safe }}</div>
+    </div>
   </div>
   <a class="secondaryButton" href="/teacher">Back</a>
 </div>

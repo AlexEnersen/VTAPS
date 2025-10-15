@@ -71,18 +71,22 @@ except Exception as error:
 @csrf_exempt 
 @csrf_protect
 def runGame(request, game_id=None):
+
+    game_url = f'/game/{game_id}' if game_id is not None else '/game'
+
     try:
         if game_id is None:   
-            game_id = request.session.get('game_id', None) 
-        game = Game.objects.get(id=game_id)
+            current_id = request.session.get('game_id', None) 
+        else:
+            current_id = game_id
+        game = Game.objects.get(id=current_id)
     except Game.DoesNotExist:
         if game_id is None:
             game = Game()
             game.save()
         else:
             return redirect("/")
-
-    game_url = f'/game/{game_id}' if game_id is not None else '/game'
+        
     context = {'game_url': game_url, "game_id": game_id, "game_name": game.name}
 
     if request.user.is_authenticated:
@@ -265,6 +269,8 @@ def weeklySelection(request, game):
     context['other_costs'] = round(742.79, 2)
 
     context['total_cost'] = round(context['seed_cost'] + context['irr_cost'] + context['fert_cost'] + context['other_costs'], 2)
+    game.total_cost = context['total_cost']
+    game.save()
     context['bushel_cost'] = round(context['total_cost']/230, 2)
     return context
 
@@ -1110,9 +1116,9 @@ def downloadOutputs(gamePath):
                 elif name[-4:] == '.OPN':
                     data['OPN_name'] = name
                     data['OPN_content'] = content
-                elif name[-4:] == '.INP':
-                    for line in content:
-                        print("INP LINE:", line)
+                # elif name[-4:] == '.INP':
+                #     for line in content:
+                #         print("INP LINE:", line)
                 # elif name == 'WARNING.OUT':
                 #     for line in content:
                 #         print(line)

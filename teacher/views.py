@@ -12,8 +12,10 @@ import string
 import time
 from django.http import HttpResponse    
 import os
+import io
 from django.contrib.auth import get_user_model
 from uuid import uuid4
+import matplotlib.pyplot as plt
 
 environment = os.environ['ENV']
 
@@ -171,6 +173,7 @@ def passwordPage(game):
 
 def gamePage(game):
     context = {'players': [], 'code': game.code}
+    studentList = []
 
     weekForm = WeekForm(initial = {'week': game.weekLimit})
     context['week_form'] = weekForm
@@ -185,7 +188,10 @@ def gamePage(game):
         except:
             playerInfo['week'] = 0
         
+        studentList.append(student)
         context['players'].append(playerInfo)
+
+    context['group_cost_graph'] = groupCostGraph(game, studentList)
 
     return context
 
@@ -261,3 +267,34 @@ def createGame(response, id):
 
 
     return redirect('/teacher')
+
+def groupCostGraph(game, studentList):
+
+    costNames = []
+    costAmount = []
+
+    for student in studentList:
+        costNames.append(student.username)
+        try:
+            gameProfile = GameProfile.objects.get(user=student.user)
+            costAmount.append(gameProfile.total_cost)
+        except:
+            costAmount.append(0)
+
+    fig, ax = plt.subplots()
+
+
+    ax.bar(costNames, costAmount, color='skyblue')
+    ax.set_xlabel('Students')
+    ax.set_ylabel('Total Operational Costs')
+    ax.set_ylim(bottom=0)
+    fig.suptitle('Cost Per Student', fontsize=16)
+    
+    imgdata = io.StringIO()
+    fig.savefig(imgdata, format='svg')
+    imgdata.seek(0)
+    data = imgdata.getvalue()
+
+    plt.close(fig)
+    
+    return data

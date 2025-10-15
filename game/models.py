@@ -100,6 +100,8 @@ class GameProfile(models.Model):
     computing = models.BooleanField(default=False)
     finished = models.BooleanField(default=False)
 
+    total_cost = models.FloatField(default=0)
+
 class FertilizerEntries1(models.Model):
     fertilizer = models.IntegerField(blank=False, default=0, choices=FERT_CHOICES_1)
 

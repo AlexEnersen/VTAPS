@@ -1,8 +1,7 @@
 .gameSummaryTable {
   border: 2px solid black;
   border-collapse: collapse;
-  margin-bottom: 24px;
-  max-width: 50%;
+  max-width: 100%;
 }
 
 .gameSummaryRow {
@@ -33,11 +32,14 @@
 
 .weekChangeField {
   font-size: 20px;
-  padding: 6px 12px;
 }
 
 .weekChangeField select {
   height: 40px;
+}
+
+form.weekChangeField {
+  margin-bottom: 36px;
 }
 
 .weekButton {
@@ -46,4 +48,16 @@
   margin-left: 12px;
   padding: 6px 12px;
   font-weight: normal;
+}
+
+.teacherGamePage {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.teacherGameColumn {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
 }

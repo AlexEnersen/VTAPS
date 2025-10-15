@@ -1,26 +1,28 @@
-{% extends "game/base.html" %}
-{% block content %}
-  {% csrf_token %} {% if game_id != None %}
-  <div class="gameAccountHeader">
-    <div class="row center">
-      <p class="className">Room: {{ game_name }}</p>
-    </div>
-    <a href="/student/logout" class="logoutButton">Logout</a>
+{% extends "game/base.html" %} {% block content %} 
+{% csrf_token %} {% if game_id != None %}
+<div class="gameAccountHeader">
+  <div class="row center">
+    <p class="className">Room: {{ game_name }}</p>
   </div>
-  {% endif %}
+  <a href="/student/logout" class="logoutButton">Logout</a>
+</div>
+{% endif %}
 <h1>Introduction</h1>
 
+<a class="continueButton" href="{{ game_url }}">Continue</a>
+
 <p class="introText">
-  The Virtual Testing Ag Performance Solutions (VTAPS) has been modeled
-  around the highly successful TAPS (<a href="https://taps.unl.edu">taps.unl.edu</a>) program. In the TAPS
-  program farmers and other participants make a series of management decisions
-  as they respond to field, agronomic and technology based information. At the
-  end of the growing season, the TAPS participants see how they compare (rank)
-  against other participants in terms of profitability, irrigation and nitrogen
-  efficiency and crop yield. The TAPS program has helped participants in the
-  self-realization of management changes that need to be improved and
-  participants have adopted new technology and management practices on their
-  farming operation.
+  The Virtual Testing Ag Performance Solutions (VTAPS) was developed by the
+  University of Nebraska Extension and has been modeled around the highly
+  successful UNL-TAPS (<a href="https://taps.unl.edu">taps.unl.edu</a>) program.
+  In the TAPS program farmers and other participants make a series of management
+  decisions as they respond to field, agronomic and technologically based
+  information. At the end of the growing season, the TAPS participants see how
+  they compare (rank) against other participants in terms of profitability,
+  irrigation and nitrogen efficiency and crop yield. The TAPS program has helped
+  participants in the self-realization of management changes that need to be
+  improved, and participants have adopted new technology and management
+  practices on their farming operation as a result of participating in TAPS.
 </p>
 
 <p class="introText">
@@ -28,32 +30,87 @@
   could have a similar TAPS experience. VTAPS participants will select the
   hybrid and seeding rate they wish to plant. They will also be able to apply
   nitrogen fertilizer <em>(at $0.60 per pound)</em> for pre-plant
-  <em>($8.50 application cost)</em>, sidedress <em>($8.50 application cost)</em>
-  and five fertigation applications <em>($1.25 application cost)</em>.
-  Participants will also be able to apply irrigation water
-  <em>($6.10 per acre-inch)</em> twice during each week of the simulation
-  <em>(maximum of 1.0 inches per application)</em>. Other costs such as
-  machinery, materials, land taxes and opportunity costs amount to
-  <em>$745</em>. A complete budget is available at
-  <a href="https://taps.unl.edu/budget">taps.unl.edu/budget</a>. All the decisions and generated weather
-  information will be fed into a crop simulation model—Decision Support System
-  for Agrotechnology Transfer (DSSAT)—and results will be included in a weekly
-  summary. Participants will also have soil-moisture sensor information
-  showing soil moisture at various depths of the soil profile.
+  <em>($8.50 application cost)</em>, sidedress
+  <em>($8.50 application cost)</em> and five fertigation applications
+  <em>($1.25 application cost/ac)</em>. Participants will also be able to apply
+  irrigation water <em>($6.10 per acre inch)</em> twice during each week of the
+  simulation <em>(maximum of 1.0 inches per application)</em>. Other costs such
+  as machinery, materials, land taxes and opportunity costs amount to
+  <em>$742.79</em>. Cost of production is calculated on a weekly basis and
+  divided by the Farm Service Agency Annual Production History (APH) of 230
+  bushes per acre. The location of the field is North Platte, NE in a corn
+  soybean no-till crop rotation. The soil type is a Cozad Silt Loam soil, 2%
+  organic matter and water holding capacity of 1.81 inches/ft. Average residual
+  nitrogen at the beginning of the growing season is 20 pounds N per acre and
+  85% initial soil water content.
+</p>
+
+<p class="introText">
+  At the end of the simulation total cost is divided by the final yield. A
+  complete budget is available at:
+  <a href="https://taps.unl.edu/budget">taps.unl.edu/budget</a>. All the
+  decisions and generated weather information are fed into a crop simulation
+  model, Decision Support System for Agrotechnology Transfer (DSSAT) and results
+  are included in a weekly summary. Participants will also have soil moisture
+  sensor information showing soil moisture at various depths of the soil
+  profile.
 </p>
 
 <p class="introText">
   At the end of week 24 participants will be able to see their final yield, cost
   of production <em>($/bushel)</em> and nitrogen and irrigation efficiency
-  <em>(Water × Nitrogen Intensification Performance Index – WNIPI, Lo et al., 2019)</em>.
-  In a group simulation such as a crop production class, participants will see how
-  they rank in these same categories, allowing them to self-realize what areas
-  of their management decisions are the strongest and which ones could use some
-  improvement. Participants will also be able to see how much nitrogen has
-  potentially leached below the root zone. The single-player version of VTAPS
+  <em
+    >(Water × Nitrogen Intensification Performance Index – WNIPI, Lo et al.,
+    2019)</em
+  >. In a group simulation such as a crop production class, participants will
+  see how they rank in these same categories, allowing them to self-realize what
+  areas of their management decisions are the strongest and which ones could use
+  some improvement. Participants will also be able to see how much nitrogen has
+  potentially leached below the root zone. The single player version of VTAPS
   will allow participants to try to improve their yield, cost of production and
-  nitrogen and irrigation application efficiency with additional simulations.
+  nitrogen and irrigation application efficiency.
 </p>
 
-<a class="continueButton" href="{{ game_url }}">Continue</a>
+<p class="introText">
+  The VTAPS program was developed by Alex Enersen under the guidance of Dr.
+  Stephen Cooper, Executive Director at the J S Raikes School of Computer
+  Science & Management at UNL. The results of the VTAPS program have been
+  calibrated with six years of TAPS data from North Platte, NE by Rintu Sen and
+  Dr. Saleh Taghvaeian from the UNL Biological Systems Engineering Department.
+  The simulated weather data and weather forecasts have been developed by Dr.
+  Matt Stockton, UNL Extension Economist at North Platte.
+</p>
+
+<p class="introText">
+  A VTAPS curriculum has been developed for high school ag students to support
+  educational efforts with the VTAPS computer program and is available upon
+  request at taps@unl.edu . The curriculum has 15 lessons each on hybrid
+  selection, nitrogen management and irrigation management.
+</p>
+
+<p class="introText">
+  Thanks to the following VTAPS Development Committee for your input and
+  support: Alex Enersen, Stephen Cooper, Rintu Sen, Saleh Taghvaeian, Matt
+  Stockton, Dirk Charlson, Daran Rudnick, Vaishali Sharda, Krystle Rhoades and
+  Chris Proctor. Thanks to the VTAPS Advisory Committee: John Thorburn, Dave
+  Eigenberg, Lisa Kemp and Jennifer Swanson. A special thanks goes to Katie
+  Hickel, Elbert Traylor and Jessica Russell of the Nebraska Department of
+  Water, Energy and Environment, who helped fund this project through the 319
+  program and the Nebraska Association Resource Districts for funding the
+  development of the VTAPS project.
+</p>
+
+<p class="introText">Sincerely,</p>
+
+<p class="introText">
+  Chuck Burr <br />Nebraska Extension Educator & VTAPS Project Lead
+</p>
+
+<p class="introText">REFERENCES</p>
+
+<p class="introText">
+  Lo, T., Rudnick, D.R., Burr, C.A., Stockton, M.C., & Werle, R. (2019).
+  Approaches to evaluating grower irrigation and fertilizer nitrogen amount and
+  timing. Agricultural Water Management. 213: 693-706.
+</p>
 {% endblock %}
