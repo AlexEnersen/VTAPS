@@ -1,4 +1,13 @@
 {% extends "game/base.html" %} {% block content %} {% load static %}
+{% csrf_token %} {% if game_id != None %}
+<div class="gameAccountHeader">
+  <div class="column">
+    <p class="className">{{ username }}</p>
+    <p class="className marginLeft">Class: {{ game_name }}</p>
+  </div>
+  <a href="/student/logout" class="logoutButton">Logout</a>
+</div>
+{% endif %}
 <div class="finalSelection">
   <div class="finalInfoContainer">
     <div class="tableWrapper">
@@ -65,7 +74,9 @@
       <img class="downloadIcon" src="{% static 'images/download-icon.svg' %}" alt="" />
       Download Results
     </a> -->
-    <a class="downloadButton" href="/reset">Exit Game</a>
+    {% csrf_token %} {% if game_id == None %}
+      <a class="downloadButton" href="/reset">Exit Game</a>
+    {% endif %}
   </div>
   <div class="graphContainer">
     <div class="graphSubContainer">

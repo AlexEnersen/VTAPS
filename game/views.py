@@ -68,6 +68,8 @@ except Exception as error:
     else:
         print('Error:', error)
 
+FILENAME = 'UNLI2422.MZX'
+
 @csrf_exempt 
 @csrf_protect
 def runGame(request, game_id=None):
@@ -87,12 +89,16 @@ def runGame(request, game_id=None):
         else:
             return redirect("/")
         
-    context = {'game_url': game_url, "game_id": game_id, "game_name": game.name}
+    context = {'game_url': game_url}
 
     if request.user.is_authenticated:
         user = request.user
+        context['username'] = user.student.username
     else:
         user = None
+
+    context['game_id'] = game_id
+    context['game_name'] = game.name
 
     try:
         gameProfile = GameProfile.objects.get(game=game, user=user)
@@ -111,9 +117,7 @@ def runGame(request, game_id=None):
             context['fert_form'] = fert_form
             return render(request, "game/init.html", context)
         else:
-            if gameProfile.week > game.weekLimit:
-                context['game_id'] = game_id
-                context['game_name'] = game.name
+            if gameProfile.week > game.weekLimit and user != None:
                 return render(request, "game/caughtup.html", context)
             elif gameProfile.week < 22 and not gameProfile.finished:              ##### NORMAL MODE
             # if gameProfile.week <= 1 and not gameProfile.finished:            ##### FINAL PAGE    DEBUG MODE
@@ -125,9 +129,15 @@ def runGame(request, game_id=None):
                 else:
                     context['game_id'] = game_id
                     context['game_name'] = game.name
+                    if user != None:
+                        context['username'] = user.student.username
                     return render(request, "game/weekly.html", context)
             else:
                 context = finalResults(request, gameProfile)
+                context['game_id'] = game_id
+                context['game_name'] = game.name
+                if user != None:
+                    context['username'] = user.student.username
                 return render(request, "game/final.html", context)
     except GameProfile.DoesNotExist:
         gameProfile = GameProfile(game=game, user=user)
@@ -144,7 +154,7 @@ def weeklySelection(request, game):
             
     gameInputs = {}
 
-    filename = 'UNLI2422.MZX'
+    filename = FILENAME
 
     with open(f'mzx_files/cleaned/{filename}', 'r') as f:
         gameInputs['MZX_content'] = f.read().split("\n")
@@ -258,6 +268,12 @@ def weeklySelection(request, game):
         fform.save()
     context['fform'] = fform
 
+    
+
+    for line in gameInputs['MZX_content']:
+        print("LINE:", line)
+
+
     context['weather'] = getWeather(date, gameInputs)
 
     total_irrigation_cost = getTotalIrrigationCost(gameInputs['MZX_content'], date)
@@ -356,14 +372,7 @@ def finalResults(request, game):
     game.finished = True
     game.save()
 
-    csv = createCSV(game.team_id, context['irr_amount'], context['fert_amount'], context['yield'], context['bushel_cost'], context['WNIPI'])
-    s3.put_object(
-        Bucket="finalresultsbucket",
-        Key=f"{gamePath}/final_summary-{game.team_id}.csv",
-        Body=csv,
-        ContentType="text/csv",
-        ContentDisposition=f'attachment; filename="vtaps_game_{game.id}_summary.csv"',
-    )
+    # csv = createCSV(game.team_id, context['irr_amount'], context['fert_amount'], context['yield'], context['bushel_cost'], context['WNIPI'])
 
     return context
 
@@ -428,9 +437,9 @@ def addIrrigation(text, irrigationQuantity, fertilizerQuantity, date, week):
             quantity = inchesToMM(quantity)
             beforeSpaces = " " * (6 - len(quantity))
             if index == 0:
-                newString = " 1 %s IR004%s%s" % (date, beforeSpaces, quantity)
+                newString = " 1 %s IR001%s%s" % (date, beforeSpaces, quantity)
             elif index == 1:
-                newString = " 1 %s IR004%s%s" % (date+3, beforeSpaces, quantity)
+                newString = " 1 %s IR001%s%s" % (date+3, beforeSpaces, quantity)
             irrigationLines.append(newString)
 
     for i, line in enumerate(text):
@@ -1034,7 +1043,7 @@ def checkBucket(gamePath):
 
 def uploadInputs(gameInputs, gamePath):
 
-    filename = 'UNLI2422.MZX'
+    filename = FILENAME
     zip_buffer = io.BytesIO()
 
     with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
@@ -1132,6 +1141,15 @@ def createCSV(team_id, irr_total, fert_total, final_yield, final_bushel_cost, fi
     writer = csv.writer(buf)
     writer.writerow(["Team ID", "Irrigation Total", "Fertilizer Total", "Final Yield", "Cost Per Bushel", "WNIPI Score"])
     writer.writerow([team_id, irr_total, fert_total, final_yield, final_bushel_cost, final_wnipi])
+    
+    # s3.put_object(
+    #     Bucket="finalresultsbucket",
+    #     Key=f"{gamePath}/final_summary-{game.team_id}.csv",
+    #     Body=csv,
+    #     ContentType="text/csv",
+    #     ContentDisposition=f'attachment; filename="vtaps_game_{game.id}_summary.csv"',
+    # )
+
     return buf.getvalue().encode("utf-8-sig")
 
 def getRainiest():

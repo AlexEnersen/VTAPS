@@ -74,6 +74,9 @@ select:focus,
 select:focus-within {
   border-radius: 0px;
 }
+p {
+  font-size: 20px;
+}
 .bodyWrapper {
   padding: 0 1vw;
   padding-bottom: 36px;
@@ -145,6 +148,12 @@ body {
 }
 .alignLeft {
   text-align: left;
+}
+.marginBottom {
+  margin-bottom: 28px;
+}
+.marginLeft {
+  margin-left: 12px;
 }
 .tableWrapper {
   border: 2px solid #aaa;

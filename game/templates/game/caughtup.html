@@ -2,13 +2,16 @@
 <div class="weeklySection">
   {% csrf_token %} {% if game_id != None %}
   <div class="gameAccountHeader">
-    <div class="row center">
-      <p class="className">Room: {{ game_name }}</p>
+    <div class="column">
+      <p class="className">{{ username }}</p>
+      <p class="className marginLeft">Class: {{ game_name }}</p>
     </div>
     <a href="/student/logout" class="logoutButton">Logout</a>
   </div>
   {% endif %}
-  <p>You're all caught up!</p>
-  <p>Feel free to log out now</p>
+  <div class="caughtUpText">
+    <p class="caughtUpText">You're all caught up!</p>
+    <p class="caughtUpText">Feel free to log out now</p>
+  </div>
 </div>
 {% endblock %}

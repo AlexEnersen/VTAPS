@@ -68,7 +68,7 @@ def reset(response):
     currentGames.delete()
     if game_id:
         del response.session['game_id']
-
+        
     # Teacher.objects.all().delete()
     # Student.objects.all().delete()
     # GameProfile.objects.all().delete()

@@ -1,8 +1,9 @@
 {% extends "game/base.html" %} {% block content %} {% load static %} 
 {% csrf_token %} {% if game_id != None %}
 <div class="gameAccountHeader">
-  <div class="row center">
-    <p class="className">Room: {{ game_name }}</p>
+  <div class="column">
+    <p class="className">{{ username }}</p>
+    <p class="className marginLeft">Class: {{ game_name }}</p>
   </div>
   <a href="/student/logout" class="logoutButton">Logout</a>
 </div>

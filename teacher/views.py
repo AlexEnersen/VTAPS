@@ -37,7 +37,10 @@ def teacherHome(response):
         return render(response, "teacher/t_home.html", {"user": None, "authenticated": None})
     else:
         user = response.user
-        teacher = user.teacher
+        try:
+            teacher = user.teacher
+        except:
+            return redirect("/")
         user.games = [game for game in user.games if game is not None]
         user.save()
         userGames = []
@@ -98,7 +101,7 @@ def newGame(response):
     teacher.games.append(game.id)
 
     while True:
-        code = ''.join(random.choice(string.digits) for _ in range(6))
+        code = ''.join(random.choice(string.digits) for _ in range(4))
         if not Game.objects.filter(code=code).exists():
             game.code = code
             game.save()
@@ -151,22 +154,34 @@ def editGame(game):
 
 
 def passwordPage(game):
-    context = {'players': [], "code": game.code}
+    context = {'players': [], "code": game.code, 'url': f'/teacher/game/{game.id}'}
+    characters = string.ascii_letters + string.digits
+    
     for player in game.players:
         if len(player) <= 0:
             continue
         
         player = player.strip()  
-        characters = string.ascii_letters + string.digits
-        newPassword = ''.join(random.choice(characters) for _ in range(10))
+        newPassword = ''.join(random.choice(characters) for _ in range(6))
 
-        newUser = User.objects.create_user(username=uuid4().hex, password=newPassword)
-        newUser.save()
-        newPlayer = Student(username=player, code=game.code, user=newUser)
-        newPlayer.game = game.id
-        newPlayer.save()
+        try:
+            student = Student.objects.get(username=player, code=game.code)
+            user = student.user
 
-        context['players'].append({'username': player, 'password': newPassword})
+            if student.tempPassword:
+                user.set_password(newPassword)
+                user.save(update_fields=['password'])
+                context['players'].append({'username': student.username, 'password': newPassword})
+            else:
+                context['players'].append({'username': student.username, 'password': 'Already Created'})
+        except:
+            newUser = User.objects.create_user(username=uuid4().hex, password=newPassword)
+            newUser.save()
+            newPlayer = Student(username=player, code=game.code, user=newUser)
+            newPlayer.game = game.id
+            newPlayer.save()
+            context['players'].append({'username': player, 'password': newPassword})
+
     game.passwordsFinished = True
     game.save()
     return context
