@@ -45,7 +45,7 @@
   /* height: auto; */
 }
 .smallerHeaderLink {
-  max-height: 120px;
+  max-height: 140px;
   width: auto;
 }
 .headerImage {
@@ -59,8 +59,8 @@
 }
 .smallHeaderImage {
   height: auto;
-  width: 70%;
-  max-height: 80%;
+  width: 80%;
+  max-height: 90%;
 }
 select {
   padding: 4px 8px;
