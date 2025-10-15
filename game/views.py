@@ -437,9 +437,9 @@ def addIrrigation(text, irrigationQuantity, fertilizerQuantity, date, week):
             quantity = inchesToMM(quantity)
             beforeSpaces = " " * (6 - len(quantity))
             if index == 0:
-                newString = " 1 %s IR001%s%s" % (date, beforeSpaces, quantity)
+                newString = " 1 %s IR004%s%s" % (date, beforeSpaces, quantity)
             elif index == 1:
-                newString = " 1 %s IR001%s%s" % (date+3, beforeSpaces, quantity)
+                newString = " 1 %s IR004%s%s" % (date+3, beforeSpaces, quantity)
             irrigationLines.append(newString)
 
     for i, line in enumerate(text):
