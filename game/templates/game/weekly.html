@@ -9,7 +9,10 @@
     <a href="/student/logout" class="logoutButton">Logout</a>
   </div>
   {% endif %}
-  <p class="title">Week {{week}}/21</p>
+  <div class="titleContainer">
+    <p class="title">Week {{week}}/21</p>
+    <p class="subTitle">Next week</p>
+  </div>
   <div class="divRow">
     <div class="column weatherRow">
       <h1 class="date">{{weather.0.day|linebreaksbr}}</h1>
