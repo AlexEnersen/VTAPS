@@ -206,7 +206,8 @@ def gamePage(game):
         studentList.append(student)
         context['players'].append(playerInfo)
 
-    context['group_cost_graph'] = groupCostGraph(game, studentList)
+    context['group_cost_graph'] = groupAttributeGraph(game, studentList, 'Cost')
+    context['group_yield_graph'] = groupAttributeGraph(game, studentList, 'Yield')
 
     return context
 
@@ -283,7 +284,7 @@ def createGame(response, id):
 
     return redirect('/teacher')
 
-def groupCostGraph(game, studentList):
+def groupAttributeGraph(game, studentList, attribute):
 
     costNames = []
     costAmount = []
@@ -292,7 +293,10 @@ def groupCostGraph(game, studentList):
         costNames.append(student.username)
         try:
             gameProfile = GameProfile.objects.get(user=student.user)
-            costAmount.append(gameProfile.total_cost)
+            if attribute == 'Cost':
+                costAmount.append(gameProfile.total_cost)
+            elif attribute == 'Yield':
+                costAmount.append(gameProfile.projected_yield)
         except:
             costAmount.append(0)
 
@@ -301,7 +305,11 @@ def groupCostGraph(game, studentList):
 
     ax.bar(costNames, costAmount, color='skyblue')
     ax.set_xlabel('Students')
-    ax.set_ylabel('Total Operational Costs')
+    if attribute == 'Cost':
+        ylabel = 'Total Operational Costs'
+    elif attribute == 'Yield':
+        ylabel = 'Projected Yield'
+    ax.set_ylabel(ylabel)
     ax.set_ylim(bottom=0)
     fig.suptitle('Cost Per Student', fontsize=16)
     

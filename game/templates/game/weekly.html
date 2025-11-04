@@ -273,12 +273,14 @@
   </form>
   {% if week > 1 %}
   <hr />
-  <p class="title">Graphs</p>
-  <div class="graphContainer">
-    <div class="graphs">
-      <div>{{ aquaspy_graph | safe }}</div>
-      <div>{{ water_layer_graph | safe }}</div>
-      <div>{{ root_depth_graph | safe }}</div>
+  <div class="column wide">
+    <p class="title">Graphs</p>
+    <div class="graphContainer">
+      <div class="graphs">
+        <div>{{ aquaspy_graph | safe }}</div>
+        <div>{{ water_layer_graph | safe }}</div>
+        <div>{{ root_depth_graph | safe }}</div>
+      </div>
     </div>
   </div>
   {% endif %}

@@ -178,6 +178,7 @@ hr {
   flex-wrap: wrap;
   justify-content: space-evenly;
   align-items: center;
+  width: 100%;
 }
 .divRow {
   display: flex;
@@ -210,6 +211,7 @@ hr {
   font-size: 48px;
   margin: 0;
   font-weight: bold;
+  text-align: center;
 }
 .subTitle {
   font-size: 20px;

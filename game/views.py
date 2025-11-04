@@ -268,11 +268,6 @@ def weeklySelection(request, game):
         fform.save()
     context['fform'] = fform
 
-    
-
-    for line in gameInputs['MZX_content']:
-        print("LINE:", line)
-
 
     context['weather'] = getWeather(date, gameInputs)
 
@@ -286,6 +281,10 @@ def weeklySelection(request, game):
 
     context['total_cost'] = round(context['seed_cost'] + context['irr_cost'] + context['fert_cost'] + context['other_costs'], 2)
     game.total_cost = context['total_cost']
+
+    projectedYield = getFinalYield(gameOutputs)
+    game.projected_yield = projectedYield
+
     game.save()
     context['bushel_cost'] = round(context['total_cost']/230, 2)
     return context
@@ -312,6 +311,7 @@ def finalResults(request, game):
     context['total_cost'] = round(context['seed_cost'] + context['irr_cost'] + context['fert_cost'] + context['other_costs'], 2)
 
     finalYield = getFinalYield(gameOutputs)
+    game.projected_yield = finalYield
     history = getHistory(date, start_day, gameInputs, gameOutputs)['history']
 
     context['bushel_cost'] = round(context['total_cost']/finalYield, 2)

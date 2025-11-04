@@ -99,6 +99,7 @@ class GameProfile(models.Model):
     initialized = models.BooleanField(default=False)
     computing = models.BooleanField(default=False)
     finished = models.BooleanField(default=False)
+    projected_yield = models.FloatField(default=0)
 
     total_cost = models.FloatField(default=0)
 

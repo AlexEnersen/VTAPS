@@ -295,3 +295,7 @@ em {
 .titleHeader {
   font-size: 24px;
 }
+
+.wide {
+  width: 100%;
+}
