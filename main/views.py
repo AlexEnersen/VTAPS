@@ -12,6 +12,8 @@ import watchtower, logging
 import pandas as pd
 from io import StringIO
 
+from django.contrib.auth import logout
+
 
 environment = os.environ['ENV']
 
@@ -69,6 +71,7 @@ def reset(response):
     if game_id:
         del response.session['game_id']
         
+    # logout(response)
     # Teacher.objects.all().delete()
     # Student.objects.all().delete()
     # GameProfile.objects.all().delete()

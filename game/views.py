@@ -117,11 +117,13 @@ def runGame(request, game_id=None):
             context['fert_form'] = fert_form
             return render(request, "game/init.html", context)
         else:
-            if gameProfile.week > game.weekLimit and user != None:
-                return render(request, "game/caughtup.html", context)
-            elif gameProfile.week < 22 and not gameProfile.finished:              ##### NORMAL MODE
+            if gameProfile.week < 22 and not gameProfile.finished:              ##### NORMAL MODE
             # if gameProfile.week <= 1 and not gameProfile.finished:            ##### FINAL PAGE    DEBUG MODE
-                context = weeklySelection(request, gameProfile)
+                if user != None and gameProfile.week > game.weekLimit:
+                    return render(request, "game/caughtup.html", context)
+                else:
+                    context = weeklySelection(request, gameProfile)
+             
                 if context is None:
                     return redirect(game_url)
                 # elif "computing" in context:
@@ -147,9 +149,9 @@ def runGame(request, game_id=None):
         return render(request, "game/intro.html", context)
         # return redirect(game_url)
 
-def weeklySelection(request, game):
+def weeklySelection(request, game):   
     context = {}
-    
+
     gamePath = f"id-{game.id}"
             
     gameInputs = {}
@@ -283,7 +285,7 @@ def weeklySelection(request, game):
     game.total_cost = context['total_cost']
 
     projectedYield = getFinalYield(gameOutputs)
-    game.projected_yield = projectedYield
+    game.projected_yields.append(projectedYield)
 
     game.save()
     context['bushel_cost'] = round(context['total_cost']/230, 2)
@@ -311,7 +313,7 @@ def finalResults(request, game):
     context['total_cost'] = round(context['seed_cost'] + context['irr_cost'] + context['fert_cost'] + context['other_costs'], 2)
 
     finalYield = getFinalYield(gameOutputs)
-    game.projected_yield = finalYield
+    game.projected_yields.append(finalYield)
     history = getHistory(date, start_day, gameInputs, gameOutputs)['history']
 
     context['bushel_cost'] = round(context['total_cost']/finalYield, 2)

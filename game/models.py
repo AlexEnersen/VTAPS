@@ -1,5 +1,5 @@
 from django.db import models
-from django.core.validators import MinValueValidator
+from django.contrib.postgres.fields import ArrayField
 from django.conf import settings
 from teacher.models import Game
 
@@ -99,7 +99,7 @@ class GameProfile(models.Model):
     initialized = models.BooleanField(default=False)
     computing = models.BooleanField(default=False)
     finished = models.BooleanField(default=False)
-    projected_yield = models.FloatField(default=0)
+    projected_yields = ArrayField(models.FloatField(default=0), default=list, blank=True)
 
     total_cost = models.FloatField(default=0)
 

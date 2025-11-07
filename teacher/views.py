@@ -286,31 +286,37 @@ def createGame(response, id):
 
 def groupAttributeGraph(game, studentList, attribute):
 
-    costNames = []
-    costAmount = []
+    attributeNames = []
+    attributeAmount = []
 
     for student in studentList:
-        costNames.append(student.username)
+        attributeNames.append(student.username)
         try:
             gameProfile = GameProfile.objects.get(user=student.user)
             if attribute == 'Cost':
-                costAmount.append(gameProfile.total_cost)
+                attributeAmount.append(gameProfile.total_cost)
             elif attribute == 'Yield':
-                costAmount.append(gameProfile.projected_yield)
+                attributeAmount.append(gameProfile.projected_yields)
         except:
-            costAmount.append(0)
+            attributeAmount.append(0)
 
     fig, ax = plt.subplots()
 
 
-    ax.bar(costNames, costAmount, color='skyblue')
-    ax.set_xlabel('Students')
     if attribute == 'Cost':
+        ax.bar(attributeNames, attributeAmount, color='skyblue')
         ylabel = 'Total Operational Costs'
     elif attribute == 'Yield':
         ylabel = 'Projected Yield'
+        for layer in attributeAmount:  
+            if layer == 0:
+                continue    
+            ax.plot(range(1, len(layer)+1, 1), layer)
+        ax.legend(attributeNames, loc="upper left")
+    ax.set_xlabel('Students')
     ax.set_ylabel(ylabel)
     ax.set_ylim(bottom=0)
+    
     fig.suptitle('Cost Per Student', fontsize=16)
     
     imgdata = io.StringIO()
