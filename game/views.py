@@ -219,8 +219,15 @@ def weeklySelection(request, game):
             if not fertilizerQuantity == None:
                 gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fertilizerQuantity, int(date)-7)
             gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], irrigationQuantity, fertilizerQuantity, int(date)-7, game.week)
+        
         computeDSSAT(game.hybrid, gameInputs, gamePath)
         game.week += 1
+
+        gameOutputs = downloadOutputs(gamePath)
+        print("adding projected yield...")
+        projectedYield = getFinalYield(gameOutputs)
+        game.projected_yields.append(projectedYield)
+
         game.save()
         return None
     
@@ -284,9 +291,6 @@ def weeklySelection(request, game):
     context['total_cost'] = round(context['seed_cost'] + context['irr_cost'] + context['fert_cost'] + context['other_costs'], 2)
     game.total_cost = context['total_cost']
 
-    projectedYield = getFinalYield(gameOutputs)
-    game.projected_yields.append(projectedYield)
-
     game.save()
     context['bushel_cost'] = round(context['total_cost']/230, 2)
     return context
@@ -341,27 +345,27 @@ def finalResults(request, game):
 
     controlFinalYield = getFinalYield(controlGameOutputs)
     WNIPI_yield = ((finalYield / controlFinalYield) - 1)
-    print("YIELD:", finalYield)
-    print("CONTROL YIELD:", controlFinalYield)
-    print("WNIPI YIELD:", WNIPI_yield)
+    # print("YIELD:", finalYield)
+    # print("CONTROL YIELD:", controlFinalYield)
+    # print("WNIPI YIELD:", WNIPI_yield)
 
     final_irr = sum(history['irr'])
     control_et = sum(controlHistory['et'])
     WNIPI_irr = (1 + (final_irr / control_et))
-    print("IRRIGATION:", final_irr)
-    print("CONTROL ET:", control_et)
-    print("WNIPI IRRIGATION:", WNIPI_irr)
+    # print("IRRIGATION:", final_irr)
+    # print("CONTROL ET:", control_et)
+    # print("WNIPI IRRIGATION:", WNIPI_irr)
 
     final_fert = sum(history['fert'])
     control_fert_uptake = getNitrogenUptake(date, controlGameOutputs)
     WNIPI_fert = (1 + (final_fert / control_fert_uptake))
-    print("FERTILIZER:", final_fert)
-    print("CONTROL FERTILIZER:", control_fert_uptake)
-    print("WNIPI FERTILIZER:", WNIPI_fert)
+    # print("FERTILIZER:", final_fert)
+    # print("CONTROL FERTILIZER:", control_fert_uptake)
+    # print("WNIPI FERTILIZER:", WNIPI_fert)
 
     WNIPI_total = (WNIPI_yield / (WNIPI_irr * WNIPI_fert))
     context['WNIPI'] = round(WNIPI_total, 4)
-    print("FINAL WNIPI:", context['WNIPI'])
+    # print("FINAL WNIPI:", context['WNIPI'])
 
     context['irr_amount'] = sum(history['irr'])
     context['fert_amount'] = sum(history['fert'])
@@ -549,11 +553,13 @@ def getWeather(date, gameInputs):
             
             weatherDay = items[0][len(items[0]) - 3:]
 
-            if weatherDay == str(int(day)-7):
+            if weatherDay == str(int(day)):
                 dateFound = True
 
             if dateFound:
                 weatherDateConversion = "\n" + datetime.strptime("2025-" + weatherDay, "%Y-%j").strftime("%m-%d-%Y")
+                print("weatherDay:", weatherDay)
+                print("day:", day)
                 if (int(weatherDay) - int(day)) == 0:
                     weatherDateConversion = "Monday: " + weatherDateConversion
                 elif (int(weatherDay) - int(day)) == 1:

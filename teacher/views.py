@@ -304,20 +304,30 @@ def groupAttributeGraph(game, studentList, attribute):
 
 
     if attribute == 'Cost':
-        ax.bar(attributeNames, attributeAmount, color='skyblue')
+        xlabel = 'Students'
         ylabel = 'Total Operational Costs'
+        title = 'Cost Per Student'
+        ax.bar(attributeNames, attributeAmount, color='skyblue')
+        ax.set_ylim(bottom=750)
     elif attribute == 'Yield':
+        xlabel = ''
         ylabel = 'Projected Yield'
+        title = "Projected Yield Per Student"
+
+        tickerLength = 0
         for layer in attributeAmount:  
             if layer == 0:
                 continue    
+            if len(layer) > tickerLength:
+                tickerLength = len(layer)
             ax.plot(range(1, len(layer)+1, 1), layer)
+        ax.set_xticks(range(1, tickerLength+1))    
         ax.legend(attributeNames, loc="upper left")
-    ax.set_xlabel('Students')
+        ax.set_ylim(bottom=0)
+    ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
-    ax.set_ylim(bottom=0)
     
-    fig.suptitle('Cost Per Student', fontsize=16)
+    fig.suptitle(title, fontsize=16)
     
     imgdata = io.StringIO()
     fig.savefig(imgdata, format='svg')
