@@ -1,6 +1,6 @@
 {% extends "t_base.html" %} {% block content %}
 <div class="accountAuth">
-    <h2>Teacher Login</h2>
+    <h2 class="accountHeader">Teacher Login</h2>
     <form method="POST" class="authForm">
         {% csrf_token %}
         {{form}}

@@ -223,6 +223,7 @@ em {
   transition: color 0.2s;
 }
 
+.loginButton,
 .continueButton,
 .ctaButton {
   display: inline-block;
@@ -239,6 +240,7 @@ em {
   font-family: var(--sans-font);
   transition: background-color 0.2s;
 }
+.loginButton:hover,
 .ctaButton:hover,
 .continueButton:hover {
   background-color: var(--darkened-primary-color);

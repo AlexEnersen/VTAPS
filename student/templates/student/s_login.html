@@ -1,10 +1,10 @@
 {% extends "s_base.html" %} {% block content %}
 <div class="accountAuth">
-    <h2>Student Login</h2>
+    <h2 class="accountHeader">Student Login</h2>
     <form method="POST" class="authForm">
         {% csrf_token %}
         {{form}}
-        <button type="submit" class="btn btn-success">Login</button>
+        <button type="submit" class="loginButton">Login</button>
     </form>
     {% endblock %}
 </div>
