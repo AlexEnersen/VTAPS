@@ -13,7 +13,6 @@ import time
 from django.http import HttpResponse    
 import os
 import io
-from django.contrib.auth import get_user_model
 from uuid import uuid4
 import matplotlib.pyplot as plt
 

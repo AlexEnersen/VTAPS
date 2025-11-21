@@ -194,16 +194,15 @@ def weeklySelection(request, game):
             game.fert_id = fertilizer_init.id
 
             gameInputs['WTH_name'] = "NEME2401.WTH"
-            # gameInputs['WTH_content'] = yearlyRandomizer()
-            file = open("weather_files/NEME1201.WTH")
-            fileContents = file.read().split("\n")
-            # gameInputs['WTH_content'] = fileContents
+            fileContents = yearlyRandomizer()
+            # file = open("weather_files/NEME1201.WTH")
+            # fileContents = file.read().split("\n")
+            # file.close()
             gameInputs['WTH_content'] = changeWeatherYear(fileContents, 2020)
-            file.close()
 
             altForecast = True
-            # gameInputs['forecast_content'] = altForecastWeather(gameInputs['WTH_content']) if altForecast else forecastWeather(gameInputs['WTH_content'])
-            gameInputs['forecast_content'] = forecastWeather(fileContents)
+            gameInputs['forecast_content'] = altForecastWeather(gameInputs['WTH_content']) if altForecast else forecastWeather(gameInputs['WTH_content'])
+            # gameInputs['forecast_content'] = forecastWeather(fileContents)
             uploadInputs(gameInputs, gamePath)
             game.initialized = True
             game.week = 0
@@ -224,9 +223,13 @@ def weeklySelection(request, game):
         game.week += 1
 
         gameOutputs = downloadOutputs(gamePath)
-        print("adding projected yield...")
+        print("gameOutputs:", gameOutputs)
         projectedYield = getFinalYield(gameOutputs)
         game.projected_yields.append(projectedYield)
+        game.monday_irrigation.append(request.POST.get('monday'))
+        game.thursday_irrigation.append(request.POST.get('thursday'))
+        if request.POST.get('fertilizer') != None:
+            game.weekly_fertilizer.append(request.POST.get('fertilizer'))
 
         game.save()
         return None
@@ -1019,6 +1022,7 @@ def computeDSSAT(hybrid, gameInputs, gamePath):
         zip_file.writestr(gameInputs['SOL_name'], "\n".join(gameInputs['SOL_content']))
         zip_file.writestr(gameInputs['WTH_name'], "\n".join(gameInputs['WTH_content']))
         zip_file.writestr('command.ps1', commandString)
+    print('path:', gamePath)
 
     zip_buffer.seek(0)     
 

@@ -99,7 +99,11 @@ class GameProfile(models.Model):
     initialized = models.BooleanField(default=False)
     computing = models.BooleanField(default=False)
     finished = models.BooleanField(default=False)
+    
     projected_yields = ArrayField(models.FloatField(default=0), default=list, blank=True)
+    monday_irrigation = ArrayField(models.FloatField(default=0), default=list, blank=True)
+    thursday_irrigation = ArrayField(models.FloatField(default=0), default=list, blank=True)
+    weekly_fertilizer = ArrayField(models.FloatField(default=0), default=list, blank=True)
 
     total_cost = models.FloatField(default=0)
 
