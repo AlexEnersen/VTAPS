@@ -12,7 +12,7 @@ if environment == 'prod':
     logger = logging.getLogger(__name__)
     logger.addHandler(watchtower.CloudWatchLogHandler())
 
-monthRanges = [32, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366]
+monthRanges = [32, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 367]
 
 def forecastWeather(weather_text):  
 
@@ -161,7 +161,8 @@ def yearlyRandomizer():
 
         for line in text:
             items = line.split(" ")
-            if items[0].isdigit():
+            # print("items:", items)
+            if len(items) > 0 and items[0].isdigit():
                 day = int(items[0][4:])
                 if day < tempDay:
                     continue
@@ -173,7 +174,9 @@ def yearlyRandomizer():
             elif index == 0:
                 newWeather += line
 
-    return newWeather.split("\n")[5:]
+        
+
+    return newWeather.split("\n")
 
 def changeWeatherYear(weatherText, year):
     newText = []
@@ -186,4 +189,4 @@ def changeWeatherYear(weatherText, year):
         newDate = str(year) + items[0][4:7]
         newLine = newDate + line[7:]
         newText.append(newLine)
-    return newText
+    return newText[:-1]

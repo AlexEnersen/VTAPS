@@ -194,11 +194,19 @@ def weeklySelection(request, game):
             game.fert_id = fertilizer_init.id
 
             gameInputs['WTH_name'] = "NEME2401.WTH"
+
             fileContents = yearlyRandomizer()
-            # file = open("weather_files/NEME1201.WTH")
+            # file = open("weather_files/NEME0601.WTH")
             # fileContents = file.read().split("\n")
             # file.close()
+
+            # print("fileContents:", fileContents)
             gameInputs['WTH_content'] = changeWeatherYear(fileContents, 2020)
+            print("WTH CONTENT:", gameInputs['WTH_content'])
+
+
+
+
 
             altForecast = True
             gameInputs['forecast_content'] = altForecastWeather(gameInputs['WTH_content']) if altForecast else forecastWeather(gameInputs['WTH_content'])
@@ -223,7 +231,6 @@ def weeklySelection(request, game):
         game.week += 1
 
         gameOutputs = downloadOutputs(gamePath)
-        print("gameOutputs:", gameOutputs)
         projectedYield = getFinalYield(gameOutputs)
         game.projected_yields.append(projectedYield)
         game.monday_irrigation.append(request.POST.get('monday'))
@@ -1114,6 +1121,7 @@ def downloadOutputs(gamePath):
         zip_buffer.seek(0) 
         data = {}
         with zipfile.ZipFile(zip_buffer) as zipFile:
+            print("namelist:", zipFile.namelist())
             for name in zipFile.namelist():
                 content = zipFile.read(name).decode('utf-8').split("\n")
                 name = name.split("\\")[1]
@@ -1138,9 +1146,9 @@ def downloadOutputs(gamePath):
                 # elif name[-4:] == '.INP':
                 #     for line in content:
                 #         print("INP LINE:", line)
-                # elif name == 'WARNING.OUT':
-                #     for line in content:
-                #         print(line)
+                elif name == 'WARNING.OUT':
+                    for line in content:
+                        print(line)
 
         return data
     except:
