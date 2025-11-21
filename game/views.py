@@ -195,10 +195,10 @@ def weeklySelection(request, game):
 
             gameInputs['WTH_name'] = "NEME2401.WTH"
 
-            fileContents = yearlyRandomizer()
-            # file = open("weather_files/NEME0601.WTH")
-            # fileContents = file.read().split("\n")
-            # file.close()
+            # fileContents = yearlyRandomizer()
+            file = open("weather_files/NEME1901.WTH")
+            fileContents = file.read().split("\n")
+            file.close()
 
             gameInputs['WTH_content'] = changeWeatherYear(fileContents, 2020)
 
@@ -206,7 +206,7 @@ def weeklySelection(request, game):
 
 
 
-            altForecast = True
+            altForecast = False
             gameInputs['forecast_content'] = altForecastWeather(gameInputs['WTH_content']) if altForecast else forecastWeather(gameInputs['WTH_content'])
             # gameInputs['forecast_content'] = forecastWeather(fileContents)
             uploadInputs(gameInputs, gamePath)
@@ -669,6 +669,7 @@ def plotOneAttribute(date, start_day, content, attribute, yaxis, title):
         ax.axvline(x=d, color="gray", linestyle=":", linewidth=1)
     if attribute == 'RDPD':
         ax.invert_yaxis()
+        ax.set_ylim(None, 0)
     if attribute == 'GSTD':
         ax.set_yticks([0, 1, 2, 3, 4, 5])
         ax.set_yticklabels(['VE', 'V3-V8', 'VT-R1', 'R2-R3', 'R4-R5', 'R6'])
