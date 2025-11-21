@@ -73,9 +73,9 @@ def reset(response):
         
     logout(response)
     # Teacher.objects.all().delete()
-    Student.objects.all().delete()
-    GameProfile.objects.all().delete()
-    Game.objects.all().delete()
+    # Student.objects.all().delete()
+    # GameProfile.objects.all().delete()
+    # Game.objects.all().delete()
     # non_superusers = User.objects.filter(is_superuser = False)
     # non_superusers.delete()
     
