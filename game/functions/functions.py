@@ -37,7 +37,7 @@ def forecastWeather(weather_text):
         # high = str(round(float(items[2]) * (9/5) + 32, 1))
         # low = str(round(float(items[3]) * (9/5) + 32, 1))
         # rain = str(round(float(items[4])))
-
+        srad = str(round(float(items[1]), 1))
         high = str(round(float(items[2]), 1))
         low = str(round(float(items[3]), 1))
         rain = str(round(float(items[4]), 1))
@@ -60,7 +60,7 @@ def forecastWeather(weather_text):
         
         # weather_string = weatherDay + " " + high_forecast + " " + low_forecast + " " + rain_forecast
 
-        weather_string = weatherDay + " " + high + " " + low + " " + rain
+        weather_string = weatherDay + " " + srad + " " + high + " " + low + " " + rain
         
         forecast_text.append(weather_string)
 
@@ -132,6 +132,7 @@ def altForecastWeather(weather_text):
                     break
 
             forecastString = f"{day[0]:<7}{day[1]:>6}{float(randHighTemp):>6}{randLowTemp:>6}{day[4]:>6}{day[5]:>6}{day[6]:>6}"
+            print("forecastString:", forecastString)
             monthlyForecast.append(forecastString)
 
     return monthlyForecast
@@ -189,4 +190,4 @@ def changeWeatherYear(weatherText, year):
         newDate = str(year) + items[0][4:7]
         newLine = newDate + line[7:]
         newText.append(newLine)
-    return newText[:-1]
+    return newText

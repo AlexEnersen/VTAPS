@@ -303,36 +303,38 @@ def weeklySelection(request, game):
     context['bushel_cost'] = round(context['total_cost']/230, 2)
     return context
 
-def finalResults(request, game):
+def finalResults(request, gameProfile):
 
     context = {}
-    gamePath = f"id-{game.id}"
+    gamePath = f"id-{gameProfile.id}"
     
     gameInputs = downloadInputs(gamePath)
     gameOutputs = downloadOutputs(gamePath)
 
     start_date = int(request.session.get('start_date', None))
     start_day = int(str(start_date)[len(str(start_date)) - 3:])
-    date = str(start_date + (game.week * 7))
+    date = str(start_date + (gameProfile.week * 7))
 
     total_irrigation_cost = round(getTotalIrrigationCost(gameInputs['MZX_content'], date), 2)
     total_fertilizer_cost = round(getTotalFertilizerCost(gameInputs['MZX_content'], date), 2)
 
-    context['seed_cost'] = round(getSeedCost(game.hybrid, game.seeding_rate), 2)
+    context['seed_cost'] = round(getSeedCost(gameProfile.hybrid, gameProfile.seeding_rate), 2)
     context['irr_cost'] = total_irrigation_cost
     context['fert_cost'] = total_fertilizer_cost
     context['other_costs'] = round(742, 2)
     context['total_cost'] = round(context['seed_cost'] + context['irr_cost'] + context['fert_cost'] + context['other_costs'], 2)
 
     finalYield = getFinalYield(gameOutputs)
-    if not game.finished:
-        game.projected_yields.append(finalYield)
-        game.finished = True
+    if not gameProfile.finished:
+        gameProfile.projected_yields.append(finalYield)
+        gameProfile.monday_irrigation.append(request.POST.get('monday'))
+        gameProfile.thursday_irrigation.append(request.POST.get('thursday'))
+        gameProfile.finished = True
     history = getHistory(date, start_day, gameInputs, gameOutputs)['history']
 
     context['bushel_cost'] = round(context['total_cost']/finalYield, 2)
     context['yield'] = finalYield
-    context['hybrid'] = " ".join(game.hybrid.split(" ")[1:])
+    context['hybrid'] = " ".join(gameProfile.hybrid.split(" ")[1:])
     
     context['aquaspy_graph'], yAxis = plotAquaSpy(date, start_day, gameInputs, gameOutputs)
     context['nitrogen_stress_graph'] = plotOneAttribute(date, start_day, gameOutputs['OPG_content'], 'NSTD', 'N Stress', 'Nitrogen Stress')
@@ -342,13 +344,13 @@ def finalResults(request, game):
     controlGameInputs = gameInputs.copy()
     with open(f"mzx_files/cleaned/{controlGameInputs['MZX_name']}", 'r') as f:
         controlGameInputs['MZX_content'] = f.read().split("\n")
-    controlGameInputs['MZX_content'] = setHybrid(controlGameInputs['MZX_content'], game.hybrid)
-    controlGameInputs['MZX_content'] = setSeedingRate(controlGameInputs['MZX_content'], game.seeding_rate)
+    controlGameInputs['MZX_content'] = setHybrid(controlGameInputs['MZX_content'], gameProfile.hybrid)
+    controlGameInputs['MZX_content'] = setSeedingRate(controlGameInputs['MZX_content'], gameProfile.seeding_rate)
  
     controlGamePath = gamePath + 'control'
      
     if checkBucket(controlGamePath) == False:
-        computeDSSAT(game.hybrid, controlGameInputs, controlGamePath)
+        computeDSSAT(gameProfile.hybrid, controlGameInputs, controlGamePath)
     controlGameOutputs = downloadOutputs(controlGamePath)
 
     controlHistory = getHistory(date, start_day, controlGameInputs, controlGameOutputs)['history']
@@ -385,19 +387,18 @@ def finalResults(request, game):
     context['control_aquaspy_graph'] = plotAquaSpy(date, start_day, controlGameInputs, controlGameOutputs, yAxis)[0]
     context['control_nitrogen_stress_graph'] = plotOneAttribute(date, start_day, controlGameOutputs['OPG_content'], 'NSTD', 'N Stress', 'Nitrogen Stress')
 
-    game.save()
+    gameProfile.save()
 
-    csv = createCSV(context['irr_amount'], context['fert_amount'], context['yield'], context['bushel_cost'], context['WNIPI'])
+    csv = createCSV(context['irr_amount'], context['fert_amount'], context['yield'], context['bushel_cost'], context['WNIPI'], gameProfile)
     s3.put_object(
         Bucket="finalresultsbucket",
         Key=f"{gamePath}/final_summary.csv",
         Body=csv,
         ContentType="text/csv",
-        ContentDisposition=f'attachment; filename="vtaps_game_{game.id}_summary.csv"',
+        ContentDisposition=f'attachment; filename="vtaps_game_{gameProfile.id}_summary.csv"',
     )
 
-    print(game.id)
-    context['url'] = '/game/download' if request.user == None else f'/game/download/{game.id}'
+    context['url'] = '/game/download' if request.user == None else f'/game/download/{gameProfile.id}'
 
     return context
 
@@ -572,12 +573,12 @@ def getWeather(date, gameInputs):
                 elif (int(weatherDay) - int(day)) == 6:
                     weatherDateConversion = "Sunday: " + weatherDateConversion
 
-                rainQuant = mmToInches(float(items[3]))
+                rainQuant = mmToInches(float(items[4]))
                 if rainQuant < 0:
                     rainQuant = 0
                 
-                weatherData = {"day": weatherDateConversion, "tHigh": round((float(items[1]) * (9/5)) + 32, 1), "tLow": round((float(items[2]) * (9/5)) + 32, 1), "pRain": rainQuant}
-
+                weatherData = {"day": weatherDateConversion, "tHigh": round((float(items[2]) * (9/5)) + 32, 1), "tLow": round((float(items[3]) * (9/5)) + 32, 1), "pRain": rainQuant}
+                print("items:", items)
                 weatherInfo.append(weatherData)
 
                 if int(weatherDay) - int(day) >= 6:
@@ -690,9 +691,9 @@ def getFinalYield(gameOutputs):
         if items[0] == '@' and not readingVariables:
             readingVariables = True
         elif readingVariables and items[0].startswith('Yield'):
-            finalYield = round(float(items[-2]) / 62.77, 1)
+            finalYield = float(items[-2]) / 62.77
             finalYield = finalYield / 0.845                     #Based on Rintu's Calibration (9/8/2025)
-            return finalYield
+            return round(finalYield, 1)
 
 def plotAquaSpy(date, start_day, gameInputs, gameOutputs, yAxis=-1):
     
@@ -1141,11 +1142,39 @@ def downloadOutputs(gamePath):
     except:
         return False
     
-def createCSV(irr_total, fert_total, final_yield, final_bushel_cost, final_wnipi):
+def createCSV(irr_total, fert_total, final_yield, final_bushel_cost, final_wnipi, gameProfile):
     buf = io.StringIO(newline='')
     writer = csv.writer(buf)
-    writer.writerow(["Irrigation Total", "Fertilizer Total", "Final Yield", "Cost Per Bushel", "WNIPI Score"])
+    writer.writerow(["Irrigation Total (in)", "Fertilizer Total (lbs)", "Final Yield (bu/ac)", "Cost Per Bushel", "WNIPI Score"])
     writer.writerow([irr_total, fert_total, final_yield, final_bushel_cost, final_wnipi])
+
+    writer.writerow([])
+    writer.writerow(['Week', 'Projected Yield (bu/ac)', "Monday Irrigation (in)", "Thursday Irrigation (in)", "Fertilizer (lbs)"])
+    print("pyield:", gameProfile.projected_yields)
+    print("mIr:", gameProfile.monday_irrigation)
+    for index, pyield in enumerate(gameProfile.projected_yields):
+        if index == 0:
+            continue
+        monday_irrigation = gameProfile.monday_irrigation[index]
+        thursday_irrigation = gameProfile.thursday_irrigation[index]
+        if index == 1:
+            fertilizer = gameProfile.weekly_fertilizer[0]
+        elif index == 6:
+            fertilizer = gameProfile.weekly_fertilizer[1]
+        elif index == 9:
+            fertilizer = gameProfile.weekly_fertilizer[2]
+        elif index == 10:
+            fertilizer = gameProfile.weekly_fertilizer[3]
+        elif index == 12:
+            fertilizer = gameProfile.weekly_fertilizer[4]
+        elif index == 14:
+            fertilizer = gameProfile.weekly_fertilizer[5]
+        elif index == 15:
+            fertilizer = gameProfile.weekly_fertilizer[6]
+        else:
+            fertilizer = "-"
+        
+        writer.writerow([index, pyield, monday_irrigation, thursday_irrigation, fertilizer])
 
     return buf.getvalue().encode("utf-8-sig")
 

@@ -391,7 +391,7 @@ def download(request, id):
 
     buf = io.StringIO(newline='')
     writer = csv.writer(buf)
-    writer.writerow(['Username', 'Week', 'Projected Yield', "Monday Irrigation", "Thursday Irrigation", "Fertilizer"])
+    writer.writerow(['Username', 'Week', 'Projected Yield (bu/ac)', "Monday Irrigation (in)", "Thursday Irrigation (in)", "Fertilizer (lbs)"])
     for player in game.players:
         student = Student.objects.get(username=player, code=game.code)
         try:
@@ -399,14 +399,12 @@ def download(request, id):
         except:
             continue
 
-        print(gameProfile.projected_yields)
-        print(gameProfile.monday_irrigation)
         for index, pyield in enumerate(gameProfile.projected_yields):
             if index == 0:
                 continue
             playerInfo = [player]
             playerInfo.append(index)
-            playerInfo.append(pyield)
+            playerInfo.append(round(pyield, 1))
             playerInfo.append(gameProfile.monday_irrigation[index])
             playerInfo.append(gameProfile.thursday_irrigation[index])
             if index == 1:
@@ -446,5 +444,3 @@ def download(request, id):
         ExpiresIn=60
     )
     return HttpResponseRedirect(presigned)
-
-    return redirect(f'/teacher/game/{id}')
