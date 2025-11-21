@@ -200,9 +200,7 @@ def weeklySelection(request, game):
             # fileContents = file.read().split("\n")
             # file.close()
 
-            # print("fileContents:", fileContents)
             gameInputs['WTH_content'] = changeWeatherYear(fileContents, 2020)
-            print("WTH CONTENT:", gameInputs['WTH_content'])
 
 
 
@@ -327,7 +325,9 @@ def finalResults(request, game):
     context['total_cost'] = round(context['seed_cost'] + context['irr_cost'] + context['fert_cost'] + context['other_costs'], 2)
 
     finalYield = getFinalYield(gameOutputs)
-    game.projected_yields.append(finalYield)
+    if not game.finished:
+        game.projected_yields.append(finalYield)
+        game.finished = True
     history = getHistory(date, start_day, gameInputs, gameOutputs)['history']
 
     context['bushel_cost'] = round(context['total_cost']/finalYield, 2)
@@ -385,36 +385,25 @@ def finalResults(request, game):
     context['control_aquaspy_graph'] = plotAquaSpy(date, start_day, controlGameInputs, controlGameOutputs, yAxis)[0]
     context['control_nitrogen_stress_graph'] = plotOneAttribute(date, start_day, controlGameOutputs['OPG_content'], 'NSTD', 'N Stress', 'Nitrogen Stress')
 
-    game.finished = True
     game.save()
 
-    # csv = createCSV(game.team_id, context['irr_amount'], context['fert_amount'], context['yield'], context['bushel_cost'], context['WNIPI'])
+    csv = createCSV(context['irr_amount'], context['fert_amount'], context['yield'], context['bushel_cost'], context['WNIPI'])
+    s3.put_object(
+        Bucket="finalresultsbucket",
+        Key=f"{gamePath}/final_summary.csv",
+        Body=csv,
+        ContentType="text/csv",
+        ContentDisposition=f'attachment; filename="vtaps_game_{game.id}_summary.csv"',
+    )
+
+    print(game.id)
+    context['url'] = '/game/download' if request.user == None else f'/game/download/{game.id}'
 
     return context
 
-def downloadResults(request, game_id=None):
-    try:
-        if game_id is None:   
-            game_id = request.session.get('game_id', None) 
-        game = Game.objects.get(id=game_id)      
-    except Game.DoesNotExist:
-        return redirect("/")
-    
-    if request.user.is_authenticated:
-        user = request.user
-    else:
-        user = None
-
-    try:
-        gameProfile = GameProfile.objects.get(game=game, user=user)
-        if not gameProfile.finished:
-            return redirect("/")  
-    except GameProfile.DoesNotExist:
-        return redirect("/")
-      
-    gamePath = f"id-{gameProfile.id}"
-    key = f"{gamePath}/final_summary-{gameProfile.team_id}.csv"
-
+def downloadResults(request, game_id=None):      
+    gamePath = f"id-{game_id}"
+    key = f"{gamePath}/final_summary.csv"
 
     presigned = s3.generate_presigned_url(
         ClientMethod="get_object",
@@ -1029,7 +1018,6 @@ def computeDSSAT(hybrid, gameInputs, gamePath):
         zip_file.writestr(gameInputs['SOL_name'], "\n".join(gameInputs['SOL_content']))
         zip_file.writestr(gameInputs['WTH_name'], "\n".join(gameInputs['WTH_content']))
         zip_file.writestr('command.ps1', commandString)
-    print('path:', gamePath)
 
     zip_buffer.seek(0)     
 
@@ -1121,7 +1109,6 @@ def downloadOutputs(gamePath):
         zip_buffer.seek(0) 
         data = {}
         with zipfile.ZipFile(zip_buffer) as zipFile:
-            print("namelist:", zipFile.namelist())
             for name in zipFile.namelist():
                 content = zipFile.read(name).decode('utf-8').split("\n")
                 name = name.split("\\")[1]
@@ -1146,27 +1133,19 @@ def downloadOutputs(gamePath):
                 # elif name[-4:] == '.INP':
                 #     for line in content:
                 #         print("INP LINE:", line)
-                elif name == 'WARNING.OUT':
-                    for line in content:
-                        print(line)
+                # elif name == 'WARNING.OUT':
+                #     for line in content:
+                #         print(line)
 
         return data
     except:
         return False
     
-def createCSV(team_id, irr_total, fert_total, final_yield, final_bushel_cost, final_wnipi):
+def createCSV(irr_total, fert_total, final_yield, final_bushel_cost, final_wnipi):
     buf = io.StringIO(newline='')
     writer = csv.writer(buf)
-    writer.writerow(["Team ID", "Irrigation Total", "Fertilizer Total", "Final Yield", "Cost Per Bushel", "WNIPI Score"])
-    writer.writerow([team_id, irr_total, fert_total, final_yield, final_bushel_cost, final_wnipi])
-    
-    # s3.put_object(
-    #     Bucket="finalresultsbucket",
-    #     Key=f"{gamePath}/final_summary-{game.team_id}.csv",
-    #     Body=csv,
-    #     ContentType="text/csv",
-    #     ContentDisposition=f'attachment; filename="vtaps_game_{game.id}_summary.csv"',
-    # )
+    writer.writerow(["Irrigation Total", "Fertilizer Total", "Final Yield", "Cost Per Bushel", "WNIPI Score"])
+    writer.writerow([irr_total, fert_total, final_yield, final_bushel_cost, final_wnipi])
 
     return buf.getvalue().encode("utf-8-sig")
 

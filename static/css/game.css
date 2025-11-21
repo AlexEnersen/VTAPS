@@ -307,35 +307,6 @@ hr {
 .finalInfoContainer div {
   width: 99%;
 }
-.downloadButton {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  background-color: var(--primary-color);
-  margin: 12px auto;
-  padding: 8px 20px;
-  border-radius: 6px;
-  text-align: center;
-  color: var(--lighter-background-color);
-  font-family: var(--sans-font);
-  font-weight: bold;
-  font-size: 22px;
-  align-items: center;
-  border: 2px solid var(--primary-color);
-  text-decoration: none;
-  max-width: inherit;
-  transition: background-color 0.2s, border 0.2s;
-}
-.downloadButton:hover {
-  background-color: var(--darkened-primary-color);
-  border: 2px solid var(--darkened-primary-color);
-  transition: background-color 0.2s, border 0.2s;
-}
-.downloadIcon {
-  height: 24px;
-  width: auto;
-  margin-right: 20px;
-}
 .finalTable {
   width: 100%;
 }

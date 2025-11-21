@@ -15,8 +15,55 @@ import os
 import io
 from uuid import uuid4
 import matplotlib.pyplot as plt
-
+import csv
+import environ
+import watchtower, logging
+import boto3
+from django.http import HttpResponseRedirect
+from botocore.config import Config
 environment = os.environ['ENV']
+
+secret_name = "S3_Keys"
+region_name = "us-east-1"
+
+if environment == 'prod':
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
+    logger.addHandler(watchtower.CloudWatchLogHandler())
+
+try:
+    if environment == 'prod':
+        session = boto3.session.Session()
+        client = session.client(
+            service_name='secretsmanager',
+            region_name=region_name
+        )
+
+        get_secret_value_response = client.get_secret_value(
+            SecretId=secret_name
+        )
+        SECRET_KEY = eval(get_secret_value_response['SecretString'])
+        s3_access_key = SECRET_KEY['S3_ACCESS_KEY_ID']
+        s3_secret_key = SECRET_KEY['S3_SECRET_ACCESS_KEY']
+        
+    else:
+        env = environ.Env()
+        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+        s3_access_key = env('S3_ACCESS_KEY_ID')
+        s3_secret_key = env('S3_SECRET_ACCESS_KEY')
+
+    client_config = Config(
+        max_pool_connections=100
+    )
+
+    s3 = boto3.client("s3", aws_access_key_id=s3_access_key, aws_secret_access_key=s3_secret_key, config=client_config)
+        
+except Exception as error:
+    if environment == 'prod':
+        logger.info('error:', error)
+    else:
+        print('Error:', error)
 
 def teacherHome(response):
     if response.user in User.objects.filter(is_superuser=True):
@@ -208,6 +255,8 @@ def gamePage(game):
     context['group_cost_graph'] = groupAttributeGraph(game, studentList, 'Cost')
     context['group_yield_graph'] = groupAttributeGraph(game, studentList, 'Yield')
 
+    context['url'] = f'/teacher/game/{game.id}/download'
+
     return context
 
 
@@ -336,3 +385,66 @@ def groupAttributeGraph(game, studentList, attribute):
     plt.close(fig)
     
     return data
+
+def download(request, id):
+    game = Game.objects.get(id=id)
+
+    buf = io.StringIO(newline='')
+    writer = csv.writer(buf)
+    writer.writerow(['Username', 'Week', 'Projected Yield', "Monday Irrigation", "Thursday Irrigation", "Fertilizer"])
+    for player in game.players:
+        student = Student.objects.get(username=player, code=game.code)
+        try:
+            gameProfile = GameProfile.objects.get(user=student.user)
+        except:
+            continue
+
+        print(gameProfile.projected_yields)
+        print(gameProfile.monday_irrigation)
+        for index, pyield in enumerate(gameProfile.projected_yields):
+            if index == 0:
+                continue
+            playerInfo = [player]
+            playerInfo.append(index)
+            playerInfo.append(pyield)
+            playerInfo.append(gameProfile.monday_irrigation[index])
+            playerInfo.append(gameProfile.thursday_irrigation[index])
+            if index == 1:
+                playerInfo.append(gameProfile.weekly_fertilizer[0])
+            elif index == 6:
+                playerInfo.append(gameProfile.weekly_fertilizer[1])
+            elif index == 9:
+                playerInfo.append(gameProfile.weekly_fertilizer[2])
+            elif index == 10:
+                playerInfo.append(gameProfile.weekly_fertilizer[3])
+            elif index == 12:
+                playerInfo.append(gameProfile.weekly_fertilizer[4])
+            elif index == 14:
+                playerInfo.append(gameProfile.weekly_fertilizer[5])
+            elif index == 15:
+                playerInfo.append(gameProfile.weekly_fertilizer[6])
+            else:
+                playerInfo.append("-")
+            writer.writerow(playerInfo)
+
+    data = buf.getvalue().encode("utf-8-sig")
+        
+    s3.put_object(
+        Bucket="teachersummariesbucket",
+        Key=f"{id}/teacher_summary.csv",
+        Body=data,
+        ContentType="text/csv",
+        ContentDisposition=f'attachment; filename="teacher_summary_{id}.csv"',
+    )
+
+    
+    key = f"{id}/teacher_summary.csv"
+
+    presigned = s3.generate_presigned_url(
+        ClientMethod="get_object",
+        Params={"Bucket": "teachersummariesbucket", "Key": key},
+        ExpiresIn=60
+    )
+    return HttpResponseRedirect(presigned)
+
+    return redirect(f'/teacher/game/{id}')

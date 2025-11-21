@@ -1,4 +1,4 @@
-{% extends "t_base.html" %} {% block content %}
+{% extends "t_base.html" %} {% load static %} {% block content %}
 <div class="accountWrapper">
   <div class="teacherGamePage">
     <div class="teacherGameColumn">
@@ -23,13 +23,23 @@
         </tr>
         {% endif %} {% endfor %}
       </table>
+      <div class="row left">
+        <a class="downloadButton" href={{ url }}>
+          <img
+            class="downloadIcon"
+            src="{% static 'images/download-icon.svg' %}"
+            alt=""
+          />
+          Download Results
+        </a>
+      </div>
       <p class="weekChangeField">Code: {{code}}</p>
       <p class="weekChangeField">Week Limit: {{week_limit}}</p>
       <form method="post" class="row center weekChangeField">
         {% csrf_token %}
         <p class="weekChangeField">{{week_form.week}}</p>
         <input
-          class="continueButton weekButton"
+          class="secondaryButton weekButton"
           type="submit"
           value="Change Week Limit"
         />

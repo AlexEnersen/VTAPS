@@ -1,5 +1,4 @@
-{% extends "game/base.html" %} {% block content %} {% load static %}
-{% csrf_token %} {% if game_id != None %}
+{% extends "game/base.html" %} {% block content %} {% load static %} {% if game_id != None %}
 <div class="gameAccountHeader">
   <div class="column">
     <p class="className">{{ username }}</p>
@@ -70,12 +69,16 @@
         </tr>
       </table>
     </div>
-    <!-- <a class="downloadButton" href="/game/download">
-      <img class="downloadIcon" src="{% static 'images/download-icon.svg' %}" alt="" />
+    <a class="downloadButton" href={{ url }}>
+      <img
+        class="downloadIcon"
+        src="{% static 'images/download-icon.svg' %}"
+        alt=""
+      />
       Download Results
-    </a> -->
-    {% csrf_token %} {% if game_id == None %}
-      <a class="downloadButton" href="/reset">Exit Game</a>
+    </a>
+    {% if game_id == None %}
+    <a class="secondaryButton" href="/reset">Exit Game</a>
     {% endif %}
   </div>
   <div class="graphContainer">
