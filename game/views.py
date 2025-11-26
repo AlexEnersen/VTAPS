@@ -251,7 +251,7 @@ def weeklySelection(request, game):
         context['aquaspy_graph'] = plotAquaSpy(date, start_day, gameInputs, gameOutputs)[0]
         context['root_depth_graph'] = plotOneAttribute(date, start_day, gameOutputs['OPG_content'], 'RDPD', 'Inches (in)', 'Root Depth')
         context['growth_stage_graph'] = plotOneAttribute(date, start_day, gameOutputs['OPG_content'], 'GSTD', 'Stage', 'Growth Stage')
-        context['nitrogen_stress_graph'] = plotOneAttribute(date, start_day, gameOutputs['OPG_content'], 'NSTD', 'N Stress', 'Nitrogen Stress')
+        context['nitrogen_stress_graph'] = plotOneAttribute(date, start_day, gameOutputs['NiBal_content'], 'RLCH', r'Nitrate Leached (kg N $ha^{-1}$)', 'Nitrate Leaching')
         context['water_layer_graph'] = plotWaterLayers(date, start_day, gameOutputs)
         
     historyDict = getHistory(date, start_day, gameInputs, gameOutputs)
@@ -966,19 +966,26 @@ def getNitrogenUptake(date, gameOutputs):
     day = int(date[len(date) - 3:])
     reading = False
     nitrogenUptake = 0.00000001
+    totalNitrogenUptake = nitrogenUptake
 
-    for line in gameOutputs['OPN_content']:
+    for line in gameOutputs['NiBal_content']:
         items = list(filter(None, line.split(" ")))
         if len(items) <= 5:
             continue 
         elif not reading and items[0] == "@YEAR":
+            itemIndex = items.index('RNUP')
             reading = True
         elif reading:
-            nitrogenUptake = (float(items[5]) * 8.92) + 0.0000001
+            if not items[1].isnumeric():
+                break
+            print("items[1]:", items[1])
+            print("items[1].isnumeric():", items[1].isnumeric())
+            nitrogenUptake = (float(items[itemIndex]) * 8.92) + 0.0000001
+            totalNitrogenUptake += nitrogenUptake
             if int(items[1]) == day:
                 return nitrogenUptake
         
-    return nitrogenUptake
+    return totalNitrogenUptake
 
 # def getWeatherHistory(date, start_day, gameInputs, gameOutputs):
 #     day = int(date[len(date) - 3:])
@@ -1132,6 +1139,9 @@ def downloadOutputs(gamePath):
                 elif name[-4:] == '.OPN':
                     data['OPN_name'] = name
                     data['OPN_content'] = content
+                elif name == 'SoilNiBal.OUT':
+                    data['NiBal_name'] = name
+                    data['NiBal_content'] = content
                 # elif name[-4:] == '.INP':
                 #     for line in content:
                 #         print("INP LINE:", line)

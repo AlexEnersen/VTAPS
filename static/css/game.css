@@ -86,12 +86,12 @@
 
 hr {
   position: relative;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100vw; /* full viewport width */
+  left: -0.5vw;
+  /* transform: translateX(-); */
+  width: 99vw; /* full viewport width */
   border: none;
   border-top: 2px dashed black;
-  margin: 24px 0 12px 0;
+  margin: 24px auto 12px auto;
 }
 .row {
   display: flex;
