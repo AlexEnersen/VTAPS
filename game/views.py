@@ -172,8 +172,6 @@ def weeklySelection(request, game):
     if request.method == "POST":
         if (game.week == 0) or not game.initialized or 'hybrid' in request.POST:
 
-            request.session['start_date'] = start_date
-
             game.hybrid = request.POST['hybrid']
             gameInputs['MZX_content'] = setHybrid(gameInputs['MZX_content'], game.hybrid)
 
@@ -228,13 +226,14 @@ def weeklySelection(request, game):
         computeDSSAT(game.hybrid, gameInputs, gamePath)
         game.week += 1
 
-        gameOutputs = downloadOutputs(gamePath)
-        projectedYield = getFinalYield(gameOutputs)
-        game.projected_yields.append(projectedYield)
-        game.monday_irrigation.append(request.POST.get('monday'))
-        game.thursday_irrigation.append(request.POST.get('thursday'))
-        if request.POST.get('fertilizer') != None:
-            game.weekly_fertilizer.append(request.POST.get('fertilizer'))
+        if game.week > 1:
+            gameOutputs = downloadOutputs(gamePath)
+            projectedYield = getFinalYield(gameOutputs)
+            game.projected_yields.append(projectedYield)
+            game.monday_irrigation.append(request.POST.get('monday'))
+            game.thursday_irrigation.append(request.POST.get('thursday'))
+            if request.POST.get('fertilizer') != None:
+                game.weekly_fertilizer.append(request.POST.get('fertilizer'))
 
         game.save()
         return None
@@ -251,7 +250,7 @@ def weeklySelection(request, game):
         context['aquaspy_graph'] = plotAquaSpy(date, start_day, gameInputs, gameOutputs)[0]
         context['root_depth_graph'] = plotOneAttribute(date, start_day, gameOutputs['OPG_content'], 'RDPD', 'Inches (in)', 'Root Depth')
         context['growth_stage_graph'] = plotOneAttribute(date, start_day, gameOutputs['OPG_content'], 'GSTD', 'Stage', 'Growth Stage')
-        context['nitrogen_stress_graph'] = plotOneAttribute(date, start_day, gameOutputs['NiBal_content'], 'RLCH', r'Nitrate Leached (kg N $ha^{-1}$)', 'Nitrate Leaching')
+        context['nitrogen_stress_graph'] = plotOneAttribute(date, start_day, gameOutputs['NiBal_content'], 'RLCH', 'Nitrate Leached (lbs/a)', 'Nitrate Leaching')
         context['water_layer_graph'] = plotWaterLayers(date, start_day, gameOutputs)
         
     historyDict = getHistory(date, start_day, gameInputs, gameOutputs)
@@ -311,9 +310,9 @@ def finalResults(request, gameProfile):
     gameInputs = downloadInputs(gamePath)
     gameOutputs = downloadOutputs(gamePath)
 
-    start_date = int(request.session.get('start_date', None))
+    start_date = str(int(getDate(gameInputs['MZX_content'])))
     start_day = int(str(start_date)[len(str(start_date)) - 3:])
-    date = str(start_date + (gameProfile.week * 7))
+    date = str(int(start_date) + (gameProfile.week * 7))
 
     total_irrigation_cost = round(getTotalIrrigationCost(gameInputs['MZX_content'], date), 2)
     total_fertilizer_cost = round(getTotalFertilizerCost(gameInputs['MZX_content'], date), 2)
@@ -376,8 +375,20 @@ def finalResults(request, gameProfile):
     # print("WNIPI FERTILIZER:", WNIPI_fert)
 
     WNIPI_total = (WNIPI_yield / (WNIPI_irr * WNIPI_fert))
+    gameProfile.wnipi = WNIPI_total
     context['WNIPI'] = round(WNIPI_total, 4)
-    # print("FINAL WNIPI:", context['WNIPI'])
+    
+    agronomicEfficiency = (finalYield - controlFinalYield)/(final_fert + 0.001)
+    gameProfile.agronomic_efficiency = agronomicEfficiency
+    context['AE'] = agronomicEfficiency
+
+    irrigationWaterUseEfficiency = (finalYield - controlFinalYield)/(final_irr + 0.001)
+    gameProfile.irrigation_water_use_efficiency = irrigationWaterUseEfficiency
+    context['IWUE'] = irrigationWaterUseEfficiency
+
+    nitrogenLeaching = getNitrogenLeaching(gameOutputs)
+    gameProfile.nitrogen_leaching = nitrogenLeaching
+    context['NLeaching'] = nitrogenLeaching
 
     context['irr_amount'] = sum(history['irr'])
     context['fert_amount'] = sum(history['fert'])
@@ -389,7 +400,7 @@ def finalResults(request, gameProfile):
 
     gameProfile.save()
 
-    csv = createCSV(context['irr_amount'], context['fert_amount'], context['yield'], context['bushel_cost'], context['WNIPI'], gameProfile)
+    csv = createCSV(context['irr_amount'], context['fert_amount'], context['yield'], context['bushel_cost'], context['WNIPI'], controlFinalYield, gameProfile)
     s3.put_object(
         Bucket="finalresultsbucket",
         Key=f"{gamePath}/final_summary.csv",
@@ -539,6 +550,20 @@ def getTotalFertilizerCost(text, date):
 
     return totalFertilizerCost
 
+def getNitrogenLeaching(gameOutputs):
+    totalLeaching = 0
+    readingLeaching = False
+    for line in gameOutputs['NiBal_content']:
+        items = list(filter(None, line.strip("\n").split(" ")))
+        if readingLeaching and len(items) < 14:
+            break
+        elif not readingLeaching and items[0].startswith("@"):
+            readingLeaching = True
+        elif readingLeaching:
+            totalLeaching += float(items[13])
+    return totalLeaching
+            
+
         
 def getWeather(date, gameInputs):
     dateFound = False
@@ -578,7 +603,6 @@ def getWeather(date, gameInputs):
                     rainQuant = 0
                 
                 weatherData = {"day": weatherDateConversion, "tHigh": round((float(items[2]) * (9/5)) + 32, 1), "tLow": round((float(items[3]) * (9/5)) + 32, 1), "pRain": rainQuant}
-                print("items:", items)
                 weatherInfo.append(weatherData)
 
                 if int(weatherDay) - int(day) >= 6:
@@ -656,6 +680,8 @@ def plotOneAttribute(date, start_day, content, attribute, yaxis, title):
             days.append(int(adjusted_day))
             if attribute == "RDPD":
                 attribute_values.append(mmToInches(float(items[index]) * 1000))
+            elif attribute == 'RLCH':
+                attribute_values.append(float(items[index]) * 0.892)
             else:
                 attribute_values.append(float(items[index]))
 
@@ -978,8 +1004,6 @@ def getNitrogenUptake(date, gameOutputs):
         elif reading:
             if not items[1].isnumeric():
                 break
-            print("items[1]:", items[1])
-            print("items[1].isnumeric():", items[1].isnumeric())
             nitrogenUptake = (float(items[itemIndex]) * 8.92) + 0.0000001
             totalNitrogenUptake += nitrogenUptake
             if int(items[1]) == day:
@@ -1153,11 +1177,11 @@ def downloadOutputs(gamePath):
     except:
         return False
     
-def createCSV(irr_total, fert_total, final_yield, final_bushel_cost, final_wnipi, gameProfile):
+def createCSV(irr_total, fert_total, final_yield, final_bushel_cost, final_wnipi, controlFinalYield, gameProfile):
     buf = io.StringIO(newline='')
     writer = csv.writer(buf)
-    writer.writerow(["Irrigation Total (in)", "Fertilizer Total (lbs)", "Final Yield (bu/ac)", "Cost Per Bushel", "WNIPI Score"])
-    writer.writerow([irr_total, fert_total, final_yield, final_bushel_cost, final_wnipi])
+    writer.writerow(["Irrigation Total (in)", "Fertilizer Total (lbs)", "Final Yield (bu/ac)", "Cost Per Bushel", "WNIPI Score", "Control Plot Yield (bu/ac)"])
+    writer.writerow([irr_total, fert_total, final_yield, final_bushel_cost, final_wnipi, controlFinalYield])
 
     writer.writerow([])
     writer.writerow(['Week', 'Projected Yield (bu/ac)', "Monday Irrigation (in)", "Thursday Irrigation (in)", "Fertilizer (lbs)"])

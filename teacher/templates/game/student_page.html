@@ -24,7 +24,7 @@
         {% endif %} {% endfor %}
       </table>
       <div class="row left">
-        <a class="downloadButton" href={{ url }}>
+        <a class="downloadButton" href="{{ url }}">
           <img
             class="downloadIcon"
             src="{% static 'images/download-icon.svg' %}"
@@ -44,13 +44,20 @@
           value="Change Week Limit"
         />
       </form>
+      <a class="secondaryButton backButton" href="/teacher">Back</a>
     </div>
     <div class="teacherGameColumn center">
-      <h1 class="header">Graphs</h1>
+      <h1 class="header">Results</h1>
       <div>{{ group_cost_graph | safe }}</div>
       <div>{{ group_yield_graph | safe }}</div>
+      {% if finalWeek %}
+        <h1 class="header">Final Results</h1>
+        <div>{{ group_leaching_graph | safe }}</div>
+        <div>{{ group_ae_graph | safe }}</div>
+        <div>{{ group_iwue_graph | safe }}</div>
+        <div>{{ group_wnipi_graph | safe }}</div>
+      {% endif %}
     </div>
   </div>
-  <a class="secondaryButton" href="/teacher">Back</a>
 </div>
 {% endblock %}

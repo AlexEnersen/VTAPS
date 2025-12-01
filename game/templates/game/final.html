@@ -64,7 +64,19 @@
           <td class="bold">${{bushel_cost|floatformat:2}}/bu</td>
         </tr>
         <tr class="infoRow">
-          <td class="bold alignLeft">Efficiency (WNIPI):</td>
+          <td class="bold alignLeft">Agronomic Efficiency (AE):</td>
+          <td class="bold">{{AE|floatformat:4}}</td>
+        </tr>
+        <tr class="infoRow">
+          <td class="bold alignLeft">Irrigation Water Use Efficiency (IWUE):</td>
+          <td class="bold">{{IWUE|floatformat:4}}</td>
+        </tr>
+        <tr class="infoRow">
+          <td class="bold alignLeft">Total Nitrogen Leached (lb/ac):</td>
+          <td class="bold">{{NLeaching|floatformat:4}}</td>
+        </tr>
+        <tr class="infoRow">
+          <td class="bold alignLeft">Overall Efficiency (WNIPI):</td>
           <td class="bold">{{WNIPI|floatformat:4}}</td>
         </tr>
       </table>

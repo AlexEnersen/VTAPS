@@ -106,6 +106,10 @@ class GameProfile(models.Model):
     weekly_fertilizer = ArrayField(models.FloatField(default=0), default=list, blank=True)
 
     total_cost = models.FloatField(default=0)
+    agronomic_efficiency = models.FloatField(default=0)
+    irrigation_water_use_efficiency = models.FloatField(default=0)
+    nitrogen_leaching = models.FloatField(default=0)
+    wnipi = models.FloatField(default=0)
 
 class FertilizerEntries1(models.Model):
     fertilizer = models.IntegerField(blank=False, default=0, choices=FERT_CHOICES_1)

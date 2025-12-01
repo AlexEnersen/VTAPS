@@ -118,14 +118,10 @@ def teacherRegister(response):
 
 def teacherLogin(response):
     if response.method == "POST":
-        form = LoginTeacherForm(response.POST)
-        username = response.POST['username']
-        password = response.POST['password']
-        user = authenticate(response, username=username, password=password)
-        if user is not None:
-            login(response, user)
-
-        return redirect("/teacher")
+        form = LoginTeacherForm(request=response, data=response.POST)
+        if form.is_valid():
+            login(response, form.get_user())
+            return redirect("/teacher")
     else:
         form = LoginTeacherForm()
     return render(response, "teacher/t_login.html", {"form":form})
@@ -203,9 +199,17 @@ def passwordPage(game):
     context = {'players': [], "code": game.code, 'url': f'/teacher/game/{game.id}'}
     characters = string.ascii_letters + string.digits
     
+    playerList = {}
     for player in game.players:
         if len(player) <= 0:
             continue
+
+        if player in playerList:
+            playerList[player] += 1
+            player = f'{player}{playerList[player]}'
+        else:
+            playerList[player] = 1
+        
         
         player = player.strip()  
         newPassword = ''.join(random.choice(characters) for _ in range(6))
@@ -238,14 +242,17 @@ def gamePage(game):
 
     weekForm = WeekForm(initial = {'week': game.weekLimit})
     context['week_form'] = weekForm
-    context['week_limit'] = game.weekLimit
+    context['week_limit'] = game.weekLimit if game.weekLimit < 21 else f'{game.weekLimit} (End)'
 
+    context['finalWeek'] = False
     for player in game.players:
         playerInfo = {'username': player}
         student = Student.objects.get(username=player, code=game.code)
         try:
             gameProfile = GameProfile.objects.get(game=game, user=student.user)
             playerInfo['week'] = gameProfile.week
+            if gameProfile.week > 21:
+                context['finalWeek'] = True
         except:
             playerInfo['week'] = 0
         
@@ -254,6 +261,11 @@ def gamePage(game):
 
     context['group_cost_graph'] = groupAttributeGraph(game, studentList, 'Cost')
     context['group_yield_graph'] = groupAttributeGraph(game, studentList, 'Yield')
+    if context['finalWeek']:
+        context['group_leaching_graph'] = groupAttributeGraph(game, studentList, 'Leaching')
+        context['group_ae_graph'] = groupAttributeGraph(game, studentList, 'AE')
+        context['group_iwue_graph'] = groupAttributeGraph(game, studentList, 'IWUE')
+        context['group_wnipi_graph'] = groupAttributeGraph(game, studentList, 'WNIPI')
 
     context['url'] = f'/teacher/game/{game.id}/download'
 
@@ -343,6 +355,14 @@ def groupAttributeGraph(game, studentList, attribute):
             gameProfile = GameProfile.objects.get(user=student.user)
             if attribute == 'Cost':
                 attributeAmount.append(gameProfile.total_cost)
+            elif attribute == 'AE':
+                attributeAmount.append(gameProfile.agronomic_efficiency)
+            elif attribute == 'IWUE':
+                attributeAmount.append(gameProfile.irrigation_water_use_efficiency)
+            elif attribute == 'WNIPI':
+                attributeAmount.append(gameProfile.wnipi)
+            elif attribute == 'Leaching':
+                attributeAmount.append(gameProfile.nitrogen_leaching)
             elif attribute == 'Yield':
                 attributeAmount.append(gameProfile.projected_yields)
         except:
@@ -357,8 +377,28 @@ def groupAttributeGraph(game, studentList, attribute):
         title = 'Cost Per Student'
         ax.bar(attributeNames, attributeAmount, color='skyblue')
         ax.set_ylim(bottom=750)
+    elif attribute == 'AE':
+        xlabel = 'Students'
+        ylabel = 'Agronimic Efficiency'
+        title = 'Agronomic Efficiency Per Student'
+        ax.bar(attributeNames, attributeAmount, color='skyblue')
+    elif attribute == 'IWUE':
+        xlabel = 'Students'
+        ylabel = 'Irrigation Water Use Efficiency'
+        title = 'Irrigation Water Use Efficiency Per Student'
+        ax.bar(attributeNames, attributeAmount, color='skyblue')
+    elif attribute == 'WNIPI':
+        xlabel = 'Students'
+        ylabel = 'Overall Efficiency Efficiency'
+        title = 'Overall Efficiency Per Student'
+        ax.bar(attributeNames, attributeAmount, color='skyblue')
+    elif attribute == 'Leaching':
+        xlabel = 'Students'
+        ylabel = 'Nitrate Leached (lbs/ac)'
+        title = 'Nitrate Leached Per Student'
+        ax.bar(attributeNames, attributeAmount, color='skyblue')
     elif attribute == 'Yield':
-        xlabel = ''
+        xlabel = 'Week'
         ylabel = 'Projected Yield'
         title = "Projected Yield Per Student"
 

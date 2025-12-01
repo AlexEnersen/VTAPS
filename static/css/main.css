@@ -338,3 +338,8 @@ em {
   width: auto;
   margin-right: 20px;
 }
+
+.backButton {
+  margin-top: 100px;
+  max-width: 120px;
+}
