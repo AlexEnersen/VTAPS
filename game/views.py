@@ -97,6 +97,8 @@ def runGame(request, game_id=None):
         
     context = {'game_url': game_url}
 
+    print("user:", request.user)
+    print("authenticated:", request.user.is_authenticated)
     if request.user.is_authenticated:
         user = request.user
         context['username'] = user.student.username
