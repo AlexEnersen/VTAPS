@@ -156,7 +156,12 @@ def newGame(response):
 
 def game(response, id):
     context = {}
-    game = Game.objects.get(id = id)
+    try:
+        game = Game.objects.get(id = id)
+    except:
+        return redirect("/teacher")
+    if not response.user.is_authenticated or not str(id) in response.user.games:
+        return redirect("/teacher")
     if game.created == False:
         if response.method == 'POST':
             players = []

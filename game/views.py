@@ -74,6 +74,12 @@ FILENAME = 'UNLI2422.MZX'
 @csrf_protect
 def runGame(request, game_id=None):
 
+    if game_id != None:
+        if not hasattr(request.user, 'student'):
+            return redirect("/")
+        elif (request.user.student.game != str(game_id)):
+            return redirect(f"/game/{request.user.student.game}")
+
     game_url = f'/game/{game_id}' if game_id is not None else '/game'
 
     try:
@@ -164,13 +170,14 @@ def weeklySelection(request, game):
 
     start_date = str(int(getDate(gameInputs['MZX_content'])))
     start_day = int(start_date[len(start_date) - 3:])
-    date = str(int(start_date) + (((game.week)) * 7))
+    date = str(int(start_date) + (((game.week-1)) * 7))
 
     context = {}
     fert_entry = -1
     
     if request.method == "POST":
         if (game.week == 0) or not game.initialized or 'hybrid' in request.POST:
+            print("game.week == 0:", game.week)
 
             game.hybrid = request.POST['hybrid']
             gameInputs['MZX_content'] = setHybrid(gameInputs['MZX_content'], game.hybrid)
@@ -179,15 +186,6 @@ def weeklySelection(request, game):
             gameInputs['MZX_content'] = setSeedingRate(gameInputs['MZX_content'], game.seeding_rate)
 
             fertilizer_init = FertilizerInit(week1 = request.POST['week1'], week6 = request.POST['week6'], week9 = request.POST['week9'], week10 = request.POST['week10'], week12 = request.POST['week12'], week14 = request.POST['week14'], week15 = request.POST['week15'])
-            # gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], request.POST['week1'], int(start_date) + (0 * 7))
-            # gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], request.POST['week6'], int(start_date) + (5 * 7))
-            # gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], request.POST['week9'], int(start_date) + (8 * 7))
-            # gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], request.POST['week10'], int(start_date) + (9 * 7))
-            # gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], [0.75], 0, int(start_date) + (6 * 7), 7)
-            # gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], [0.75], 0, int(start_date) + (7 * 7), 8)
-            # gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], [0.75], 0, int(start_date) + (8 * 7), 9)
-            # gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], [0.75], 0, int(start_date) + (9 * 7), 10)
-            # gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], [0.75], 0, int(start_date) + (10 * 7), 11)
             fertilizer_init.save()
             game.fert_id = fertilizer_init.id
 
@@ -220,13 +218,12 @@ def weeklySelection(request, game):
             fertilizerQuantity = request.POST.get('fertilizer')
             irrigationQuantity = getIrrigation(request)
             if not fertilizerQuantity == None:
-                gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fertilizerQuantity, int(date)-7)
-            gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], irrigationQuantity, fertilizerQuantity, int(date)-7, game.week)
+                gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fertilizerQuantity, int(date))
+            gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], irrigationQuantity, fertilizerQuantity, int(date), game.week)
         
         computeDSSAT(game.hybrid, gameInputs, gamePath)
-        game.week += 1
 
-        if game.week > 1:
+        if game.week > 0:
             gameOutputs = downloadOutputs(gamePath)
             projectedYield = getFinalYield(gameOutputs)
             game.projected_yields.append(projectedYield)
@@ -234,6 +231,8 @@ def weeklySelection(request, game):
             game.thursday_irrigation.append(request.POST.get('thursday'))
             if request.POST.get('fertilizer') != None:
                 game.weekly_fertilizer.append(request.POST.get('fertilizer'))
+
+        game.week += 1
 
         game.save()
         return None
@@ -569,7 +568,8 @@ def getWeather(date, gameInputs):
     dateFound = False
     weatherInfo = []
 
-    day = date[len(date) - 3:]
+    day = int(date[len(date) - 3:])
+
 
     try:
         for line in gameInputs['forecast_content']:
@@ -658,6 +658,9 @@ def inchesToMM(inches):
 def plotOneAttribute(date, start_day, content, attribute, yaxis, title):
 
     day = int(date[len(date) - 3:])
+
+    print("start day:", start_day)
+    print("day:", day)
     
     readingStress = False
 
@@ -669,7 +672,7 @@ def plotOneAttribute(date, start_day, content, attribute, yaxis, title):
         items = list(filter(None, line.split(" ")))
         if len(items) <= 3 and not readingStress:
             continue
-        elif (readingStress and len(items) == 0) or (readingStress and int(items[1]) > day-8):
+        elif (readingStress and len(items) == 0) or (readingStress and int(items[1]) > day-1):
             break
         elif len(items) > 3 and not readingStress:
             if (items[0] == "@YEAR"):
@@ -729,6 +732,7 @@ def plotAquaSpy(date, start_day, gameInputs, gameOutputs, yAxis=-1):
     start_day = int(start_day)
 
     rootArray = getRootDepth(date, gameOutputs)
+    print(rootArray)
     if not rootArray:
         return None
 
@@ -775,7 +779,7 @@ def plotAquaSpy(date, start_day, gameInputs, gameOutputs, yAxis=-1):
         elif len(items) > 1 and readingWater:
             if int(items[1]) < int(start_day):
                 continue
-            elif int(items[1]) >= day-7:
+            elif int(items[1]) >= day:
                 break
             else:
                 depthTracker = 0
@@ -858,7 +862,7 @@ def plotWaterLayers(date, start_day, gameOutputs):
         elif len(items) > 1 and readingWater:
             if int(items[1]) <= int(start_day):
                 continue
-            elif int(items[1]) > day-7:
+            elif int(items[1]) > day:
                 break
             else:
                 for index2, layer in enumerate(waterLayers):
@@ -908,9 +912,8 @@ def getRootDepth(date, gameOutputs):
     return rootArray
 
 def getHistory(date, start_day, gameInputs, gameOutputs):
-    
-    day = int(date[len(date) - 3:])-7
-    date = int(date) - 7
+    day = int(date[len(date) - 3:])
+
     history = {"rain": [0.0], "et": [0.0], "irr": [0.0], "fert": [0.0]}
     recentHistory = {"rain": [0.0], "et": [0.0], "irr": [0.0], "fert": [0.0]}
 
@@ -929,7 +932,7 @@ def getHistory(date, start_day, gameInputs, gameOutputs):
         else:
             rain = mmToInches(float(items[4]))
             history['rain'].append(rain)
-            if currDay >= day - 7:
+            if currDay >= day-7:
                 recentHistory['rain'].append(rain)
     
     onIrrigation = False
@@ -1010,33 +1013,6 @@ def getNitrogenUptake(date, gameOutputs):
                 return nitrogenUptake
         
     return totalNitrogenUptake
-
-# def getWeatherHistory(date, start_day, gameInputs, gameOutputs):
-#     day = int(date[len(date) - 3:])
-    
-#     history = []
-
-#     forecastIndex = -1
-#     for line in gameInputs['WTH_content']:
-#         items = line.split(" ")
-#         items = [x for x in items if x]
-
-#         if len(items) == 0 or not items[0].isdigit():
-#             continue
-#         else:
-#             forecastIndex += 1
-
-#         forecastItems = gameInputs['forecast_content'][forecastIndex].split(" ")
-#         forecastItems = [x for x in forecastItems if x]
-#         tempDay = int(items[0][len(items[0]) - 3:])
-#         if tempDay < start_day:
-#             continue
-#         elif tempDay >= day:
-#             break
-#         else:
-#             weatherDict = {"day": tempDay, "high": round(float(items[2]) * (9/5) + 32, 1), "low": round(float(items[3]) * (9/5) + 32, 1), "rain": mmToInches(float(items[4])), "forecast_high": round(float(forecastItems[2]) * (9/5) + 32, 1), "forecast_low": round(float(forecastItems[3]) * (9/5) + 32, 1), "forecast_rain": mmToInches(float(forecastItems[4]))}
-#             history.append(weatherDict)
-#     return history
 
 def computeDSSAT(hybrid, gameInputs, gamePath): 
     
