@@ -35,6 +35,21 @@
     }
   </style>
   <h2 class="bigHeader">Welcome, Admin</h2>
+  <h class="header">Unconfirmed Users</h>
+  <div class="columnContainer">
+    {% for un_user in unconfirmed_users %}
+    <div
+      class="rowContainer {% if forloop.counter|divisibleby:2 == 0 %} grayRow {% endif %}"
+    >
+      <p class="rowText">{{un_user.user.email}}</p>
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="email" value="{{ un_user.user.email }}" />
+        <button type="submit" class="btn btn-success">Add teacher</button>
+      </form>
+    </div>
+    {% endfor %}
+  </div>
   <h class="header">Pending Users</h>
   <div class="columnContainer">
     {% for un_user in unauthorized_users %}

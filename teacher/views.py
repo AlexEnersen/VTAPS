@@ -71,13 +71,16 @@ def teacherHome(response):
         if response.method == 'POST':
             user = User.objects.get(email = response.POST['email'])
             teacher = user.teacher
+            teacher.confirmed = True
             teacher.authorized = True
             teacher.save()
 
+        print("teachers:", Teacher.objects.all())
+        unconfirmed_users = Teacher.objects.filter(confirmed = False, authorized = False)
         unauthorized_users = Teacher.objects.filter(confirmed = True, authorized = False)
         authorized_users = Teacher.objects.filter(confirmed = True, authorized = True)
 
-        context = {"unauthorized_users": unauthorized_users, "authorized_users": authorized_users, "form": form}
+        context = {"unauthorized_users": unauthorized_users, "authorized_users": authorized_users, "unconfirmed_users": unconfirmed_users, "form": form}
         return render(response, "teacher/t_admin.html", context)
     elif not response.user.is_authenticated:
         return render(response, "teacher/t_home.html", {"user": None, "authenticated": None})
@@ -104,7 +107,10 @@ def teacherHome(response):
 
 def teacherRegister(response):
     if response.method == "POST":
+        print("teachers:", User.objects.all())
         form = RegisterTeacherForm(response.POST)
+        print("valid:", form.is_valid())
+        print("errors:", form.errors)
         if form.is_valid():
             user = form.save()
 

@@ -14,10 +14,11 @@ class RegisterTeacherForm(UserCreationForm):
         fields = ["username", "email"]
 
     def save(self, commit=True):
+        print("Hi?")
         user = super().save(commit=False)
         if commit:
             user.save()
-            Teacher.objects.create(user=user)
+            Teacher.objects.create(user=user, email=user.email)
         return user
 
 class LoginTeacherForm(AuthenticationForm):

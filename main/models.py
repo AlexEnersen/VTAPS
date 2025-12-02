@@ -4,7 +4,7 @@ from django.contrib.postgres.fields import ArrayField
 
 class User(AbstractUser):
     username = models.CharField(max_length = 128, blank=True, unique=True) ### Account Username
-    password = models.CharField(max_length = 256)
+    # password = models.CharField(max_length = 256)
 
 
     games = ArrayField(models.CharField(max_length = 256), default=list, blank=True)
