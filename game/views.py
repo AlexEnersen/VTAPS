@@ -728,7 +728,6 @@ def plotAquaSpy(date, start_day, gameInputs, gameOutputs, yAxis=-1):
     start_day = int(start_day)
 
     rootArray = getRootDepth(date, gameOutputs)
-    print(rootArray)
     if not rootArray:
         return None
 
@@ -935,6 +934,7 @@ def getHistory(date, start_day, gameInputs, gameOutputs, weeklyFertilizer):
     onFertilizer = False
 
     fertCount = 0
+    weeklyFertilizer = [fertilizer for fertilizer in weeklyFertilizer if fertilizer > 0]
     for line in gameInputs['MZX_content']:
         items = line.split(" ")
         items = [x for x in items if x]
@@ -962,11 +962,9 @@ def getHistory(date, start_day, gameInputs, gameOutputs, weeklyFertilizer):
             onFertilizer = True
 
         elif (onFertilizer):
-            print(int(items[5]))
-            print(int(items[5]) == 0)
-            if int(items[5]) == 0:
-                continue
             if (int(items[1]) < int(date)):
+                if int(items[5]) == 0:
+                    continue
                 fertilizer = weeklyFertilizer[fertCount]
                 fertCount += 1
                 history['fert'].append(fertilizer)
