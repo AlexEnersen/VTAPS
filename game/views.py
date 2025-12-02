@@ -177,7 +177,6 @@ def weeklySelection(request, game):
     
     if request.method == "POST":
         if (game.week == 0) or not game.initialized or 'hybrid' in request.POST:
-            print("game.week == 0:", game.week)
 
             game.hybrid = request.POST['hybrid']
             gameInputs['MZX_content'] = setHybrid(gameInputs['MZX_content'], game.hybrid)
@@ -252,7 +251,7 @@ def weeklySelection(request, game):
         context['nitrogen_stress_graph'] = plotOneAttribute(date, start_day, gameOutputs['NiBal_content'], 'RLCH', 'Nitrate Leached (lbs/a)', 'Nitrate Leaching')
         context['water_layer_graph'] = plotWaterLayers(date, start_day, gameOutputs)
         
-    historyDict = getHistory(date, start_day, gameInputs, gameOutputs)
+    historyDict = getHistory(date, start_day, gameInputs, gameOutputs, game.weekly_fertilizer)
     history = historyDict['history']
     recentHistory = historyDict['recentHistory']
     context['weekly_rain'] = round(sum(recentHistory['rain']), 2)
@@ -328,7 +327,7 @@ def finalResults(request, gameProfile):
         gameProfile.monday_irrigation.append(request.POST.get('monday'))
         gameProfile.thursday_irrigation.append(request.POST.get('thursday'))
         gameProfile.finished = True
-    history = getHistory(date, start_day, gameInputs, gameOutputs)['history']
+    history = getHistory(date, start_day, gameInputs, gameOutputs, gameProfile.weekly_fertilizer)['history']
 
     context['bushel_cost'] = round(context['total_cost']/finalYield, 2)
     context['yield'] = finalYield
@@ -351,7 +350,7 @@ def finalResults(request, gameProfile):
         computeDSSAT(gameProfile.hybrid, controlGameInputs, controlGamePath)
     controlGameOutputs = downloadOutputs(controlGamePath)
 
-    controlHistory = getHistory(date, start_day, controlGameInputs, controlGameOutputs)['history']
+    controlHistory = getHistory(date, start_day, controlGameInputs, controlGameOutputs, [0])['history']
 
     controlFinalYield = getFinalYield(controlGameOutputs)
     WNIPI_yield = ((finalYield / controlFinalYield) - 1)
@@ -658,9 +657,6 @@ def inchesToMM(inches):
 def plotOneAttribute(date, start_day, content, attribute, yaxis, title):
 
     day = int(date[len(date) - 3:])
-
-    print("start day:", start_day)
-    print("day:", day)
     
     readingStress = False
 
@@ -911,7 +907,7 @@ def getRootDepth(date, gameOutputs):
         
     return rootArray
 
-def getHistory(date, start_day, gameInputs, gameOutputs):
+def getHistory(date, start_day, gameInputs, gameOutputs, weeklyFertilizer):
     day = int(date[len(date) - 3:])
 
     history = {"rain": [0.0], "et": [0.0], "irr": [0.0], "fert": [0.0]}
@@ -938,6 +934,7 @@ def getHistory(date, start_day, gameInputs, gameOutputs):
     onIrrigation = False
     onFertilizer = False
 
+    fertCount = 0
     for line in gameInputs['MZX_content']:
         items = line.split(" ")
         items = [x for x in items if x]
@@ -965,8 +962,13 @@ def getHistory(date, start_day, gameInputs, gameOutputs):
             onFertilizer = True
 
         elif (onFertilizer):
+            print(int(items[5]))
+            print(int(items[5]) == 0)
+            if int(items[5]) == 0:
+                continue
             if (int(items[1]) < int(date)):
-                fertilizer = float(items[5]) / 1.12085
+                fertilizer = weeklyFertilizer[fertCount]
+                fertCount += 1
                 history['fert'].append(fertilizer)
                 if (int(items[1]) >= int(date) - 7):
                     recentHistory['fert'].append(fertilizer)
@@ -1161,8 +1163,6 @@ def createCSV(irr_total, fert_total, final_yield, final_bushel_cost, final_wnipi
 
     writer.writerow([])
     writer.writerow(['Week', 'Projected Yield (bu/ac)', "Monday Irrigation (in)", "Thursday Irrigation (in)", "Fertilizer (lbs)"])
-    print("pyield:", gameProfile.projected_yields)
-    print("mIr:", gameProfile.monday_irrigation)
     for index, pyield in enumerate(gameProfile.projected_yields):
         if index == 0:
             continue

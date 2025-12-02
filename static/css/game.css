@@ -88,7 +88,7 @@ hr {
   position: relative;
   left: -0.5vw;
   /* transform: translateX(-); */
-  width: 99vw; /* full viewport width */
+  width: 98vw; /* full viewport width */
   border: none;
   border-top: 2px dashed black;
   margin: 24px auto 12px auto;
