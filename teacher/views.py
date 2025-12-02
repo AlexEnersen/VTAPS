@@ -75,7 +75,6 @@ def teacherHome(response):
             teacher.authorized = True
             teacher.save()
 
-        print("teachers:", Teacher.objects.all())
         unconfirmed_users = Teacher.objects.filter(confirmed = False, authorized = False)
         unauthorized_users = Teacher.objects.filter(confirmed = True, authorized = False)
         authorized_users = Teacher.objects.filter(confirmed = True, authorized = True)
@@ -107,14 +106,11 @@ def teacherHome(response):
 
 def teacherRegister(response):
     if response.method == "POST":
-        print("teachers:", User.objects.all())
         form = RegisterTeacherForm(response.POST)
-        print("valid:", form.is_valid())
-        print("errors:", form.errors)
         if form.is_valid():
             user = form.save()
 
-            sendConfirmationEmail(user)
+            # sendConfirmationEmail(user)
             return render(response, "teacher/t_submission.html")
         else:
             return render(response, "error_register.html")
@@ -298,7 +294,7 @@ def sendConfirmationEmail(user):
         connection.open()
 
         message = EmailMultiAlternatives("Hello from VTAPS!", "VTAPS Confirmation", "enersen1995@gmail.com", [user.email], connection=connection)
-        message.attach_alternative(f"<p>Hello, {user.username}. This is a confirmation email for VTAPS.org. If you did not create an account recently, please disregard this message</br></br>Click <a href='{'http://localhost:8000' if environment == 'dev' else 'https://vtaps.org'}/teacher/confirm/{activation_key}'> here</a> to finalize your registration with VTAPS.org</p>", "text/html")
+        message.attach_alternative(f"<p>Hello, {user.username}. This is a confirmation email for VTAPS.org. If you did not create an account recently, please disregard this message</br></br>Click <a href='https://vtaps.org/teacher/confirm/{activation_key}'> here</a> to finalize your registration with VTAPS.org</p>", "text/html")
         message.send()
 
         connection.close()
