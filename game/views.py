@@ -97,14 +97,15 @@ def runGame(request, game_id=None):
         
     context = {'game_url': game_url}
 
-    print("user:", request.user)
-    print("authenticated:", request.user.is_authenticated)
+    print("request.user:", request.user)
+    print("user.is_authenticated:", user.is_authenticated)
     if request.user.is_authenticated:
         user = request.user
         context['username'] = user.student.username
     else:
         user = None
 
+    print("new user:", user)
     context['game_id'] = game_id
     context['game_name'] = game.name
 
@@ -131,7 +132,6 @@ def runGame(request, game_id=None):
                     return render(request, "game/caughtup.html", context)
                 else:
                     context = weeklySelection(request, gameProfile)
-             
                 if context is None:
                     return redirect(game_url)
                 # elif "computing" in context:
@@ -241,7 +241,8 @@ def weeklySelection(request, game):
     gameInputs = downloadInputs(gamePath)
     gameOutputs = downloadOutputs(gamePath)
     if gameOutputs is False:
-        time.sleep(3)
+        computeDSSAT(game.hybrid, gameInputs, gamePath)
+        time.sleep(5)
         return None
     
     if game.week > 1:
