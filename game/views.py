@@ -195,7 +195,7 @@ def weeklySelection(request, game):
             gameInputs['WTH_name'] = "NEME2401.WTH"
 
             # fileContents = yearlyRandomizer()
-            file = open("weather_files/NEME2001.WTH")
+            file = open("weather_files/NEME1901.WTH")
             fileContents = file.read().split("\n")
             file.close()
 
