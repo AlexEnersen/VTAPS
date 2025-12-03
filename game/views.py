@@ -23,6 +23,7 @@ import csv
 from django.http import HttpResponseRedirect
 from botocore.config import Config
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
+from django.contrib.auth import logout
 
 environment = os.environ['ENV']
 
@@ -98,8 +99,12 @@ def runGame(request, game_id=None):
     context = {'game_url': game_url}
 
     if request.user.is_authenticated:
-        user = request.user
-        context['username'] = user.student.username
+        try:
+            user = request.user
+            context['username'] = user.student.username
+        except:
+            logout(request)
+            return redirect("/")
     else:
         user = None
 
