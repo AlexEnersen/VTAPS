@@ -329,8 +329,9 @@ def finalResults(request, gameProfile):
     finalYield = getFinalYield(gameOutputs)
     if not gameProfile.finished:
         gameProfile.projected_yields.append(finalYield)
-        gameProfile.monday_irrigation.append(request.POST.get('monday'))
-        gameProfile.thursday_irrigation.append(request.POST.get('thursday'))
+        # if request.method == "POST":
+        #     gameProfile.monday_irrigation.append(request.POST.get('monday'))
+        #     gameProfile.thursday_irrigation.append(request.POST.get('thursday'))
         gameProfile.finished = True
     history = getHistory(date, start_day, gameInputs, gameOutputs, gameProfile.weekly_fertilizer)['history']
 
@@ -1167,28 +1168,33 @@ def createCSV(irr_total, fert_total, final_yield, final_bushel_cost, final_wnipi
     writer.writerow([])
     writer.writerow(['Week', 'Projected Yield (bu/ac)', "Monday Irrigation (in)", "Thursday Irrigation (in)", "Fertilizer (lbs)"])
     for index, pyield in enumerate(gameProfile.projected_yields):
+        if len(gameProfile.monday_irrigation) > index:
+            monday_irrigation = gameProfile.monday_irrigation[index]
+            thursday_irrigation = gameProfile.thursday_irrigation[index]
+        else:
+            monday_irrigation = None
+            thursday_irrigation = None
         if index == 0:
-            continue
-        monday_irrigation = gameProfile.monday_irrigation[index]
-        thursday_irrigation = gameProfile.thursday_irrigation[index]
-        if index == 1:
             fertilizer = gameProfile.weekly_fertilizer[0]
-        elif index == 6:
+        elif index == 5:
             fertilizer = gameProfile.weekly_fertilizer[1]
-        elif index == 9:
+        elif index == 8:
             fertilizer = gameProfile.weekly_fertilizer[2]
-        elif index == 10:
+        elif index == 9:
             fertilizer = gameProfile.weekly_fertilizer[3]
-        elif index == 12:
+        elif index == 11:
             fertilizer = gameProfile.weekly_fertilizer[4]
-        elif index == 14:
+        elif index == 13:
             fertilizer = gameProfile.weekly_fertilizer[5]
-        elif index == 15:
+        elif index == 14:
             fertilizer = gameProfile.weekly_fertilizer[6]
         else:
-            fertilizer = "-"
+            if index < len(gameProfile.projected_yields)-1:
+                fertilizer = "-"
+            else:
+                fertilizer = None
         
-        writer.writerow([index, pyield, monday_irrigation, thursday_irrigation, fertilizer])
+        writer.writerow([index+1 if index < len(gameProfile.projected_yields)-1 else 'End', pyield, monday_irrigation, thursday_irrigation, fertilizer])
 
     return buf.getvalue().encode("utf-8-sig")
 
