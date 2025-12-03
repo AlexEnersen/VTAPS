@@ -249,7 +249,8 @@ def gamePage(game):
 
     weekForm = WeekForm(initial = {'week': game.weekLimit})
     context['week_form'] = weekForm
-    context['week_limit'] = game.weekLimit if game.weekLimit < 21 else f'{game.weekLimit} (End)'
+    context['week_limit'] = game.weekLimit
+    context['week_limit_display'] = game.weekLimit if game.weekLimit < 21 else f'{game.weekLimit} (End)'
 
     context['finalWeek'] = False
     for player in game.players:
@@ -448,7 +449,7 @@ def download(request, id):
 
         for index, pyield in enumerate(gameProfile.projected_yields):
             playerInfo = [player]
-            playerInfo.append(index+1 if index < len(gameProfile.projected_yields)-1 else 'End')
+            playerInfo.append(index+1 if index < 21 else 'End')
             playerInfo.append(round(pyield, 1))
             if len(gameProfile.monday_irrigation) > index:
                 playerInfo.append(gameProfile.monday_irrigation[index])
@@ -467,7 +468,7 @@ def download(request, id):
                 playerInfo.append(gameProfile.weekly_fertilizer[5])
             elif index == 14 and len(gameProfile.weekly_fertilizer) > 6:
                 playerInfo.append(gameProfile.weekly_fertilizer[6])
-            elif index < len(gameProfile.projected_yields)-1:
+            elif index < 21:
                 playerInfo.append("-")
             writer.writerow(playerInfo)
 

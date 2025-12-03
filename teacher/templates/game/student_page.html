@@ -34,7 +34,7 @@
         </a>
       </div>
       <p class="weekChangeField">Code: {{code}}</p>
-      <p class="weekChangeField">Week Limit: {{week_limit}}</p>
+      <p class="weekChangeField">Week Limit: {{week_limit_display}}</p>
       <form method="post" class="row center weekChangeField">
         {% csrf_token %}
         <p class="weekChangeField">{{week_form.week}}</p>
