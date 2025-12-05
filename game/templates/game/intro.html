@@ -1,4 +1,4 @@
-{% extends "game/base.html" %} {% block content %} 
+{% extends "game/base.html" %} {% block content %} {% load static %} 
 {% csrf_token %} {% if game_id != None %}
 <div class="gameAccountHeader">
   <div class="column">
@@ -47,14 +47,18 @@
 </p>
 
 <p class="introText">
-  At the end of the simulation total cost is divided by the final yield. A
-  complete budget is available at:
-  <a href="https://taps.unl.edu/budget">taps.unl.edu/budget</a>. All the
-  decisions and generated weather information are fed into a crop simulation
-  model, Decision Support System for Agrotechnology Transfer (DSSAT) and results
-  are included in a weekly summary. Participants will also have soil moisture
-  sensor information showing soil moisture at various depths of the soil
-  profile.
+  At the end of the simulation total cost is divided by the final yield.
+  <a 
+    href="{% static 'xlsx/budget.xlsx' %}" 
+    target="_blank" 
+    rel="noopener"
+    >A complete budget is available here</a
+  >
+  All the decisions and generated weather information are fed into a crop
+  simulation model, Decision Support System for Agrotechnology Transfer (DSSAT)
+  and results are included in a weekly summary. Participants will also have soil
+  moisture sensor information showing soil moisture at various depths of the
+  soil profile.
 </p>
 
 <p class="introText">
