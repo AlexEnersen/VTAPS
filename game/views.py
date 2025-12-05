@@ -136,8 +136,13 @@ def runGame(request, game_id=None):
                     context = weeklySelection(request, gameProfile)
                 if context is None:
                     return redirect(game_url)
-                # elif "computing" in context:
-                #     return render(request, "game/standby.html", context)
+                elif context is False:
+                    context = {}
+                    context['game_id'] = game_id
+                    context['game_name'] = game.name
+                    if user != None:
+                        context['username'] = user.student.username
+                    return render(request, "game/corrupted.html", context)
                 else:
                     context['game_id'] = game_id
                     context['game_name'] = game.name
@@ -157,7 +162,6 @@ def runGame(request, game_id=None):
         if game_id is None:
             request.session['game_id'] = game.id
         return render(request, "game/intro.html", context)
-        # return redirect(game_url)
 
 def weeklySelection(request, game):   
     context = {}
@@ -239,13 +243,15 @@ def weeklySelection(request, game):
 
         game.save()
         return None
-    
+
     gameInputs = downloadInputs(gamePath)
     gameOutputs = downloadOutputs(gamePath)
     if gameOutputs is False:
         computeDSSAT(game.hybrid, gameInputs, gamePath)
         time.sleep(5)
         return None
+    elif len(gameOutputs) == 0:
+        return False
     
     if game.week > 1:
         game.computing = False
@@ -1236,5 +1242,5 @@ def setHybrid(content, hybrid):
     return newContent
 
 def getSeedCost(hybrid, seeding_rate):
-    seedCosts = {'IB2074 Channel213-19VTPRIB': 3.38, 'PC0006 Fontanelle 11D637': 3.28, 'IB2073 Pioneer 0801AM': 2.81, 'IB2072 Pioneer 1197AM': 2.94, 'IB1071 Pioneer 1366AML': 3.04, 'IB1073 Pioneer 1185': 3.25}
+    seedCosts = {'IB2074 Channel213-19VTPRIB': 3.38, 'IB2075 Fontanelle 11D637': 3.28, 'IB2073 Pioneer 0801AM': 2.81, 'IB2072 Pioneer 1197AM': 2.94, 'IB1071 Pioneer 1366AML': 3.04, 'IB1073 Pioneer 1185': 3.25}
     return (seedCosts[hybrid]) * (seeding_rate/1000)

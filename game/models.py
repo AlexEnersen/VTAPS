@@ -5,7 +5,7 @@ from teacher.models import Game
 
 HYBRID_CHOICES = [
     ('IB2074 Channel213-19VTPRIB', 'Channel213-19VTPRIB'),
-    ('PC0006 Fontanelle 11D637', 'Fontanelle 11D637'),
+    ('IB2075 Fontanelle 11D637', 'Fontanelle 11D637'),
     ('IB2073 Pioneer 0801AM', 'Pioneer 0801AM'),
     ('IB2072 Pioneer 1197AM', 'Pioneer 1197AM'),
     ('IB1071 Pioneer 1366AML', 'Pioneer 1366AML'),
