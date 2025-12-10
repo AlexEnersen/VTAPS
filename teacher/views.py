@@ -169,6 +169,9 @@ def game(response, id):
             players = []
             for player in response.POST['players'].split("\n"):
                 player = player.replace("\r", "")
+                player = player.strip()
+                if len(player) <= 0:
+                    continue
                 players.append(player)
             game.players = players
             game.name = response.POST['gameName']
@@ -208,9 +211,6 @@ def passwordPage(game):
     
     playerList = {}
     for player in game.players:
-        if len(player) <= 0:
-            continue
-
         if player in playerList:
             playerList[player] += 1
             player = f'{player}{playerList[player]}'
@@ -253,11 +253,8 @@ def gamePage(game):
     context['week_limit_display'] = game.weekLimit if game.weekLimit < 21 else f'{game.weekLimit} (End)'
 
     context['finalWeek'] = False
-    print(game.players)
     for player in game.players:
         playerInfo = {'username': player}
-        print("player:", player)
-        print("code:", game.code)
         try:
             student = Student.objects.get(username=player, code=game.code)
         except:
