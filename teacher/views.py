@@ -253,9 +253,15 @@ def gamePage(game):
     context['week_limit_display'] = game.weekLimit if game.weekLimit < 21 else f'{game.weekLimit} (End)'
 
     context['finalWeek'] = False
+    print(game.players)
     for player in game.players:
         playerInfo = {'username': player}
-        student = Student.objects.get(username=player, code=game.code)
+        print("player:", player)
+        print("code:", game.code)
+        try:
+            student = Student.objects.get(username=player, code=game.code)
+        except:
+            continue
         try:
             gameProfile = GameProfile.objects.get(game=game, user=student.user)
             playerInfo['week'] = gameProfile.week
