@@ -57,7 +57,13 @@ form.weekChangeField {
   justify-content: space-between;
 }
 
-.teacherGameColumn {
+.teacherGameColumnLeft {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+}
+
+.teacherGameColumnRight {
   display: flex;
   flex-direction: column;
   width: 50%;

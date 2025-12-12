@@ -1,7 +1,7 @@
 {% extends "t_base.html" %} {% load static %} {% block content %}
 <div class="accountWrapper">
   <div class="teacherGamePage">
-    <div class="teacherGameColumn">
+    <div class="teacherGameColumnLeft">
       <h1 class="header">Players</h1>
       <table class="gameSummaryTable">
         <tr class="gameSummaryRow">
@@ -46,7 +46,7 @@
       </form>
       <a class="secondaryButton backButton" href="/teacher">Back</a>
     </div>
-    <div class="teacherGameColumn center">
+    <div class="teacherGameColumnRight center">
       <h1 class="header">Results</h1>
       <div>{{ group_cost_graph | safe }}</div>
       <div>{{ group_yield_graph | safe }}</div>

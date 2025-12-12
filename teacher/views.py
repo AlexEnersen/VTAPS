@@ -361,8 +361,9 @@ def groupAttributeGraph(game, studentList, attribute):
     attributeAmount = []
 
     for student in studentList:
-        attributeNames.append(student.username)
         try:
+            if attribute is not 'Yield':
+                attributeNames.append(student.username)
             gameProfile = GameProfile.objects.get(user=student.user)
             if attribute == 'Cost':
                 attributeAmount.append(gameProfile.total_cost)
@@ -375,9 +376,12 @@ def groupAttributeGraph(game, studentList, attribute):
             elif attribute == 'Leaching':
                 attributeAmount.append(gameProfile.nitrogen_leaching)
             elif attribute == 'Yield':
-                attributeAmount.append(gameProfile.projected_yields)
+                attributeAmount.append(gameProfile.projected_yields)    
+                attributeNames.append(student.username)
+
         except:
-            attributeAmount.append(0)
+            if attribute is not 'Yield':
+                attributeAmount.append(0)
 
     fig, ax = plt.subplots()
 
@@ -444,8 +448,8 @@ def download(request, id):
     writer = csv.writer(buf)
     writer.writerow(['Username', 'Week', 'Projected Yield (bu/ac)', "Monday Irrigation (in)", "Thursday Irrigation (in)", "Fertilizer (lbs)"])
     for player in game.players:
-        student = Student.objects.get(username=player, code=game.code)
         try:
+            student = Student.objects.get(username=player, code=game.code)
             gameProfile = GameProfile.objects.get(user=student.user)
         except:
             continue
