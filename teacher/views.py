@@ -167,12 +167,22 @@ def game(response, id):
     if game.created == False:
         if response.method == 'POST':
             players = []
+            uniquePlayers = {}
             for player in response.POST['players'].split("\n"):
                 player = player.replace("\r", "")
                 player = player.strip()
                 if len(player) <= 0:
                     continue
+                player = player.strip()  
+                
+                if player in uniquePlayers:
+                    uniquePlayers[player] += 1
+                    player = f'{player}{uniquePlayers[player]}'
+                else:
+                    uniquePlayers[player] = 1
+                
                 players.append(player)
+
             game.players = players
             game.name = response.POST['gameName']
             game.created = True
@@ -211,14 +221,6 @@ def passwordPage(game):
     
     playerList = {}
     for player in game.players:
-        if player in playerList:
-            playerList[player] += 1
-            player = f'{player}{playerList[player]}'
-        else:
-            playerList[player] = 1
-        
-        
-        player = player.strip()  
         newPassword = ''.join(random.choice(characters) for _ in range(6))
 
         try:
@@ -362,7 +364,7 @@ def groupAttributeGraph(game, studentList, attribute):
 
     for student in studentList:
         try:
-            if attribute is not 'Yield':
+            if attribute != 'Yield':
                 attributeNames.append(student.username)
             gameProfile = GameProfile.objects.get(user=student.user)
             if attribute == 'Cost':
