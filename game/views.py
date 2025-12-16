@@ -128,8 +128,8 @@ def runGame(request, game_id=None):
             context['fert_form'] = fert_form
             return render(request, "game/init.html", context)
         else:
-            # if gameProfile.week < 22 and not gameProfile.finished:              ##### NORMAL MODE
-            if gameProfile.week <= 1 and not gameProfile.finished:            ##### FINAL PAGE    DEBUG MODE
+            if gameProfile.week < 22 and not gameProfile.finished:              ##### NORMAL MODE
+            # if gameProfile.week <= 1 and not gameProfile.finished:            ##### FINAL PAGE    DEBUG MODE
                 if user != None and gameProfile.week > game.weekLimit:
                     return render(request, "game/caughtup.html", context)
                 else:
