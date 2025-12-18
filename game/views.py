@@ -682,7 +682,7 @@ def plotOneAttribute(date, start_day, content, attribute, yaxis, title):
         items = list(filter(None, line.split(" ")))
         if len(items) <= 3 and not readingStress:
             continue
-        elif (readingStress and len(items) == 0) or (readingStress and int(items[1]) > day-1):
+        elif (readingStress and len(items) <= 1) or (readingStress and int(items[1]) > day-1):
             break
         elif len(items) > 3 and not readingStress:
             if (items[0] == "@YEAR"):
