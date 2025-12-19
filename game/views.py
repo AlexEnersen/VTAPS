@@ -227,6 +227,9 @@ def weeklySelection(request, game):
             if not fertilizerQuantity == None:
                 gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fertilizerQuantity, int(date))
             gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], irrigationQuantity, fertilizerQuantity, int(date), game.week)
+
+            # with open(f'{gameInputs['MZX_name']}-fertilized', 'w') as f:
+            #     f.write("\n".join(gameInputs['MZX_content']))
         
         computeDSSAT(game.hybrid, gameInputs, gamePath)
 
@@ -350,7 +353,7 @@ def finalResults(request, gameProfile):
     context['nitrogen_leaching_graph'] = plotOneAttribute(date, start_day, gameOutputs['NiBal_content'], 'RLCH', 'Nitrate Leached (lbs/a)', 'Nitrate Leaching')
 
 
-
+    ### CONTROL GAME
     controlGameInputs = gameInputs.copy()
     with open(f"mzx_files/cleaned/{controlGameInputs['MZX_name']}", 'r') as f:
         controlGameInputs['MZX_content'] = f.read().split("\n")
@@ -363,6 +366,37 @@ def finalResults(request, gameProfile):
         computeDSSAT(gameProfile.hybrid, controlGameInputs, controlGamePath)
     controlGameOutputs = downloadOutputs(controlGamePath)
 
+    ### IRRIGATED GAME
+    irrigatedGameInputs = gameInputs.copy()
+    with open(f"mzx_files/cleaned/{irrigatedGameInputs['MZX_name'][:-4]}-irrigated.MZX", 'r') as f:
+        irrigatedGameInputs['MZX_content'] = f.read().split("\n")
+    irrigatedGameInputs['MZX_content'] = setHybrid(irrigatedGameInputs['MZX_content'], gameProfile.hybrid)
+    irrigatedGameInputs['MZX_content'] = setSeedingRate(irrigatedGameInputs['MZX_content'], gameProfile.seeding_rate)
+
+    irrigatedGamePath = gamePath + 'irrigated'
+     
+    if checkBucket(irrigatedGamePath) == False:
+        computeDSSAT(gameProfile.hybrid, irrigatedGameInputs, irrigatedGamePath)
+    irrigatedGameOutputs = downloadOutputs(irrigatedGamePath)
+    irrigatedFinalYield = getFinalYield(irrigatedGameOutputs)
+
+
+    ### FERTILIZED GAME
+    fertilizedGameInputs = gameInputs.copy()
+    with open(f"mzx_files/cleaned/{fertilizedGameInputs['MZX_name'][:-4]}-fertilized.MZX", 'r') as f:
+        fertilizedGameInputs['MZX_content'] = f.read().split("\n")
+    fertilizedGameInputs['MZX_content'] = setHybrid(fertilizedGameInputs['MZX_content'], gameProfile.hybrid)
+    fertilizedGameInputs['MZX_content'] = setSeedingRate(fertilizedGameInputs['MZX_content'], gameProfile.seeding_rate)
+
+    fertilizedGamePath = gamePath + 'fertilized'
+     
+    if checkBucket(fertilizedGamePath) == False:
+        computeDSSAT(gameProfile.hybrid, fertilizedGameInputs, fertilizedGamePath)
+    fertilizedGameOutputs = downloadOutputs(fertilizedGamePath)
+    fertilizedFinalYield = getFinalYield(fertilizedGameOutputs)
+
+
+    ### PROCEEDING
     controlHistory = getHistory(date, start_day, controlGameInputs, controlGameOutputs, [0])['history']
 
     controlFinalYield = getFinalYield(controlGameOutputs)
@@ -389,11 +423,11 @@ def finalResults(request, gameProfile):
     gameProfile.wnipi = WNIPI_total
     context['WNIPI'] = round(WNIPI_total, 4)
     
-    agronomicEfficiency = (finalYield - controlFinalYield)/(final_fert + 0.001)
+    agronomicEfficiency = (finalYield - fertilizedFinalYield)/(final_fert + 0.001)
     gameProfile.agronomic_efficiency = agronomicEfficiency
     context['AE'] = agronomicEfficiency
 
-    irrigationWaterUseEfficiency = (finalYield - controlFinalYield)/(final_irr + 0.001)
+    irrigationWaterUseEfficiency = (finalYield - irrigatedFinalYield)/(final_irr + 0.001)
     gameProfile.irrigation_water_use_efficiency = irrigationWaterUseEfficiency
     context['IWUE'] = irrigationWaterUseEfficiency
 
@@ -412,7 +446,7 @@ def finalResults(request, gameProfile):
 
     gameProfile.save()
 
-    csv = createCSV(context['irr_amount'], context['fert_amount'], context['yield'], context['bushel_cost'], context['WNIPI'], controlFinalYield, gameProfile)
+    csv = createCSV(context['irr_amount'], context['fert_amount'], context['yield'], context['bushel_cost'], context['AE'], context['IWUE'], context['NLeaching'], context['WNIPI'], controlFinalYield, gameProfile)
     s3.put_object(
         Bucket="finalresultsbucket",
         Key=f"{gamePath}/final_summary.csv",
@@ -573,7 +607,7 @@ def getNitrogenLeaching(gameOutputs):
             readingLeaching = True
         elif readingLeaching:
             totalLeaching += float(items[13])
-    return totalLeaching
+    return totalLeaching * 0.892
             
 
         
@@ -1167,11 +1201,11 @@ def downloadOutputs(gamePath):
     except:
         return False
     
-def createCSV(irr_total, fert_total, final_yield, final_bushel_cost, final_wnipi, controlFinalYield, gameProfile):
+def createCSV(irr_total, fert_total, final_yield, final_bushel_cost, ae, iwue, nleaching, final_wnipi, controlFinalYield, gameProfile):
     buf = io.StringIO(newline='')
     writer = csv.writer(buf)
-    writer.writerow(["Irrigation Total (in)", "Fertilizer Total (lbs)", "Final Yield (bu/ac)", "Cost Per Bushel", "WNIPI Score", "Control Plot Yield (bu/ac)"])
-    writer.writerow([irr_total, fert_total, final_yield, final_bushel_cost, final_wnipi, controlFinalYield])
+    writer.writerow(["Irrigation Total (in)", "Fertilizer Total (lbs)", "Final Yield (bu/ac)", "Cost Per Bushel", "AE", "IWUE", "N Leaching (lbs/ac)", "WNIPI Score", "Control Plot Yield (bu/ac)"])
+    writer.writerow([irr_total, fert_total, final_yield, final_bushel_cost, ae, iwue, nleaching, final_wnipi, controlFinalYield])
 
     writer.writerow([])
     writer.writerow(['Week', 'Projected Yield (bu/ac)', "Monday Irrigation (in)", "Thursday Irrigation (in)", "Fertilizer (lbs)"])

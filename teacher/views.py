@@ -382,7 +382,7 @@ def groupAttributeGraph(game, studentList, attribute):
                 attributeNames.append(student.username)
 
         except:
-            if attribute is not 'Yield':
+            if attribute != 'Yield':
                 attributeAmount.append(0)
 
     fig, ax = plt.subplots()
@@ -448,40 +448,44 @@ def download(request, id):
 
     buf = io.StringIO(newline='')
     writer = csv.writer(buf)
-    writer.writerow(['Username', 'Week', 'Projected Yield (bu/ac)', "Monday Irrigation (in)", "Thursday Irrigation (in)", "Fertilizer (lbs)"])
-    for player in game.players:
+    writer.writerow(['Username', 'Week', 'Projected Yield (bu/ac)', "Monday Irrigation (in)", "Thursday Irrigation (in)", "Fertilizer (lbs)", '',"Control Yield (bu/ac)"])
+    for index, player in enumerate(game.players):
         try:
             student = Student.objects.get(username=player, code=game.code)
             gameProfile = GameProfile.objects.get(user=student.user)
         except:
             continue
 
-        for index, pyield in enumerate(gameProfile.projected_yields):
+        for index2, pyield in enumerate(gameProfile.projected_yields):
             playerInfo = [player]
-            playerInfo.append(index+1 if index < 21 else 'End')
+            playerInfo.append(index2+1 if index2 < 21 else 'End')
             playerInfo.append(round(pyield, 1))
-            if len(gameProfile.monday_irrigation) > index:
-                playerInfo.append(gameProfile.monday_irrigation[index])
-                playerInfo.append(gameProfile.thursday_irrigation[index])
-            if index == 0 and len(gameProfile.weekly_fertilizer) > 0:
+            if len(gameProfile.monday_irrigation) > index2:
+                playerInfo.append(gameProfile.monday_irrigation[index2])
+                playerInfo.append(gameProfile.thursday_irrigation[index2])
+            if index2 == 0 and len(gameProfile.weekly_fertilizer) > 0:
                 playerInfo.append(gameProfile.weekly_fertilizer[0])
-            elif index == 5 and len(gameProfile.weekly_fertilizer) > 1:
+            elif index2 == 5 and len(gameProfile.weekly_fertilizer) > 1:
                 playerInfo.append(gameProfile.weekly_fertilizer[1])
-            elif index == 8 and len(gameProfile.weekly_fertilizer) > 2:
+            elif index2 == 8 and len(gameProfile.weekly_fertilizer) > 2:
                 playerInfo.append(gameProfile.weekly_fertilizer[2])
-            elif index == 9 and len(gameProfile.weekly_fertilizer) > 3:
+            elif index2 == 9 and len(gameProfile.weekly_fertilizer) > 3:
                 playerInfo.append(gameProfile.weekly_fertilizer[3])
-            elif index == 11 and len(gameProfile.weekly_fertilizer) > 4:
+            elif index2 == 11 and len(gameProfile.weekly_fertilizer) > 4:
                 playerInfo.append(gameProfile.weekly_fertilizer[4])
-            elif index == 13 and len(gameProfile.weekly_fertilizer) > 5:
+            elif index2 == 13 and len(gameProfile.weekly_fertilizer) > 5:
                 playerInfo.append(gameProfile.weekly_fertilizer[5])
-            elif index == 14 and len(gameProfile.weekly_fertilizer) > 6:
+            elif index2 == 14 and len(gameProfile.weekly_fertilizer) > 6:
                 playerInfo.append(gameProfile.weekly_fertilizer[6])
-            elif index < 21:
+            elif index2 < 21:
                 playerInfo.append("-")
+
+            # if index == 0 and index2 == 0:
+            #     playerInfo.append('')
+            #     playerInfo.append()
             writer.writerow(playerInfo)
 
-            if index == len(gameProfile.projected_yields)-1:
+            if index2 == len(gameProfile.projected_yields)-1:
                 writer.writerow([])
 
     data = buf.getvalue().encode("utf-8-sig")
