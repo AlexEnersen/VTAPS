@@ -24,6 +24,8 @@ from django.http import HttpResponseRedirect
 from botocore.config import Config
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.contrib.auth import logout
+from botocore.exceptions import ClientError
+import random
 
 environment = os.environ['ENV']
 
@@ -151,6 +153,8 @@ def runGame(request, game_id=None):
                     return render(request, "game/weekly.html", context)
             else:
                 context = finalResults(request, gameProfile)
+                if context is None:
+                    return redirect(game_url)
                 context['game_id'] = game_id
                 context['game_name'] = game.name
                 if user != None:
@@ -235,8 +239,9 @@ def weeklySelection(request, game):
 
         if game.week > 0:
             gameOutputs = downloadOutputs(gamePath)
-            projectedYield = getFinalYield(gameOutputs)
-            game.projected_yields.append(projectedYield)
+            if gameOutputs is not False and 'OOV_content' in gameOutputs:
+                projectedYield = getFinalYield(gameOutputs)
+                game.projected_yields.append(projectedYield)
             game.monday_irrigation.append(request.POST.get('monday'))
             game.thursday_irrigation.append(request.POST.get('thursday'))
             if request.POST.get('fertilizer') != None:
@@ -321,6 +326,9 @@ def finalResults(request, gameProfile):
     
     gameInputs = downloadInputs(gamePath)
     gameOutputs = downloadOutputs(gamePath)
+    if gameOutputs is False:
+        uploadInputs(gamePath, gameInputs)
+        return None
 
     start_date = str(int(getDate(gameInputs['MZX_content'])))
     start_day = int(str(start_date)[len(str(start_date)) - 3:])
@@ -338,9 +346,6 @@ def finalResults(request, gameProfile):
     finalYield = getFinalYield(gameOutputs)
     if not gameProfile.finished:
         gameProfile.projected_yields.append(finalYield)
-        # if request.method == "POST":
-        #     gameProfile.monday_irrigation.append(request.POST.get('monday'))
-        #     gameProfile.thursday_irrigation.append(request.POST.get('thursday'))
         gameProfile.finished = True
     history = getHistory(date, start_day, gameInputs, gameOutputs, gameProfile.weekly_fertilizer)['history']
 
@@ -362,7 +367,7 @@ def finalResults(request, gameProfile):
  
     controlGamePath = gamePath + 'control'
      
-    if checkBucket(controlGamePath) == False:
+    if checkBucket(controlGamePath) is False:
         computeDSSAT(gameProfile.hybrid, controlGameInputs, controlGamePath)
     controlGameOutputs = downloadOutputs(controlGamePath)
 
@@ -1079,17 +1084,18 @@ def computeDSSAT(hybrid, gameInputs, gamePath):
     zip_buffer.seek(0)     
 
     # Upload to S3
-    s3.delete_object(Bucket='outputvtapsbucket', Key=f"{gamePath}/{gamePath}.zip")  
     s3.upload_fileobj(zip_buffer, 'vtapsbucket', f"{gamePath}.zip")
 
 def checkOutputs(gamePath):
 
-    timeout = time.time() + (60*10)
+    timeout = time.time() + (60*15)
+    delay = 1.0
 
     while time.time() < timeout:
         if checkBucket(gamePath):
-            return True
-        time.sleep(0.1)
+            return True    
+        time.sleep(delay)
+        delay = min(delay * 1.25, 10.0)
     
     return False
 
@@ -1099,8 +1105,22 @@ def checkBucket(gamePath):
 
     try:
         s3.head_object(Bucket='outputvtapsbucket', Key=key)
-        return True
-    except:
+        return True   
+    except ClientError as e:
+        code = e.response.get("Error", {}).get("Code", "")
+
+        if environment == "prod":
+            logger.info(f"checkBucket error code={code} key={key} err={e}")
+        else:
+            print("checkBucket error:", code, e)
+        
+        if code in ("404", "NoSuchKey", "NotFound"):
+            return False
+
+        if code in ("SlowDown", "RequestTimeout", "Throttling", "503"):
+            time.sleep(0.2 + random.random() * 0.8)
+            return False
+
         return False
 
 def uploadInputs(gameInputs, gamePath):
