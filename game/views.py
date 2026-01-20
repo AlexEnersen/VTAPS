@@ -231,10 +231,7 @@ def weeklySelection(request, game):
             if not fertilizerQuantity == None:
                 gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fertilizerQuantity, int(date))
             gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], irrigationQuantity, fertilizerQuantity, int(date), game.week)
-
-            # with open(f'{gameInputs['MZX_name']}-fertilized', 'w') as f:
-            #     f.write("\n".join(gameInputs['MZX_content']))
-        
+            
         computeDSSAT(game.hybrid, gameInputs, gamePath)
 
         if game.week > 0:
@@ -327,7 +324,7 @@ def finalResults(request, gameProfile):
     gameInputs = downloadInputs(gamePath)
     gameOutputs = downloadOutputs(gamePath)
     if gameOutputs is False:
-        uploadInputs(gamePath, gameInputs)
+        computeDSSAT(gameProfile.hybrid, gameInputs, gamePath)
         return None
 
     start_date = str(int(getDate(gameInputs['MZX_content'])))
@@ -403,26 +400,17 @@ def finalResults(request, gameProfile):
 
     ### PROCEEDING
     controlHistory = getHistory(date, start_day, controlGameInputs, controlGameOutputs, [0])['history']
-
     controlFinalYield = getFinalYield(controlGameOutputs)
+
     WNIPI_yield = ((finalYield / controlFinalYield) - 1)
-    # print("YIELD:", finalYield)
-    # print("CONTROL YIELD:", controlFinalYield)
-    # print("WNIPI YIELD:", WNIPI_yield)
 
     final_irr = sum(history['irr'])
     control_et = sum(controlHistory['et'])
     WNIPI_irr = (1 + (final_irr / control_et))
-    # print("IRRIGATION:", final_irr)
-    # print("CONTROL ET:", control_et)
-    # print("WNIPI IRRIGATION:", WNIPI_irr)
 
     final_fert = sum(history['fert'])
     control_fert_uptake = getNitrogenUptake(date, controlGameOutputs)
     WNIPI_fert = (1 + (final_fert / control_fert_uptake))
-    # print("FERTILIZER:", final_fert)
-    # print("CONTROL FERTILIZER:", control_fert_uptake)
-    # print("WNIPI FERTILIZER:", WNIPI_fert)
 
     WNIPI_total = (WNIPI_yield / (WNIPI_irr * WNIPI_fert))
     gameProfile.wnipi = WNIPI_total
@@ -435,6 +423,20 @@ def finalResults(request, gameProfile):
     irrigationWaterUseEfficiency = (finalYield - irrigatedFinalYield)/(final_irr + 0.001)
     gameProfile.irrigation_water_use_efficiency = irrigationWaterUseEfficiency
     context['IWUE'] = irrigationWaterUseEfficiency
+
+    totalFert = sum(history['fert'])
+    totalIrr = sum(history['irr'])
+    totalET = sum(history['et'])
+
+    context['PFP'] = finalYield / totalFert
+    context['NUE'] = (getNitrogenUptake(date, gameOutputs) / totalFert) * 100
+    context['WUE'] = finalYield / totalET
+    context['WP'] = finalYield / totalIrr
+
+    gameProfile.partialFactorProductivity = context['PFP']
+    gameProfile.nitrogenUseEfficiency = context['NUE']
+    gameProfile.waterUseEfficiency = context["WUE"]
+    gameProfile.waterProductivity = context['WP']
 
     nitrogenLeaching = getNitrogenLeaching(gameOutputs)
     gameProfile.nitrogen_leaching = nitrogenLeaching
@@ -451,7 +453,7 @@ def finalResults(request, gameProfile):
 
     gameProfile.save()
 
-    csv = createCSV(context['irr_amount'], context['fert_amount'], context['yield'], context['bushel_cost'], context['AE'], context['IWUE'], context['NLeaching'], context['WNIPI'], controlFinalYield, gameProfile)
+    csv = createCSV(context['irr_amount'], context['fert_amount'], context['yield'], context['bushel_cost'], context['PFP'], context['NUE'], context['WUE'], context['WP'], context['NLeaching'], controlFinalYield, gameProfile)
     s3.put_object(
         Bucket="finalresultsbucket",
         Key=f"{gamePath}/final_summary.csv",
@@ -1103,8 +1105,10 @@ def checkBucket(gamePath):
 
     key = f'{gamePath}/{gamePath}.zip'
 
+    print("checking...")
     try:
         s3.head_object(Bucket='outputvtapsbucket', Key=key)
+        print("its true")
         return True   
     except ClientError as e:
         code = e.response.get("Error", {}).get("Code", "")
@@ -1120,7 +1124,7 @@ def checkBucket(gamePath):
         if code in ("SlowDown", "RequestTimeout", "Throttling", "503"):
             time.sleep(0.2 + random.random() * 0.8)
             return False
-
+        print("oh?")
         return False
 
 def uploadInputs(gameInputs, gamePath):
@@ -1221,11 +1225,11 @@ def downloadOutputs(gamePath):
     except:
         return False
     
-def createCSV(irr_total, fert_total, final_yield, final_bushel_cost, ae, iwue, nleaching, final_wnipi, controlFinalYield, gameProfile):
+def createCSV(irr_total, fert_total, final_yield, final_bushel_cost, pfp, nue, wue, wp, nleaching, controlFinalYield, gameProfile):
     buf = io.StringIO(newline='')
     writer = csv.writer(buf)
-    writer.writerow(["Irrigation Total (in)", "Fertilizer Total (lbs)", "Final Yield (bu/ac)", "Cost Per Bushel", "AE", "IWUE", "N Leaching (lbs/ac)", "WNIPI Score", "Control Plot Yield (bu/ac)"])
-    writer.writerow([irr_total, fert_total, final_yield, final_bushel_cost, ae, iwue, nleaching, final_wnipi, controlFinalYield])
+    writer.writerow(["Irrigation Total (in)", "Fertilizer Total (lbs)", "Final Yield (bu/ac)", "Cost Per Bushel", "PFP", "NUE", "WUE", "WP", "N Leaching (lbs/ac)", "Control Plot Yield (bu/ac)"])
+    writer.writerow([irr_total, fert_total, final_yield, final_bushel_cost, pfp, nue, wue, wp, nleaching, controlFinalYield])
 
     writer.writerow([])
     writer.writerow(['Week', 'Projected Yield (bu/ac)', "Monday Irrigation (in)", "Thursday Irrigation (in)", "Fertilizer (lbs)"])

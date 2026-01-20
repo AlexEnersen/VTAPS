@@ -276,9 +276,13 @@ def gamePage(game):
     context['group_yield_graph'] = groupAttributeGraph(game, studentList, 'Yield')
     if context['finalWeek']:
         context['group_leaching_graph'] = groupAttributeGraph(game, studentList, 'Leaching')
-        context['group_ae_graph'] = groupAttributeGraph(game, studentList, 'AE')
-        context['group_iwue_graph'] = groupAttributeGraph(game, studentList, 'IWUE')
-        context['group_wnipi_graph'] = groupAttributeGraph(game, studentList, 'WNIPI')
+        # context['group_ae_graph'] = groupAttributeGraph(game, studentList, 'AE')
+        # context['group_iwue_graph'] = groupAttributeGraph(game, studentList, 'IWUE')
+        # context['group_wnipi_graph'] = groupAttributeGraph(game, studentList, 'WNIPI')
+        context['group_pfp_graph'] = groupAttributeGraph(game, studentList, 'PFP')
+        context['group_nue_graph'] = groupAttributeGraph(game, studentList, 'NUE')
+        context['group_wue_graph'] = groupAttributeGraph(game, studentList, 'WUE')
+        context['group_wp_graph'] = groupAttributeGraph(game, studentList, 'WP')
 
     context['url'] = f'/teacher/game/{game.id}/download'
 
@@ -369,12 +373,14 @@ def groupAttributeGraph(game, studentList, attribute):
             gameProfile = GameProfile.objects.get(user=student.user)
             if attribute == 'Cost':
                 attributeAmount.append(gameProfile.total_cost)
-            elif attribute == 'AE':
-                attributeAmount.append(gameProfile.agronomic_efficiency)
-            elif attribute == 'IWUE':
-                attributeAmount.append(gameProfile.irrigation_water_use_efficiency)
-            elif attribute == 'WNIPI':
-                attributeAmount.append(gameProfile.wnipi)
+            elif attribute == 'PFP':
+                attributeAmount.append(gameProfile.partialFactorProductivity)
+            elif attribute == 'NUE':
+                attributeAmount.append(gameProfile.nitrogenUseEfficiency)
+            elif attribute == 'WUE':
+                attributeAmount.append(gameProfile.waterUseEfficiency)
+            elif attribute == 'WP':
+                attributeAmount.append(gameProfile.waterProductivity)
             elif attribute == 'Leaching':
                 attributeAmount.append(gameProfile.nitrogen_leaching)
             elif attribute == 'Yield':
@@ -394,20 +400,38 @@ def groupAttributeGraph(game, studentList, attribute):
         title = 'Cost Per Student'
         ax.bar(attributeNames, attributeAmount, color='skyblue')
         ax.set_ylim(bottom=750)
-    elif attribute == 'AE':
+    # elif attribute == 'AE':
+    #     xlabel = 'Students'
+    #     ylabel = 'Agronimic Efficiency'
+    #     title = 'Agronomic Efficiency Per Student'
+    #     ax.bar(attributeNames, attributeAmount, color='skyblue')
+    # elif attribute == 'IWUE':
+    #     xlabel = 'Students'
+    #     ylabel = 'Irrigation Water Use Efficiency'
+    #     title = 'Irrigation Water Use Efficiency Per Student'
+    #     ax.bar(attributeNames, attributeAmount, color='skyblue')
+    # elif attribute == 'WNIPI':
+    #     xlabel = 'Students'
+    #     ylabel = 'Overall Efficiency Efficiency'
+    #     title = 'Overall Efficiency Per Student'
+    elif attribute == 'PFP':
         xlabel = 'Students'
-        ylabel = 'Agronimic Efficiency'
-        title = 'Agronomic Efficiency Per Student'
+        ylabel = 'Partial Factor Productivity'
+        title = 'Partial Factor Productivity Per Student'
         ax.bar(attributeNames, attributeAmount, color='skyblue')
-    elif attribute == 'IWUE':
+    elif attribute == 'NUE':
         xlabel = 'Students'
-        ylabel = 'Irrigation Water Use Efficiency'
-        title = 'Irrigation Water Use Efficiency Per Student'
+        ylabel = 'Nitrogen Use Efficiency'
+        title = 'Nitrogen Use Efficiency Per Student'
         ax.bar(attributeNames, attributeAmount, color='skyblue')
-    elif attribute == 'WNIPI':
+    elif attribute == 'WUE':
         xlabel = 'Students'
-        ylabel = 'Overall Efficiency Efficiency'
-        title = 'Overall Efficiency Per Student'
+        ylabel = 'Water Use Efficiency'
+        title = 'Water Use Efficiency Per Student'
+    elif attribute == 'WP':
+        xlabel = 'Students'
+        ylabel = 'Water Productivity'
+        title = 'Water Productivity Per Student'
         ax.bar(attributeNames, attributeAmount, color='skyblue')
     elif attribute == 'Leaching':
         xlabel = 'Students'
@@ -448,7 +472,7 @@ def download(request, id):
 
     buf = io.StringIO(newline='')
     writer = csv.writer(buf)
-    writer.writerow(['Username', 'Week', 'Projected Yield (bu/ac)', "Monday Irrigation (in)", "Thursday Irrigation (in)", "Fertilizer (lbs)", '',"Control Yield (bu/ac)"])
+    writer.writerow(['Username', 'Week', 'Projected Yield (bu/ac)', "Monday Irrigation (in)", "Thursday Irrigation (in)", "Fertilizer (lbs)"])
     for index, player in enumerate(game.players):
         try:
             student = Student.objects.get(username=player, code=game.code)
