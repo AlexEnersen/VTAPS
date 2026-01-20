@@ -428,6 +428,7 @@ def groupAttributeGraph(game, studentList, attribute):
         xlabel = 'Students'
         ylabel = 'Water Use Efficiency'
         title = 'Water Use Efficiency Per Student'
+        ax.bar(attributeNames, attributeAmount, color='skyblue')
     elif attribute == 'WP':
         xlabel = 'Students'
         ylabel = 'Water Productivity'

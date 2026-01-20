@@ -232,6 +232,7 @@ def weeklySelection(request, game):
                 gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fertilizerQuantity, int(date))
             gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], irrigationQuantity, fertilizerQuantity, int(date), game.week)
             
+        
         computeDSSAT(game.hybrid, gameInputs, gamePath)
 
         if game.week > 0:
@@ -369,64 +370,66 @@ def finalResults(request, gameProfile):
     controlGameOutputs = downloadOutputs(controlGamePath)
 
     ### IRRIGATED GAME
-    irrigatedGameInputs = gameInputs.copy()
-    with open(f"mzx_files/cleaned/{irrigatedGameInputs['MZX_name'][:-4]}-irrigated.MZX", 'r') as f:
-        irrigatedGameInputs['MZX_content'] = f.read().split("\n")
-    irrigatedGameInputs['MZX_content'] = setHybrid(irrigatedGameInputs['MZX_content'], gameProfile.hybrid)
-    irrigatedGameInputs['MZX_content'] = setSeedingRate(irrigatedGameInputs['MZX_content'], gameProfile.seeding_rate)
+    # irrigatedGameInputs = gameInputs.copy()
+    # with open(f"mzx_files/cleaned/{irrigatedGameInputs['MZX_name'][:-4]}-irrigated.MZX", 'r') as f:
+    #     irrigatedGameInputs['MZX_content'] = f.read().split("\n")
+    # irrigatedGameInputs['MZX_content'] = setHybrid(irrigatedGameInputs['MZX_content'], gameProfile.hybrid)
+    # irrigatedGameInputs['MZX_content'] = setSeedingRate(irrigatedGameInputs['MZX_content'], gameProfile.seeding_rate)
 
-    irrigatedGamePath = gamePath + 'irrigated'
+    # irrigatedGamePath = gamePath + 'irrigated'
      
-    if checkBucket(irrigatedGamePath) == False:
-        computeDSSAT(gameProfile.hybrid, irrigatedGameInputs, irrigatedGamePath)
-    irrigatedGameOutputs = downloadOutputs(irrigatedGamePath)
-    irrigatedFinalYield = getFinalYield(irrigatedGameOutputs)
+    # if checkBucket(irrigatedGamePath) == False:
+    #     computeDSSAT(gameProfile.hybrid, irrigatedGameInputs, irrigatedGamePath)
+    # irrigatedGameOutputs = downloadOutputs(irrigatedGamePath)
+    # irrigatedFinalYield = getFinalYield(irrigatedGameOutputs)
 
 
     ### FERTILIZED GAME
-    fertilizedGameInputs = gameInputs.copy()
-    with open(f"mzx_files/cleaned/{fertilizedGameInputs['MZX_name'][:-4]}-fertilized.MZX", 'r') as f:
-        fertilizedGameInputs['MZX_content'] = f.read().split("\n")
-    fertilizedGameInputs['MZX_content'] = setHybrid(fertilizedGameInputs['MZX_content'], gameProfile.hybrid)
-    fertilizedGameInputs['MZX_content'] = setSeedingRate(fertilizedGameInputs['MZX_content'], gameProfile.seeding_rate)
+    # fertilizedGameInputs = gameInputs.copy()
+    # with open(f"mzx_files/cleaned/{fertilizedGameInputs['MZX_name'][:-4]}-fertilized.MZX", 'r') as f:
+    #     fertilizedGameInputs['MZX_content'] = f.read().split("\n")
+    # fertilizedGameInputs['MZX_content'] = setHybrid(fertilizedGameInputs['MZX_content'], gameProfile.hybrid)
+    # fertilizedGameInputs['MZX_content'] = setSeedingRate(fertilizedGameInputs['MZX_content'], gameProfile.seeding_rate)
 
-    fertilizedGamePath = gamePath + 'fertilized'
+    # fertilizedGamePath = gamePath + 'fertilized'
      
-    if checkBucket(fertilizedGamePath) == False:
-        computeDSSAT(gameProfile.hybrid, fertilizedGameInputs, fertilizedGamePath)
-    fertilizedGameOutputs = downloadOutputs(fertilizedGamePath)
-    fertilizedFinalYield = getFinalYield(fertilizedGameOutputs)
+    # if checkBucket(fertilizedGamePath) == False:
+    #     computeDSSAT(gameProfile.hybrid, fertilizedGameInputs, fertilizedGamePath)
+    # fertilizedGameOutputs = downloadOutputs(fertilizedGamePath)
+    # fertilizedFinalYield = getFinalYield(fertilizedGameOutputs)
 
 
     ### PROCEEDING
-    controlHistory = getHistory(date, start_day, controlGameInputs, controlGameOutputs, [0])['history']
-    controlFinalYield = getFinalYield(controlGameOutputs)
+    # controlHistory = getHistory(date, start_day, controlGameInputs, controlGameOutputs, [0])['history']
+    # controlFinalYield = getFinalYield(controlGameOutputs)
 
-    WNIPI_yield = ((finalYield / controlFinalYield) - 1)
+    # WNIPI_yield = ((finalYield / controlFinalYield) - 1)
 
-    final_irr = sum(history['irr'])
-    control_et = sum(controlHistory['et'])
-    WNIPI_irr = (1 + (final_irr / control_et))
+    # final_irr = sum(history['irr'])
+    # control_et = sum(controlHistory['et'])
+    # WNIPI_irr = (1 + (final_irr / control_et))
 
-    final_fert = sum(history['fert'])
-    control_fert_uptake = getNitrogenUptake(date, controlGameOutputs)
-    WNIPI_fert = (1 + (final_fert / control_fert_uptake))
+    # final_fert = sum(history['fert'])
+    # control_fert_uptake = getNitrogenUptake(date, controlGameOutputs)
+    # WNIPI_fert = (1 + (final_fert / control_fert_uptake))
 
-    WNIPI_total = (WNIPI_yield / (WNIPI_irr * WNIPI_fert))
-    gameProfile.wnipi = WNIPI_total
-    context['WNIPI'] = round(WNIPI_total, 4)
+    # WNIPI_total = (WNIPI_yield / (WNIPI_irr * WNIPI_fert))
+    # gameProfile.wnipi = WNIPI_total
+    # context['WNIPI'] = round(WNIPI_total, 4)
     
-    agronomicEfficiency = (finalYield - fertilizedFinalYield)/(final_fert + 0.001)
-    gameProfile.agronomic_efficiency = agronomicEfficiency
-    context['AE'] = agronomicEfficiency
+    # agronomicEfficiency = (finalYield - fertilizedFinalYield)/(final_fert + 0.001)
+    # gameProfile.agronomic_efficiency = agronomicEfficiency
+    # context['AE'] = agronomicEfficiency
 
-    irrigationWaterUseEfficiency = (finalYield - irrigatedFinalYield)/(final_irr + 0.001)
-    gameProfile.irrigation_water_use_efficiency = irrigationWaterUseEfficiency
-    context['IWUE'] = irrigationWaterUseEfficiency
+    # irrigationWaterUseEfficiency = (finalYield - irrigatedFinalYield)/(final_irr + 0.001)
+    # gameProfile.irrigation_water_use_efficiency = irrigationWaterUseEfficiency
+    # context['IWUE'] = irrigationWaterUseEfficiency
 
-    totalFert = sum(history['fert'])
-    totalIrr = sum(history['irr'])
-    totalET = sum(history['et'])
+    totalFert = max(sum(history['fert']), 1)
+    totalIrr = max(sum(history['irr']), 1)
+    totalET = max(sum(history['et']), 1)
+    print("totalFert:", totalFert)
+    print("N uptake:", getNitrogenUptake(date, gameOutputs))
 
     context['PFP'] = finalYield / totalFert
     context['NUE'] = (getNitrogenUptake(date, gameOutputs) / totalFert) * 100
@@ -453,7 +456,7 @@ def finalResults(request, gameProfile):
 
     gameProfile.save()
 
-    csv = createCSV(context['irr_amount'], context['fert_amount'], context['yield'], context['bushel_cost'], context['PFP'], context['NUE'], context['WUE'], context['WP'], context['NLeaching'], controlFinalYield, gameProfile)
+    csv = createCSV(context['irr_amount'], context['fert_amount'], context['yield'], context['bushel_cost'], context['PFP'], context['NUE'], context['WUE'], context['WP'], context['NLeaching'], gameProfile)
     s3.put_object(
         Bucket="finalresultsbucket",
         Key=f"{gamePath}/final_summary.csv",
@@ -1049,7 +1052,7 @@ def getHistory(date, start_day, gameInputs, gameOutputs, weeklyFertilizer):
 def getNitrogenUptake(date, gameOutputs):
     day = int(date[len(date) - 3:])
     reading = False
-    nitrogenUptake = 0.00000001
+    nitrogenUptake = 0
     totalNitrogenUptake = nitrogenUptake
 
     for line in gameOutputs['NiBal_content']:
@@ -1062,7 +1065,7 @@ def getNitrogenUptake(date, gameOutputs):
         elif reading:
             if not items[1].isnumeric():
                 break
-            nitrogenUptake = (float(items[itemIndex]) * 8.92) + 0.0000001
+            nitrogenUptake = (float(items[itemIndex]))
             totalNitrogenUptake += nitrogenUptake
             if int(items[1]) == day:
                 return nitrogenUptake
@@ -1086,6 +1089,7 @@ def computeDSSAT(hybrid, gameInputs, gamePath):
     zip_buffer.seek(0)     
 
     # Upload to S3
+    s3.delete_object(Bucket = 'outputvtapsbucket', Key = f"{gamePath}.zip")
     s3.upload_fileobj(zip_buffer, 'vtapsbucket', f"{gamePath}.zip")
 
 def checkOutputs(gamePath):
@@ -1097,18 +1101,16 @@ def checkOutputs(gamePath):
         if checkBucket(gamePath):
             return True    
         time.sleep(delay)
-        delay = min(delay * 1.25, 10.0)
+        delay = min(delay * 1.1, 10.0)
     
     return False
 
 def checkBucket(gamePath):
 
-    key = f'{gamePath}/{gamePath}.zip'
+    key = f'{gamePath}.zip'
 
-    print("checking...")
     try:
         s3.head_object(Bucket='outputvtapsbucket', Key=key)
-        print("its true")
         return True   
     except ClientError as e:
         code = e.response.get("Error", {}).get("Code", "")
@@ -1124,7 +1126,6 @@ def checkBucket(gamePath):
         if code in ("SlowDown", "RequestTimeout", "Throttling", "503"):
             time.sleep(0.2 + random.random() * 0.8)
             return False
-        print("oh?")
         return False
 
 def uploadInputs(gameInputs, gamePath):
@@ -1186,7 +1187,7 @@ def downloadOutputs(gamePath):
     
     try:
         zip_buffer = io.BytesIO()
-        s3.download_fileobj('outputvtapsbucket', f"{gamePath}/{gamePath}.zip", zip_buffer)
+        s3.download_fileobj('outputvtapsbucket', f"{gamePath}.zip", zip_buffer)
         zip_buffer.seek(0) 
         data = {}
         with zipfile.ZipFile(zip_buffer) as zipFile:
@@ -1225,11 +1226,11 @@ def downloadOutputs(gamePath):
     except:
         return False
     
-def createCSV(irr_total, fert_total, final_yield, final_bushel_cost, pfp, nue, wue, wp, nleaching, controlFinalYield, gameProfile):
+def createCSV(irr_total, fert_total, final_yield, final_bushel_cost, pfp, nue, wue, wp, nleaching, gameProfile):
     buf = io.StringIO(newline='')
     writer = csv.writer(buf)
-    writer.writerow(["Irrigation Total (in)", "Fertilizer Total (lbs)", "Final Yield (bu/ac)", "Cost Per Bushel", "PFP", "NUE", "WUE", "WP", "N Leaching (lbs/ac)", "Control Plot Yield (bu/ac)"])
-    writer.writerow([irr_total, fert_total, final_yield, final_bushel_cost, pfp, nue, wue, wp, nleaching, controlFinalYield])
+    writer.writerow(["Irrigation Total (in)", "Fertilizer Total (lbs)", "Final Yield (bu/ac)", "Cost Per Bushel", "Partial Factor Productivity (bu/lbs N)", "Nitrogen Utilization Efficiency (%)", "Water Utilization Efficiency (bu/in)", "Water Productivity (bu/in)", "N Leaching (lbs/ac)"])
+    writer.writerow([irr_total, fert_total, final_yield, final_bushel_cost, pfp, nue, wue, wp, nleaching])
 
     writer.writerow([])
     writer.writerow(['Week', 'Projected Yield (bu/ac)', "Monday Irrigation (in)", "Thursday Irrigation (in)", "Fertilizer (lbs)"])
