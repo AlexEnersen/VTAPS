@@ -431,10 +431,10 @@ def finalResults(request, gameProfile):
     print("totalFert:", totalFert)
     print("N uptake:", getNitrogenUptake(date, gameOutputs))
 
-    context['PFP'] = finalYield / totalFert
-    context['NUE'] = (getNitrogenUptake(date, gameOutputs) / totalFert) * 100
-    context['WUE'] = finalYield / totalET
-    context['WP'] = finalYield / totalIrr
+    context['PFP'] = round(finalYield / totalFert, 2)
+    context['NUE'] = round((getNitrogenUptake(date, gameOutputs) / totalFert) * 100, 0)
+    context['WUE'] = round(finalYield / totalET, 1)
+    context['WP'] = round(finalYield / totalIrr, 1)
 
     gameProfile.partialFactorProductivity = context['PFP']
     gameProfile.nitrogenUseEfficiency = context['NUE']
