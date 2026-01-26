@@ -433,7 +433,7 @@ def finalResults(request, gameProfile):
     totalFert = max(sum(history['fert']), 1)
     totalIrr = max(sum(history['irr']), 1)
     totalET = max(sum(history['et']), 1)
-    n_uptake = getNitrogenUptake(date, gameOutputs)
+    n_uptake = round(getNitrogenUptake(date, gameOutputs), 1)
     print("totalFert:", totalFert)
     print("N uptake:", n_uptake)
     gameProfile.nitrogen_uptake = n_uptake
@@ -448,7 +448,7 @@ def finalResults(request, gameProfile):
     gameProfile.waterUseEfficiency = context["WUE"]
     gameProfile.waterProductivity = context['WP']
 
-    nitrogenLeaching = getNitrogenLeaching(gameOutputs)
+    nitrogenLeaching = round(getNitrogenLeaching(gameOutputs), 1)
     gameProfile.nitrogen_leaching = nitrogenLeaching
     context['NLeaching'] = nitrogenLeaching
 
@@ -1320,15 +1320,13 @@ def getGDU(date, gameOutputs):
         items = line.strip().split(" ")
         if len(items) <= 1:
             continue
+
         dtt = items[-1].replace("\r", "")
         
         if reading == False and dtt == 'DTTD':
             reading = True
             continue
-        
-        print("items:", items)
-        print("items[1]:", items[1])
-        print("date:", date[-3:])
+
         if reading == True:
             gdu += float(dtt)
             if int(items[1]) >= int(date[-3:]):
