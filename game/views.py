@@ -434,8 +434,6 @@ def finalResults(request, gameProfile):
     totalIrr = max(sum(history['irr']), 1)
     totalET = max(sum(history['et']), 1)
     n_uptake = round(getNitrogenUptake(date, gameOutputs), 1)
-    print("totalFert:", totalFert)
-    print("N uptake:", n_uptake)
     gameProfile.nitrogen_uptake = n_uptake
 
     context['PFP'] = round(finalYield / totalFert, 2)
@@ -448,9 +446,8 @@ def finalResults(request, gameProfile):
     gameProfile.waterUseEfficiency = context["WUE"]
     gameProfile.waterProductivity = context['WP']
 
-    nitrogenLeaching = round(getNitrogenLeaching(gameOutputs), 1)
-    gameProfile.nitrogen_leaching = nitrogenLeaching
-    context['NLeaching'] = nitrogenLeaching
+    context['NLeaching'] = round(getNitrogenLeaching(gameOutputs), 1)
+    gameProfile.nitrogen_leaching = context['NLeaching']
 
     context['irr_amount'] = sum(history['irr'])
     context['fert_amount'] = sum(history['fert'])
