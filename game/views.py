@@ -268,6 +268,8 @@ def weeklySelection(request, game):
         context['nitrogen_stress_graph'] = plotOneAttribute(date, start_day, gameOutputs['NiBal_content'], 'RLCH', 'Nitrate Leached (lbs/a)', 'Nitrate Leaching')
         context['water_layer_graph'] = plotWaterLayers(date, start_day, gameOutputs)
         
+    context['gdu'] = getGDU(date, gameOutputs)
+
     game.nitrogen_leaching = getNitrogenLeaching(gameOutputs)
     game.nitrogen_uptake = getNitrogenUptake(date, gameOutputs)
 
@@ -1310,3 +1312,55 @@ def setHybrid(content, hybrid):
 def getSeedCost(hybrid, seeding_rate):
     seedCosts = {'IB2074 Channel213-19VTPRIB': 3.38, 'IB2075 Fontanelle 11D637': 3.28, 'IB2073 Pioneer 0801AM': 2.81, 'IB2072 Pioneer 1197AM': 2.94, 'IB1071 Pioneer 1366AML': 3.04, 'IB1073 Pioneer 1185': 3.25}
     return (seedCosts[hybrid]) * (seeding_rate/1000)
+
+def getGDU(date, gameOutputs):
+    reading = False
+    gdu = 0
+    for line in gameOutputs['OPG_content']:
+        items = line.strip().split(" ")
+        if len(items) <= 1:
+            continue
+        dtt = items[-1].replace("\r", "")
+        
+        if reading == False and dtt == 'DTTD':
+            reading = True
+            continue
+        
+        print("items:", items)
+        print("items[1]:", items[1])
+        print("date:", date[-3:])
+        if reading == True:
+            gdu += float(dtt)
+            if int(items[1]) >= int(date[-3:]):
+                break
+
+    if gdu < 120:
+        return 'Planting'
+    elif gdu < 160: 
+        return 'VE'
+    elif gdu < 200: 
+        return 'V1'
+    elif gdu < 350:
+        return 'V2'
+    elif gdu < 475:
+        return 'V3'
+    elif gdu < 610:
+        return 'V5/6'
+    elif gdu < 740:
+        return 'V8'
+    elif gdu < 1135:
+        return 'V10'
+    elif gdu < 1385:
+        return 'VT'
+    elif gdu < 1660:
+        return 'R1'
+    elif gdu < 1790:
+        return 'R2'
+    elif gdu < 1925:
+        return 'R3'
+    elif gdu < 2450:
+        return 'R4'
+    elif gdu < 2700:
+        return 'R5'
+    else:
+        return 'R6'

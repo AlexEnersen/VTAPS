@@ -211,6 +211,11 @@
           <td class="historyData">{{weekly_fert|floatformat:0}} lbs.</td>
           <td class="historyData">{{total_fert|floatformat:0}} lbs.</td>
         </tr>
+        <tr>
+          <td class="historyLabel lightlyBold">Growth Stage</td>
+          <td class="historyData"></td>
+          <td class="historyData">{{gdu}}</td>
+        </tr>
       </table>
     </div>
 
@@ -248,7 +253,7 @@
     action=""
     method="post"
     class="formRow"
-    onsubmit="this.querySelector('.continueButton').disabled = true;"
+    onsubmit="this.querySelector('.continueButton').disabled = true"
   >
     <div class="subRow">
       <div class="inputRow">
