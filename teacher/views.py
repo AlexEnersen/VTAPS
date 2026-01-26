@@ -284,7 +284,8 @@ def gamePage(game):
         context['group_wue_graph'] = groupAttributeGraph(game, studentList, 'WUE')
         context['group_wp_graph'] = groupAttributeGraph(game, studentList, 'WP')
 
-    context['url'] = f'/teacher/game/{game.id}/download'
+    context['urlStudent'] = f'/teacher/game/{game.id}/downloadStudents'
+    context['urlTeacher'] = f'/teacher/game/{game.id}/downloadClass'
 
     return context
 
@@ -468,7 +469,7 @@ def groupAttributeGraph(game, studentList, attribute):
     
     return data
 
-def download(request, id):
+def downloadStudents(request, id):
     game = Game.objects.get(id=id)
 
     buf = io.StringIO(newline='')
@@ -517,14 +518,60 @@ def download(request, id):
         
     s3.put_object(
         Bucket="teachersummariesbucket",
-        Key=f"{id}/teacher_summary.csv",
+        Key=f"{id}/student_summary.csv",
         Body=data,
         ContentType="text/csv",
-        ContentDisposition=f'attachment; filename="teacher_summary_{id}.csv"',
+        ContentDisposition=f'attachment; filename="student_summary_{id}.csv"',
     )
 
     
-    key = f"{id}/teacher_summary.csv"
+    key = f"{id}/student_summary.csv"
+
+    presigned = s3.generate_presigned_url(
+        ClientMethod="get_object",
+        Params={"Bucket": "teachersummariesbucket", "Key": key},
+        ExpiresIn=60
+    )
+    return HttpResponseRedirect(presigned)
+
+def downloadClass(request, id):
+    game = Game.objects.get(id=id)
+
+    buf = io.StringIO(newline='')
+    writer = csv.writer(buf)
+    writer.writerow(['Username', "Irrigation Total (in)", "Fertilizer Total (lbs)", "Final Yield (bu/ac)", "Cost Per Bushel", "Partial Factor Productivity (bu/lbs N)", "Nitrogen Utilization Efficiency (%)", "Water Utilization Efficiency (bu/in)", "Water Productivity (bu/in)", "N Leaching (lbs/ac)", "N uptake (lbs/ac)"])
+    for index, player in enumerate(game.players):
+        try:
+            student = Student.objects.get(username=player, code=game.code)
+            gameProfile = GameProfile.objects.get(user=student.user)
+        except:
+            continue
+        
+        irr_total = sum(gameProfile.monday_irrigation) + sum(gameProfile.thursday_irrigation)
+        fert_total = sum(gameProfile.weekly_fertilizer)
+        final_yield = gameProfile.projected_yields[-1]
+        cost_per_bushel = gameProfile.total_cost / final_yield
+        pfp = gameProfile.partialFactorProductivity
+        nue = gameProfile.nitrogenUseEfficiency
+        wue = gameProfile.waterUseEfficiency
+        wp = gameProfile.waterProductivity
+        n_leaching = gameProfile.nitrogen_leaching
+        n_uptake = gameProfile.nitrogen_uptake
+        
+        writer.writerow([player, irr_total, fert_total, final_yield, cost_per_bushel, pfp, nue, wue, wp, n_leaching, n_uptake])
+
+    data = buf.getvalue().encode("utf-8-sig")
+        
+    s3.put_object(
+        Bucket="teachersummariesbucket",
+        Key=f"{id}/class_summary.csv",
+        Body=data,
+        ContentType="text/csv",
+        ContentDisposition=f'attachment; filename="class_summary_{id}.csv"',
+    )
+
+    
+    key = f"{id}/class_summary.csv"
 
     presigned = s3.generate_presigned_url(
         ClientMethod="get_object",

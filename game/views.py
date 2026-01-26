@@ -268,6 +268,9 @@ def weeklySelection(request, game):
         context['nitrogen_stress_graph'] = plotOneAttribute(date, start_day, gameOutputs['NiBal_content'], 'RLCH', 'Nitrate Leached (lbs/a)', 'Nitrate Leaching')
         context['water_layer_graph'] = plotWaterLayers(date, start_day, gameOutputs)
         
+    game.nitrogen_leaching = getNitrogenLeaching(gameOutputs)
+    game.nitrogen_uptake = getNitrogenUptake(date, gameOutputs)
+
     historyDict = getHistory(date, start_day, gameInputs, gameOutputs, game.weekly_fertilizer)
     history = historyDict['history']
     recentHistory = historyDict['recentHistory']
@@ -428,8 +431,10 @@ def finalResults(request, gameProfile):
     totalFert = max(sum(history['fert']), 1)
     totalIrr = max(sum(history['irr']), 1)
     totalET = max(sum(history['et']), 1)
+    n_uptake = getNitrogenUptake(date, gameOutputs)
     print("totalFert:", totalFert)
-    print("N uptake:", getNitrogenUptake(date, gameOutputs))
+    print("N uptake:", n_uptake)
+    gameProfile.nitrogen_uptake = n_uptake
 
     context['PFP'] = round(finalYield / totalFert, 2)
     context['NUE'] = round((getNitrogenUptake(date, gameOutputs) / totalFert) * 100, 0)

@@ -24,13 +24,23 @@
         {% endif %} {% endfor %}
       </table>
       <div class="row left">
-        <a class="downloadButton" href="{{ url }}">
+        <a class="downloadButton" href="{{ urlStudent }}">
           <img
             class="downloadIcon"
             src="{% static 'images/download-icon.svg' %}"
             alt=""
           />
-          Download Results
+          Download Individual Results
+        </a>
+      </div>
+      <div class="row left">
+        <a class="downloadButton" href="{{ urlTeacher }}">
+          <img
+            class="downloadIcon"
+            src="{% static 'images/download-icon.svg' %}"
+            alt=""
+          />
+          Download Total Results
         </a>
       </div>
       <p class="weekChangeField">Code: {{code}}</p>

@@ -109,12 +109,13 @@ class GameProfile(models.Model):
     agronomic_efficiency = models.FloatField(default=0)
     irrigation_water_use_efficiency = models.FloatField(default=0)
     nitrogen_leaching = models.FloatField(default=0)
+    nitrogen_uptake = models.FloatField(default=0)
     wnipi = models.FloatField(default=0)
     
-    partialFactorProductivity = models.FloatField(default=0)
-    nitrogenUseEfficiency = models.FloatField(default=0)
-    waterUseEfficiency = models.FloatField(default=0)
-    waterProductivity = models.FloatField(default=0)
+    partialFactorProductivity = models.FloatField(default=-1)
+    nitrogenUseEfficiency = models.FloatField(default=-1)
+    waterUseEfficiency = models.FloatField(default=-1)
+    waterProductivity = models.FloatField(default=-1)
 
 class FertilizerEntries1(models.Model):
     fertilizer = models.IntegerField(blank=False, default=0, choices=FERT_CHOICES_1)

@@ -12,5 +12,6 @@ urlpatterns = [
     path('sendEmail', views.teacherSendEmail, name="teacherSendEmail"),
     path('confirm/<str:activation_key>/', views.teacherConfirm, name='teacherConfirm'),
     path('createGame/<int:id>/', views.createGame, name="createGame"),
-    path('game/<int:id>/download', views.download, name="download")
+    path('game/<int:id>/downloadStudents', views.downloadStudents, name="downloadStudents"),
+    path('game/<int:id>/downloadClass', views.downloadClass, name="downloadClass")
 ]
