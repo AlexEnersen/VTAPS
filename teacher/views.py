@@ -547,18 +547,20 @@ def downloadClass(request, id):
         except:
             continue
         
-        irr_total = sum(gameProfile.monday_irrigation) + sum(gameProfile.thursday_irrigation)
-        fert_total = sum(gameProfile.weekly_fertilizer)
-        final_yield = gameProfile.projected_yields[-1]
-        cost_per_bushel = gameProfile.total_cost / final_yield
-        pfp = gameProfile.partialFactorProductivity
-        nue = gameProfile.nitrogenUseEfficiency
-        wue = gameProfile.waterUseEfficiency
-        wp = gameProfile.waterProductivity
-        n_leaching = gameProfile.nitrogen_leaching
-        n_uptake = gameProfile.nitrogen_uptake
+        print("gameProfile.projected_yields:", gameProfile.projected_yields)
+        if len(gameProfile.projected_yields) > 0:
+            irr_total = sum(gameProfile.monday_irrigation) + sum(gameProfile.thursday_irrigation)
+            fert_total = sum(gameProfile.weekly_fertilizer)
+            final_yield = gameProfile.projected_yields[-1]
+            cost_per_bushel = gameProfile.total_cost / final_yield
+            pfp = gameProfile.partialFactorProductivity
+            nue = gameProfile.nitrogenUseEfficiency
+            wue = gameProfile.waterUseEfficiency
+            wp = gameProfile.waterProductivity
+            n_leaching = gameProfile.nitrogen_leaching
+            n_uptake = gameProfile.nitrogen_uptake
         
-        writer.writerow([player, irr_total, fert_total, final_yield, cost_per_bushel, pfp, nue, wue, wp, n_leaching, n_uptake])
+            writer.writerow([player, irr_total, fert_total, final_yield, cost_per_bushel, pfp, nue, wue, wp, n_leaching, n_uptake])
 
     data = buf.getvalue().encode("utf-8-sig")
         
