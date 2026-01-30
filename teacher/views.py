@@ -559,8 +559,19 @@ def downloadClass(request, id):
             wp = gameProfile.waterProductivity
             n_leaching = gameProfile.nitrogen_leaching
             n_uptake = gameProfile.nitrogen_uptake
+        else:
+            irr_total = -1
+            fert_total = -1
+            final_yield = -1
+            cost_per_bushel = -1
+            pfp = -1
+            nue = -1
+            wue = -1
+            wp = -1
+            n_leaching = -1
+            n_uptake = -1
         
-            writer.writerow([player, irr_total, fert_total, final_yield, cost_per_bushel, pfp, nue, wue, wp, n_leaching, n_uptake])
+        writer.writerow([player, irr_total, fert_total, final_yield, cost_per_bushel, pfp, nue, wue, wp, n_leaching, n_uptake])
 
     data = buf.getvalue().encode("utf-8-sig")
         
