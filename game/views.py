@@ -448,7 +448,7 @@ def finalResults(request, gameProfile):
     gameProfile.waterUseEfficiency = context["WUE"]
     gameProfile.waterProductivity = context['WP']
 
-    context['NLeaching'] = round(getNitrogenLeaching(gameOutputs), 1)
+    context['NLeaching'] = round(getNitrogenLeaching(gameOutputs), 2)
     gameProfile.nitrogen_leaching = context['NLeaching']
 
     context['irr_amount'] = sum(history['irr'])
