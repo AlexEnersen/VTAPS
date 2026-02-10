@@ -284,6 +284,8 @@ def weeklySelection(request, game):
     context['total_irr'] = round(sum(history['irr']), 2)
     context['weekly_fert'] = round(sum(recentHistory['fert']), 2)
     context['total_fert'] = round(sum(history['fert']), 2)
+    context['weekly_Nleach'] = round(sum(recentHistory['Nleach']), 2)
+    context['total_Nleach'] = round(sum(history['Nleach']), 2)
         
 
     gameInputs['MZX_content'] = gameInputs['MZX_content']
@@ -971,8 +973,8 @@ def getRootDepth(date, gameOutputs):
 def getHistory(date, start_day, gameInputs, gameOutputs, weeklyFertilizer):
     day = int(date[len(date) - 3:])
 
-    history = {"rain": [0.0], "et": [0.0], "irr": [0.0], "fert": [0.0]}
-    recentHistory = {"rain": [0.0], "et": [0.0], "irr": [0.0], "fert": [0.0]}
+    history = {"rain": [0.0], "et": [0.0], "irr": [0.0], "fert": [0.0], "Nleach": [0.0]}
+    recentHistory = {"rain": [0.0], "et": [0.0], "irr": [0.0], "fert": [0.0], "Nleach": [0.0]}
 
     for line in gameInputs['WTH_content']:
         items = line.split(" ")
@@ -1049,6 +1051,22 @@ def getHistory(date, start_day, gameInputs, gameOutputs, weeklyFertilizer):
             history['et'].append(mmToInches(float(items[10])))
             if currDay >= day - 7:
                 recentHistory['et'].append(mmToInches(float(items[10])))
+
+    for line in gameOutputs['NiBal_content']:
+        items = list(filter(None, line.strip("\n").split(" ")))
+        if len(items) == 0 or not items[0].isdigit():
+            continue
+        
+        currDay = int(items[1])
+        
+        if currDay < start_day:
+            continue
+        elif currDay >= day or len(items) < 14:
+            break
+        else:
+            history['Nleach'].append(float(items[13])*0.892)
+            if currDay >= day - 7:
+                recentHistory['Nleach'].append(float(items[13])*0.892)
     
     return {"history": history, "recentHistory": recentHistory}
 
