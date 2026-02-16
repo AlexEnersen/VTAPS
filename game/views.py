@@ -1377,33 +1377,62 @@ def getGDU(date, gameOutputs):
             if int(items[1]) >= int(date[-3:]):
                 break
 
-    if gdu < 120:
-        return 'Planting'
-    elif gdu < 160: 
-        return 'VE'
-    elif gdu < 200: 
-        return 'V1'
-    elif gdu < 350:
+    # if gdu < 120:
+    #     return 'Planting'
+    # elif gdu < 160: 
+    #     return 'VE'
+    # elif gdu < 200: 
+    #     return 'V1'
+    # elif gdu < 350:
+    #     return 'V2'
+    # elif gdu < 475:
+    #     return 'V3'
+    # elif gdu < 610:
+    #     return 'V5/6'
+    # elif gdu < 740:
+    #     return 'V8'
+    # elif gdu < 1135:
+    #     return 'V10'
+    # elif gdu < 1385:
+    #     return 'VT'
+    # elif gdu < 1660:
+    #     return 'R1'
+    # elif gdu < 1790:
+    #     return 'R2'
+    # elif gdu < 1925:
+    #     return 'R3'
+    # elif gdu < 2450:
+    #     return 'R4'
+    # elif gdu < 2700:
+    #     return 'R5'
+    # else:
+    #     return 'R6'
+
+    if gdu < 93:
         return 'V2'
-    elif gdu < 475:
-        return 'V3'
-    elif gdu < 610:
-        return 'V5/6'
-    elif gdu < 740:
+    elif gdu < 174:
+        return 'V4'
+    elif gdu < 246:
+        return 'V6'
+    elif gdu < 321:
         return 'V8'
-    elif gdu < 1135:
+    elif gdu < 393:
         return 'V10'
-    elif gdu < 1385:
-        return 'VT'
-    elif gdu < 1660:
+    elif gdu < 466:
+        return 'V12'
+    elif gdu < 538:
+        return 'V14'
+    elif gdu < 613:
         return 'R1'
-    elif gdu < 1790:
+    elif gdu < 760:
         return 'R2'
-    elif gdu < 1925:
+    elif gdu < 904:
         return 'R3'
-    elif gdu < 2450:
+    elif gdu < 1052:
         return 'R4'
-    elif gdu < 2700:
-        return 'R5'
+    elif gdu < 1199:
+        return 'R4.7'
+    elif gdu < 1343:
+        return 'R5.5'
     else:
         return 'R6'
