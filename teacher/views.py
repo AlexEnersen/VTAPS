@@ -274,8 +274,8 @@ def gamePage(game):
 
     context['group_cost_graph'] = groupAttributeGraph(game, studentList, 'Cost')
     context['group_yield_graph'] = groupAttributeGraph(game, studentList, 'Yield')
+    context['group_leaching_graph'] = groupAttributeGraph(game, studentList, 'Leaching')
     if context['finalWeek']:
-        context['group_leaching_graph'] = groupAttributeGraph(game, studentList, 'Leaching')
         # context['group_ae_graph'] = groupAttributeGraph(game, studentList, 'AE')
         # context['group_iwue_graph'] = groupAttributeGraph(game, studentList, 'IWUE')
         # context['group_wnipi_graph'] = groupAttributeGraph(game, studentList, 'WNIPI')
@@ -383,7 +383,8 @@ def groupAttributeGraph(game, studentList, attribute):
             elif attribute == 'WP':
                 attributeAmount.append(gameProfile.waterProductivity)
             elif attribute == 'Leaching':
-                attributeAmount.append(gameProfile.nitrogen_leaching)
+                attributeAmount.append(gameProfile.nitrogen_leaching_array) 
+                attributeNames.append(student.username)
             elif attribute == 'Yield':
                 attributeAmount.append(gameProfile.projected_yields)    
                 attributeNames.append(student.username)
@@ -435,11 +436,6 @@ def groupAttributeGraph(game, studentList, attribute):
         ylabel = 'Water Productivity'
         title = 'Water Productivity Per Student'
         ax.bar(attributeNames, attributeAmount, color='skyblue')
-    elif attribute == 'Leaching':
-        xlabel = 'Students'
-        ylabel = 'Nitrate Leached (lbs/ac)'
-        title = 'Nitrate Leached Per Student'
-        ax.bar(attributeNames, attributeAmount, color='skyblue')
     elif attribute == 'Yield':
         xlabel = 'Week'
         ylabel = 'Projected Yield'
@@ -447,6 +443,22 @@ def groupAttributeGraph(game, studentList, attribute):
 
         tickerLength = 0
         for layer in attributeAmount:  
+            if layer == 0:
+                continue    
+            if len(layer) > tickerLength:
+                tickerLength = len(layer)
+            ax.plot(range(1, len(layer)+1, 1), layer)
+        ax.set_xticks(range(1, tickerLength+1))    
+        ax.legend(attributeNames, loc="upper left")
+        ax.set_ylim(bottom=0)
+    elif attribute == 'Leaching':
+        xlabel = 'Students'
+        ylabel = 'Nitrate Leached (lbs/ac)'
+        title = 'Nitrate Leached Per Student'
+
+        tickerLength = 0
+        for layer in attributeAmount:  
+            print("layer:", layer)
             if layer == 0:
                 continue    
             if len(layer) > tickerLength:

@@ -1,4 +1,4 @@
-*EXP.DETAILS: UNLI2222MZ IRRIGATED MAIZE
+*EXP.DETAILS: UNLI2201MZ TAPS SPRINKLER IRRIGATED CORN
 
 *GENERAL
 @PEOPLE
@@ -10,11 +10,11 @@
 
 *TREATMENTS                        -------------FACTOR LEVELS------------
 @N R O C TNAME.................... CU FL SA IC MP MI MF MR MC MT ME MH SM
- 1 0 0 0 fram_27                    1  1  0  1  1  1  1  0  0  0  0  0  1
+ 1 0 0 0 farm_23                    1  1  0  1  1  1  1  1  0  0  0  0  1
 
 *CULTIVARS
 @C CR INGENO CNAME
- 1 MZ IB2072 PIO 1197
+ 1 MZ IB1071 PIO 1366AML
 
 *FIELDS
 @L ID_FIELD WSTA....  FLSA  FLOB  FLDT  FLDD  FLDS  FLST SLTX  SLDP  ID_SOIL    FLNAME
@@ -42,52 +42,51 @@
 
 *PLANTING DETAILS
 @P PDATE EDATE  PPOP  PPOE  PLME  PLDS  PLRS  PLRD  PLDP  PLWT  PAGE  PENV  PLPH  SPRL                        PLNAME
- 1 22131 22139     7     7     S     R    76     0     5   -99   -99   -99   -99   -99                        Maize
+ 1 22131 22139     8     8     S     R    76     0     5   -99   -99   -99   -99   -99                        Maize
 
 *IRRIGATION AND WATER MANAGEMENT
 @I  EFIR  IDEP  ITHR  IEPT  IOFF  IAME  IAMT IRNAME
  1     1    30    50   100 GS000 IR001    10 13 in irrigation
 @I IDATE  IROP IRVAL
- 1 22164 IR004     0
- 1 22167 IR004  19.1
- 1 22174 IR004    13
- 1 22178 IR004     0
- 1 22181 IR004     0
- 1 22185 IR004  19.1
- 1 22189 IR004     0
- 1 22192 IR004     0
- 1 22195 IR004  25.4
- 1 22199 IR004     0
- 1 22200 IR004     7
- 1 22206 IR004  25.4
- 1 22213 IR004  25.4
- 1 22221 IR004     0
- 1 22223 IR004  25.4
- 1 22227 IR004  25.4
- 1 22229 IR004     0
- 1 22230 IR004     0
- 1 22237 IR004     0
- 1 22241 IR004     0
- 1 22248 IR004     0
- 1 22248 IR004     0
- 1 22251 IR004     0
+ 1 22164 IR004    18
+ 1 22171 IR004    18
+ 1 22174 IR004     0
+ 1 22178 IR004    18
+ 1 22181 IR004    18
+ 1 22185 IR004     0
+ 1 22189 IR004     8
+ 1 22192 IR004  19.1
+ 1 22195 IR004    18
+ 1 22200 IR004     8
+ 1 22206 IR004  19.1
+ 1 22210 IR004     8
+ 1 22213 IR004    18
+ 1 22216 IR004  20.3
+ 1 22221 IR004    27
+ 1 22223 IR004  20.3
+ 1 22227 IR004  20.3
+ 1 22230 IR004  20.3
+ 1 22237 IR004    19
+ 1 22241 IR004    19
+ 1 22244 IR004  15.2
+ 1 22251 IR004    18
  1 22255 IR004     0
- 1 22258 IR004     0
+ 1 22258 IR004  15.2
 
 *FERTILIZERS (INORGANIC)
 @F FDATE  FMCD  FACD  FDEP  FAMN  FAMP  FAMK  FAMC  FAMO  FOCD FERNAME
- 1 22121 FE036 AP002     3     6     0     0     0     0   -99 -99
- 1 22122 FE036 AP002    10    34     0     0     0     0   -99 -99
- 1 22167 FE036 AP003     0   129     0     0     0     0   -99 -99
- 1 22189 FE036 AP005     0     0     0     0     0     0   -99 -99
- 1 22200 FE036 AP005     0    28     0     0     0     0   -99 -99
- 1 22210 FE036 AP005     0     0     0     0     0     0   -99 -99
- 1 22221 FE036 AP005     0     0     0     0     0     0   -99 -99
+ 1 22121 FE036 AP004     3     6     0     0     0     0   -99 -99
+ 1 22122 FE036 AP002    10    90     0     0     0     0   -99 -99
+ 1 22167 FE036 AP003     0     0     0     0     0     0   -99 -99
+ 1 22189 FE036 AP005     0    34     0     0     0     0   -99 -99
+ 1 22200 FE036 AP005     0    34     0     0     0     0   -99 -99
+ 1 22210 FE036 AP005     0    34     0     0     0     0   -99 -99
+ 1 22221 FE036 AP005     0    34     0     0     0     0   -99 -99
  1 22229 FE036 AP005     0     0     0     0     0     0   -99 -99
 
 *RESIDUES AND ORGANIC FERTILIZER
 @R RDATE  RCOD  RAMT  RESN  RESP  RESK  RINP  RDEP  RMET RENAME
- 1 22121   -99   -99   -99   -99   -99   -99   -99   -99 -99
+ 1 22121 RE203  5000   -99   -99   -99    70    15 AP002 -99
 
 *ENVIRONMENT MODIFICATIONS
 @E ODATE EDAY  ERAD  EMAX  EMIN  ERAIN ECO2  EDEW  EWIND ENVNAME  
@@ -107,7 +106,7 @@
 @N MANAGEMENT  PLANT IRRIG FERTI RESID HARVS
  1 MA              R     R     R     R     M
 @N OUTPUTS     FNAME OVVEW SUMRY FROPT GROUT CAOUT WAOUT NIOUT MIOUT DIOUT VBOSE CHOUT OPOUT FMOPT
- 1 OU              N     Y     Y     1     Y     Y     Y     Y     N     N     A     N     N     A
+ 1 OU              Y     Y     Y     1     Y     Y     Y     Y     N     N     A     N     Y     A
 
 @  AUTOMATIC MANAGEMENT
 @N PLANTING    PFRST PLAST PH2OL PH2OU PH2OD PSTMX PSTMN

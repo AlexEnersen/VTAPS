@@ -109,6 +109,7 @@ class GameProfile(models.Model):
     agronomic_efficiency = models.FloatField(default=0)
     irrigation_water_use_efficiency = models.FloatField(default=0)
     nitrogen_leaching = models.FloatField(default=0)
+    nitrogen_leaching_array = ArrayField(models.FloatField(default=0), default=list, blank=True)
     nitrogen_uptake = models.FloatField(default=0)
     wnipi = models.FloatField(default=0)
     

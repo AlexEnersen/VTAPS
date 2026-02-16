@@ -1,4 +1,4 @@
-*EXP.DETAILS: UNLI1723MZ IRRIGATED MAIZE
+*EXP.DETAILS: UNLI2101MZ TAPS SPRINKLER IRRIGATED CORN
 
 *GENERAL
 @PEOPLE
@@ -7,18 +7,20 @@
 -99
 @SITE
 -99
+@ PAREA  PRNO  PLEN  PLDR  PLSP  PLAY HAREA  HRNO  HLEN  HARM.........
+    -99   -99   -99   -99   -99   -99   -99   -99   -99   -99
 
 *TREATMENTS                        -------------FACTOR LEVELS------------
 @N R O C TNAME.................... CU FL SA IC MP MI MF MR MC MT ME MH SM
- 1 0 0 0 farm_3                     1  1  0  1  1  1  1  0  0  0  0  0  1
+ 1 0 0 0 farm_23                    1  1  0  1  1  1  1  1  0  0  0  0  1
 
 *CULTIVARS
 @C CR INGENO CNAME
- 1 MZ IB2074 Channel213-19VT
+ 1 MZ IB2075 Fontanelle 11D6
 
 *FIELDS
 @L ID_FIELD WSTA....  FLSA  FLOB  FLDT  FLDD  FLDS  FLST SLTX  SLDP  ID_SOIL    FLNAME
- 1 UCCO0001 NEME1701   -99     0 DR000     0     0 00000 -99    200  UNNP230018 Silt loam
+ 1 UCCO0001 NEME2101   -99     0 DR000     0     0 00000 -99    200  UNNP230018 Silt loam
 @L ...........XCRD ...........YCRD .....ELEV .............AREA .SLEN .FLWR .SLAS FLHST FHDUR
  1               0               0         0                 0     0     0     0   -99   -99
 
@@ -30,46 +32,60 @@
 
 *INITIAL CONDITIONS
 @C   PCR ICDAT  ICRT  ICND  ICRN  ICRE  ICWD ICRES ICREN ICREP ICRIP ICRID ICNAME
- 1    MZ 18001   -99     0     1     1   500  1000   -99     0   100   -99 -99
+ 1    MZ 21121   -99     0     1     1   -99  1000   -99     0   100   -99 -99
 @C  ICBL  SH2O  SNH4  SNO3
- 1     5  .333    .3   2.3
- 1    31  .333    .3   2.3
- 1    61  .294    .3   2.3
- 1    91  .257    .3   2.3
- 1   122  .245    .3   2.3
- 1   152  .245    .3   2.3
- 1   183  .245    .3   2.3
+ 1     5  .333    .1    .8
+ 1    31  .333    .1    .8
+ 1    61  .294    .1    .8
+ 1    91  .257    .1    .8
+ 1   122  .245    .1    .8
+ 1   152  .245    .1    .8
+ 1   183  .245    .1    .8
 
 *PLANTING DETAILS
 @P PDATE EDATE  PPOP  PPOE  PLME  PLDS  PLRS  PLRD  PLDP  PLWT  PAGE  PENV  PLPH  SPRL                        PLNAME
- 1 17129 17139   7.4   7.4     S     R    76     0     5   -99   -99   -99   -99   -99                        Maize
+ 1 21132 21146   8.3   8.3     S     R    76     0     5   -99   -99   -99   -99   -99                        Maize
 
 *IRRIGATION AND WATER MANAGEMENT
 @I  EFIR  IDEP  ITHR  IEPT  IOFF  IAME  IAMT IRNAME
  1     1    30    50   100 GS000 IR001    10 13 in irrigation
 @I IDATE  IROP IRVAL
- 1 17136 IR004    25
- 1 17148 IR004    25
- 1 17157 IR004    25
- 1 17167 IR004    25
- 1 17182 IR004    25
- 1 17198 IR004    25
- 1 17205 IR004    25
- 1 17208 IR004    25
- 1 17213 IR004    25
- 1 17214 IR004     4
- 1 17247 IR004   6.4
- 1 17250 IR004   7.6
+ 1 21168 IR004     0
+ 1 21175 IR004     0
+ 1 21182 IR004     0
+ 1 21186 IR004     0
+ 1 21189 IR004  19.1
+ 1 21203 IR004  19.1
+ 1 21207 IR004     0
+ 1 21210 IR004  19.1
+ 1 21214 IR004     7
+ 1 21217 IR004  19.1
+ 1 21221 IR004     0
+ 1 21223 IR004     0
+ 1 21228 IR004  19.1
+ 1 21235 IR004     0
+ 1 21238 IR004     0
+ 1 21242 IR004     0
+ 1 21249 IR004  19.1
 
 *FERTILIZERS (INORGANIC)
 @F FDATE  FMCD  FACD  FDEP  FAMN  FAMP  FAMK  FAMC  FAMO  FOCD FERNAME
- 1 17124 FE036 AP004     3     6     0     0     0     0   -99 -99
- 1 17125 FE036 AP002    12    34     0     0     0     0   -99 -99
- 1 17163 FE036 AP003     0    50     0     0     0     0   -99 -99
- 1 17179 FE036 AP005     0    34     0     0     0     0   -99 -99
- 1 17194 FE036 AP005     0    17     0     0     0     0   -99 -99
- 1 17200 FE036 AP005     0    17     0     0     0     0   -99 -99
- 1 17214 FE036 AP005     0    17     0     0     0     0   -99 -99
+ 1 21118 FE036 AP004    10    45     0     0     0     0   -99 -99
+ 1 21120 FE036 AP002    10    45     0     0     0     0   -99 -99
+ 1 21135 FE036 AP003    10   112     0     0     0     0   -99 -99
+ 1 21182 FE036 AP002     0     0     0     0     0     0   -99 -99
+ 1 21186 FE036 AP005     0     0     0     0     0     0   -99 -99
+ 1 21191 FE036 AP005     0    28     0     0     0     0   -99 -99
+ 1 21210 FE036 AP005     0     0     0     0     0     0   -99 -99
+ 1 21220 FE036 AP005     0     0     0     0     0     0   -99 -99
+
+*RESIDUES AND ORGANIC FERTILIZER
+@R RDATE  RCOD  RAMT  RESN  RESP  RESK  RINP  RDEP  RMET RENAME
+ 1 21121 RE203  5000   -99   -99   -99    70    15 AP002 -99
+
+*ENVIRONMENT MODIFICATIONS
+@E ODATE EDAY  ERAD  EMAX  EMIN  ERAIN ECO2  EDEW  EWIND ENVNAME  
+ 1 19125 A   0 A   0 A   0 A   0 A   0 A   0 A   0 A   0 
 
 *HARVEST DETAILS
 @H HDATE  HSTG  HCOM HSIZE   HPC  HBPC HNAME
@@ -77,7 +93,7 @@
 
 *SIMULATION CONTROLS
 @N GENERAL     NYERS NREPS START SDATE RSEED SNAME.................... SMODEL
- 1 GE              1     1     S 17124  2150 Full_irrigation           MZCER
+ 1 GE              1     1     S 21118  2150 Full_irrigation           MZCER
 @N OPTIONS     WATER NITRO SYMBI PHOSP POTAS DISES  CHEM  TILL   CO2
  1 OP              Y     Y     N     N     N     N     N     N     W
 @N METHODS     WTHER INCON LIGHT EVAPO INFIL PHOTO HYDRO NSWIT MESOM MESEV MESOL
@@ -85,7 +101,7 @@
 @N MANAGEMENT  PLANT IRRIG FERTI RESID HARVS
  1 MA              R     R     R     R     M
 @N OUTPUTS     FNAME OVVEW SUMRY FROPT GROUT CAOUT WAOUT NIOUT MIOUT DIOUT VBOSE CHOUT OPOUT FMOPT
- 1 OU              N     Y     Y     1     Y     Y     Y     Y     N     N     A     N     N     A
+ 1 OU              N     Y     Y     1     Y     Y     Y     Y     N     N     A     N     Y     A
 
 @  AUTOMATIC MANAGEMENT
 @N PLANTING    PFRST PLAST PH2OL PH2OU PH2OD PSTMX PSTMN

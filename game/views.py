@@ -71,7 +71,7 @@ except Exception as error:
     else:
         print('Error:', error)
 
-FILENAME = 'UNLI2422.MZX'
+FILENAME = 'UNLI2401.MZX'
 
 @csrf_exempt 
 @csrf_protect
@@ -235,11 +235,18 @@ def weeklySelection(request, game):
         
         computeDSSAT(game.hybrid, gameInputs, gamePath)
 
+        nextDate = str(int(date)+7)
+
         if game.week > 0:
             gameOutputs = downloadOutputs(gamePath)
             if gameOutputs is not False and 'OOV_content' in gameOutputs:
                 projectedYield = getFinalYield(gameOutputs)
                 game.projected_yields.append(projectedYield)
+
+                nitrogen_leaching = getNitrogenLeaching(nextDate, start_day, gameOutputs)
+                game.nitrogen_leaching_array.append(nitrogen_leaching)
+                game.nitrogen_leaching = nitrogen_leaching
+                game.nitrogen_uptake = getNitrogenUptake(nextDate, gameOutputs)
             game.monday_irrigation.append(request.POST.get('monday'))
             game.thursday_irrigation.append(request.POST.get('thursday'))
             if request.POST.get('fertilizer') != None:
@@ -269,9 +276,6 @@ def weeklySelection(request, game):
         context['water_layer_graph'] = plotWaterLayers(date, start_day, gameOutputs)
         
     context['gdu'] = getGDU(date, gameOutputs)
-
-    game.nitrogen_leaching = getNitrogenLeaching(gameOutputs)
-    game.nitrogen_uptake = getNitrogenUptake(date, gameOutputs)
 
     historyDict = getHistory(date, start_day, gameInputs, gameOutputs, game.weekly_fertilizer)
     history = historyDict['history']
@@ -438,7 +442,7 @@ def finalResults(request, gameProfile):
     n_uptake = round(getNitrogenUptake(date, gameOutputs), 1)
     gameProfile.nitrogen_uptake = n_uptake
 
-    context['PFP'] = round(finalYield / totalFert, 2)
+    context['PFP'] = round(totalFert / finalYield, 2)
     context['NUE'] = round((getNitrogenUptake(date, gameOutputs) / totalFert) * 100, 0)
     context['WUE'] = round(finalYield / totalET, 1)
     context['WP'] = round(finalYield / totalIrr, 1)
@@ -448,7 +452,8 @@ def finalResults(request, gameProfile):
     gameProfile.waterUseEfficiency = context["WUE"]
     gameProfile.waterProductivity = context['WP']
 
-    context['NLeaching'] = round(getNitrogenLeaching(gameOutputs), 2)
+    context['NLeaching'] = round(getNitrogenLeaching(date, start_day, gameOutputs), 2)
+    gameProfile.nitrogen_leaching_array.append(context['NLeaching'])
     gameProfile.nitrogen_leaching = context['NLeaching']
 
     context['irr_amount'] = sum(history['irr'])
@@ -612,18 +617,41 @@ def getTotalFertilizerCost(text, date):
 
     return totalFertilizerCost
 
-def getNitrogenLeaching(gameOutputs):
+def getNitrogenLeaching(date, start_day, gameOutputs):
+
+    # totalLeaching = 0
+    # readingLeaching = False
+    # for line in gameOutputs['NiBal_content']:
+    #     items = list(filter(None, line.strip("\n").split(" ")))
+    #     print("items:", items)
+    #     if readingLeaching and (len(items) < 14 or int(items[1]) >= day):
+    #         break
+    #     elif not readingLeaching and items[0].startswith("@"):
+    #         readingLeaching = True
+    #     elif readingLeaching and int(items[1]) >= start_day:
+    #         totalLeaching += float(items[13])
+    # print(totalLeaching)
+    # return totalLeaching * 0.892
+
+
+    day = int(date[len(date) - 3:])
     totalLeaching = 0
-    readingLeaching = False
     for line in gameOutputs['NiBal_content']:
+
         items = list(filter(None, line.strip("\n").split(" ")))
-        if readingLeaching and len(items) < 14:
+        if len(items) == 0 or not items[0].isdigit():
+            continue
+        
+        currDay = int(items[1])
+        
+        if currDay < int(start_day):
+            continue
+        elif currDay >= int(day) or len(items) < 14:
             break
-        elif not readingLeaching and items[0].startswith("@"):
-            readingLeaching = True
-        elif readingLeaching:
-            totalLeaching += float(items[13])
-    return totalLeaching * 0.892
+        else:
+            totalLeaching += float(items[13])*0.892
+    
+    return totalLeaching
             
 
         
@@ -1067,6 +1095,8 @@ def getHistory(date, start_day, gameInputs, gameOutputs, weeklyFertilizer):
             history['Nleach'].append(float(items[13])*0.892)
             if currDay >= day - 7:
                 recentHistory['Nleach'].append(float(items[13])*0.892)
+
+        
     
     return {"history": history, "recentHistory": recentHistory}
 
