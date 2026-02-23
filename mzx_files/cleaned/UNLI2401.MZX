@@ -10,7 +10,7 @@
 
 *TREATMENTS                        -------------FACTOR LEVELS------------
 @N R O C TNAME.................... CU FL SA IC MP MI MF MR MC MT ME MH SM
- 1 0 0 0 farm_11                    1  1  0  1  1  0  1  1  0  0  0  0  1
+ 1 0 0 0 farm_11                    1  1  0  1  1  1  1  1  0  0  0  0  1
 
 *CULTIVARS
 @C CR INGENO CNAME
