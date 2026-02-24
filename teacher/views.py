@@ -418,13 +418,13 @@ def groupAttributeGraph(game, studentList, attribute):
     #     title = 'Overall Efficiency Per Student'
     elif attribute == 'PFP':
         xlabel = 'Students'
-        ylabel = 'Partial Factor Productivity'
-        title = 'Partial Factor Productivity Per Student'
+        ylabel = 'Nitrogen Use Efficiency'
+        title = 'Nitrogen Use Efficiency Per Student'
         ax.bar(attributeNames, attributeAmount, color='skyblue')
     elif attribute == 'NUE':
         xlabel = 'Students'
-        ylabel = 'Nitrogen Use Efficiency'
-        title = 'Nitrogen Use Efficiency Per Student'
+        ylabel = 'Nitrogen Utilization Efficiency'
+        title = 'Nitrogen Utilization Efficiency Per Student'
         ax.bar(attributeNames, attributeAmount, color='skyblue')
     elif attribute == 'WUE':
         xlabel = 'Students'
@@ -551,7 +551,7 @@ def downloadClass(request, id):
 
     buf = io.StringIO(newline='')
     writer = csv.writer(buf)
-    writer.writerow(['Username', "Irrigation Total (in)", "Fertilizer Total (lbs)", "Final Yield (bu/ac)", "Cost Per Bushel", "Partial Factor Productivity (bu/lbs N)", "Nitrogen Utilization Efficiency (%)", "Water Utilization Efficiency (bu/in)", "Water Productivity (bu/in)", "N Leaching (lbs/ac)", "N uptake (lbs/ac)"])
+    writer.writerow(['Username', "Irrigation Total (in)", "Fertilizer Total (lbs)", "Final Yield (bu/ac)", "Cost Per Bushel", "Nitrogen Use Efficiency (lbs. N/bu)", "Nitrogen Utilization Efficiency (%)", "Water Utilization Efficiency (bu/in)", "Water Productivity (bu/in)", "N Leaching (lbs/ac)", "N uptake (lbs/ac)"])
     for index, player in enumerate(game.players):
         try:
             student = Student.objects.get(username=player, code=game.code)

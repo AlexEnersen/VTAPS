@@ -1323,7 +1323,7 @@ def downloadOutputs(gamePath):
 def createCSV(irr_total, fert_total, final_yield, final_bushel_cost, pfp, nue, wue, wp, nleaching, gameProfile):
     buf = io.StringIO(newline='')
     writer = csv.writer(buf)
-    writer.writerow(["Irrigation Total (in)", "Fertilizer Total (lbs)", "Final Yield (bu/ac)", "Cost Per Bushel", "Partial Factor Productivity (bu/lbs N)", "Nitrogen Utilization Efficiency (%)", "Water Utilization Efficiency (bu/in)", "Water Productivity (bu/in)", "N Leaching (lbs/ac)"])
+    writer.writerow(["Irrigation Total (in)", "Fertilizer Total (lbs)", "Final Yield (bu/ac)", "Cost Per Bushel", "Nitrogen Use Efficiency (lbs. N/bu)", "Nitrogen Utilization Efficiency (%)", "Water Utilization Efficiency (bu/in)", "Water Productivity (bu/in)", "N Leaching (lbs/ac)"])
     writer.writerow([irr_total, fert_total, final_yield, final_bushel_cost, pfp, nue, wue, wp, nleaching])
 
     writer.writerow([])
