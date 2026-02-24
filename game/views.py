@@ -84,6 +84,7 @@ def runGame(request, game_id=None):
             return redirect(f"/game/{request.user.student.game}")
 
     game_url = f'/game/{game_id}' if game_id is not None else '/game'
+    intro_url = game_url + "/intro"
 
     try:
         if game_id is None:   
@@ -148,6 +149,7 @@ def runGame(request, game_id=None):
                 else:
                     context['game_id'] = game_id
                     context['game_name'] = game.name
+                    context['intro_url'] = intro_url
                     if user != None:
                         context['username'] = user.student.username
                     return render(request, "game/weekly.html", context)
@@ -161,11 +163,51 @@ def runGame(request, game_id=None):
                     context['username'] = user.student.username
                 return render(request, "game/final.html", context)
     except GameProfile.DoesNotExist:
+        if game_id == None:
+            return redirect("/game/intro")
+        else:
+            return redirect(f"/game/{game_id}/intro")
+    
+def intro(request, game_id=None):    
+    context = {}
+    context['game_url'] = f'/game/{game_id}' if game_id is not None else '/game'
+    
+    if request.user.is_authenticated:
+        try:
+            user = request.user
+            context['username'] = user.student.username
+        except:
+            logout(request)
+            return redirect("/")
+    else:
+        user = None
+
+    try:
+        if game_id is None:   
+            current_id = request.session.get('game_id', None) 
+        else:
+            current_id = game_id
+        game = Game.objects.get(id=current_id)
+    except:
+        if game_id is None:
+            game = Game()
+            game.save() 
+
+    try:
+        if game_id is None:
+            current_id = request.session.get("game_id", None)
+        else:
+            current_id = game_id   
+        gameProfile = GameProfile.objects.get(game=game, user=user)
+    except GameProfile.DoesNotExist:
         gameProfile = GameProfile(game=game, user=user)
         gameProfile.save()
-        if game_id is None:
-            request.session['game_id'] = game.id
-        return render(request, "game/intro.html", context)
+
+
+    if game_id is None:
+        request.session['game_id'] = game.id
+    return render(request, "game/intro.html", context)
+
 
 def weeklySelection(request, game):   
     context = {}
