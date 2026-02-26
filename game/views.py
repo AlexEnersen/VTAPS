@@ -1173,6 +1173,9 @@ def computeDSSAT(hybrid, gameInputs, gamePath):
 
     subHybrid = list(filter(None, hybrid.split(" ")))[0]
     commandString = "../../DSCSM048 %s A %s" % (subHybrid, gameInputs['MZX_name'])
+    print(commandString)
+
+    print()
 
     with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
         zip_file.writestr(gameInputs['MZX_name'], "\n".join(gameInputs['MZX_content']))
@@ -1236,9 +1239,9 @@ def uploadInputs(gameInputs, gamePath):
             zip_file.writestr(gameInputs['MZX_name'], "\n".join(gameInputs['MZX_content']))
         
         if 'SOL_name' not in gameInputs:
-            with open("NE.SOL", 'r') as f:
+            with open("UN.SOL", 'r') as f:
                 contents = f.read()
-                zip_file.writestr("NE.SOL", contents)
+                zip_file.writestr("UN.SOL", contents)
         else:
             zip_file.writestr(gameInputs['SOL_name'], "\n".join(gameInputs['SOL_content']))
 
