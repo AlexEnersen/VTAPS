@@ -71,7 +71,7 @@ except Exception as error:
     else:
         print('Error:', error)
 
-FILENAME = 'UNLI2401.MZX'
+FILENAME = 'UNLI1701.MZX'
 
 @csrf_exempt 
 @csrf_protect
@@ -242,7 +242,7 @@ def weeklySelection(request, game):
             fertilizer_init.save()
             game.fert_id = fertilizer_init.id
 
-            gameInputs['WTH_name'] = "NEME2401.WTH"
+            gameInputs['WTH_name'] = "NEME2001.WTH"
 
             # fileContents = yearlyRandomizer()
             file = open("weather_files/NEME2101.WTH")
@@ -894,6 +894,7 @@ def plotAquaSpy(date, start_day, gameInputs, gameOutputs, yAxis=-1):
     llimitArray = []
     rootDay = 0
 
+    print("SOL:", gameInputs['SOL_content'])
     for line in gameOutputs['OSW_content']:
         currentArray = []
         ulimitTempArray = []
@@ -942,6 +943,7 @@ def plotAquaSpy(date, start_day, gameInputs, gameOutputs, yAxis=-1):
     fig, ax = plt.subplots()
 
 
+    print("OSW:", gameOutputs['OSW_content'])
 
     # ax.plot(limitRange, ulimitArray, color="indigo")
     # ax.plot(limitRange, llimitArray, color="goldenrod")
@@ -1027,6 +1029,7 @@ def getRootDepth(date, gameOutputs):
     reading = False
     rootArray = []
 
+    print("OPG:", gameOutputs['OPG_content'])
     for line in gameOutputs['OPG_content']:
         items = list(filter(None, line.split(" ")))
         if len(items) <= 33:
@@ -1037,6 +1040,8 @@ def getRootDepth(date, gameOutputs):
             rootArray.append(mmToInches(float(items[33]) * 1000))
             if int(items[1]) == day:
                 return rootArray
+    
+    print("rootArray:", rootArray)
         
     return rootArray
 
@@ -1096,6 +1101,8 @@ def getHistory(date, start_day, gameInputs, gameOutputs, weeklyFertilizer):
             onFertilizer = True
 
         elif (onFertilizer):
+            print("weklyFertilizer:", weeklyFertilizer)
+            print("items:", items)
             if (int(items[1]) < int(date)):
                 if int(items[5]) == 0:
                     continue
@@ -1315,9 +1322,9 @@ def downloadOutputs(gamePath):
                 # elif name[-4:] == '.INP':
                 #     for line in content:
                 #         print("INP LINE:", line)
-                # elif name == 'WARNING.OUT':
-                #     for line in content:
-                #         print(line)
+                elif name == 'WARNING.OUT':
+                    for line in content:
+                        print(line)
 
         return data
     except:

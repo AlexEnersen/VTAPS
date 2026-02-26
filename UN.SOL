@@ -53,7 +53,7 @@
 !   uncultivated podzolic soils. J. Soil Science 24, 10-17.
 ! Baumer O.W. and Rice J.W. 1988. Methods to predict soil input data for DRAINMOD. 
 !   Am. Soc. Agr. Eng. Paper 88-2564
-! Dalgliesh, N.P., and M.A. Foale. 1998. Soil Matters � monitoring soil water and nitrogen
+! Dalgliesh, N.P., and M.A. Foale. 1998. Soil Matters   monitoring soil water and nitrogen
 !   in dryland farming. CSIRO, Agricultural Production Systems Research Unit, 
 !   Toowoomba, Queensland, Australia. 122 pp.
 ! Gijsman A.J., Jagtap S.S., Jones J.W. 2002. Wading through a swamp of complete confusion: 
@@ -74,13 +74,13 @@
 @SITE        COUNTRY          LAT     LONG SCS FAMILY
  NP          US              41.41  100.76 Silt Loam
 @ SCOM  SALB  SLU1  SLDR  SLRO  SLNF  SLPF  SMHB  SMPX  SMKE
-    BN   .13     6    .6    61     1    .9 IB001 IB001 IB001
+    BN   .13     6    .6    61     1     1 IB001 IB001 IB001
 @  SLB  SLMH  SLLL  SDUL  SSAT  SRGF  SSKS  SBDM  SLOC  SLCL  SLSI  SLCF  SLNI  SLHW  SLHB  SCEC  SADC
-     5   -99  .158  .333  .512     1   .68   1.2  1.16    20    52   -99     0   6.3   -99    17   -99
-    31   -99  .158  .333  .512     1   .68   1.2  1.16    20    52   -99     0   6.3   -99    17   -99
-    61   -99  .136  .294  .482     1  1.32  1.29   .71  18.1    49   -99     0   6.3   -99    15   -99
-    91   -99   .11  .257  .477     1  1.32  1.31   .52    14    47   -99     0     7   -99    12   -99
-   122   -99  .104  .245  .467  .119  1.32  1.34   .29    14    47   -99     0     7   -99    12   -99
-   152   -99  .104  .245  .467  .065  1.32  1.34   .29    14    47   -99     0     7   -99    12   -99
-   183   -99  .104  .245  .467  .035  1.32  1.34   .29    14    47   -99     0     7   -99    12   -99
+     5   -99  .158  .333  .512     1  3.24   1.3  1.16    20    52    28   -99   6.3   -99    17   -99
+    31   -99  .158  .333  .512     1  3.24   1.3  1.16    20    52    28   -99   6.3   -99    17   -99
+    61   -99  .136  .294  .482     1  3.24   1.4   .51    18    49    33   -99   6.3   -99    15   -99
+    91   -99   .11  .257  .477     1  3.24   1.4   .51    14    47    39   -99     7   -99    12   -99
+   122   -99  .104  .245  .467  .119  3.24   1.4   .51    14    47    39   -99     7   -99    12   -99
+   152   -99  .104  .245  .467  .065  3.24   1.4   .51    14    47    39   -99     7   -99    12   -99
+   183   -99  .104  .245  .467  .035  3.24   1.4   .51    14    47    39   -99     7   -99    12   -99
 
