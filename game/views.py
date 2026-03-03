@@ -852,7 +852,7 @@ def getFinalYield(gameOutputs):
             readingVariables = True
         elif readingVariables and items[0].startswith('Yield'):
             finalYield = float(items[-2]) / 62.77
-            finalYield = finalYield / 0.845                     #Based on Rintu's Calibration (9/8/2025)
+            finalYield = finalYield / 0.845                #Based on Rintu's Calibration (9/8/2025)
             return round(finalYield, 1)
 
 def plotAquaSpy(date, start_day, gameInputs, gameOutputs, yAxis=-1):
@@ -894,7 +894,6 @@ def plotAquaSpy(date, start_day, gameInputs, gameOutputs, yAxis=-1):
     llimitArray = []
     rootDay = 0
 
-    print("SOL:", gameInputs['SOL_content'])
     for line in gameOutputs['OSW_content']:
         currentArray = []
         ulimitTempArray = []
@@ -942,8 +941,6 @@ def plotAquaSpy(date, start_day, gameInputs, gameOutputs, yAxis=-1):
 
     fig, ax = plt.subplots()
 
-
-    print("OSW:", gameOutputs['OSW_content'])
 
     # ax.plot(limitRange, ulimitArray, color="indigo")
     # ax.plot(limitRange, llimitArray, color="goldenrod")
@@ -1029,7 +1026,6 @@ def getRootDepth(date, gameOutputs):
     reading = False
     rootArray = []
 
-    print("OPG:", gameOutputs['OPG_content'])
     for line in gameOutputs['OPG_content']:
         items = list(filter(None, line.split(" ")))
         if len(items) <= 33:
@@ -1040,8 +1036,6 @@ def getRootDepth(date, gameOutputs):
             rootArray.append(mmToInches(float(items[33]) * 1000))
             if int(items[1]) == day:
                 return rootArray
-    
-    print("rootArray:", rootArray)
         
     return rootArray
 
@@ -1101,8 +1095,6 @@ def getHistory(date, start_day, gameInputs, gameOutputs, weeklyFertilizer):
             onFertilizer = True
 
         elif (onFertilizer):
-            print("weklyFertilizer:", weeklyFertilizer)
-            print("items:", items)
             if (int(items[1]) < int(date)):
                 if int(items[5]) == 0:
                     continue
@@ -1180,9 +1172,6 @@ def computeDSSAT(hybrid, gameInputs, gamePath):
 
     subHybrid = list(filter(None, hybrid.split(" ")))[0]
     commandString = "../../DSCSM048 %s A %s" % (subHybrid, gameInputs['MZX_name'])
-    print(commandString)
-
-    print()
 
     with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
         zip_file.writestr(gameInputs['MZX_name'], "\n".join(gameInputs['MZX_content']))

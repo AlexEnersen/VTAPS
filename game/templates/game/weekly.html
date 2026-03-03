@@ -274,7 +274,13 @@
 
       {% csrf_token %} {% if week == 1 or week == 6 or week == 9 or week == 10 or week == 12 or week == 14 or week == 15 %}
       <div class="inputRow">
-        <p class="irrigationLabel">Week {{week}} Fertilizer:</p>
+        {% if week == 1 %}
+          <p class="irrigationLabel">Week {{week}} At-Plant Fertilizer:</p>
+        {% elif week == 6 %}
+          <p class="irrigationLabel">Week {{week}} Side-Dress:</p>
+        {% else %}
+          <p class="irrigationLabel">Week {{week}} Fertigation:</p>
+        {% endif %}
         <p class="irrigationField">{{fform.fertilizer}} lbs</p>
       </div>
       {% endif %}

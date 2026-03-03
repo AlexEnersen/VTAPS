@@ -129,7 +129,7 @@ class IrrigationEntries(models.Model):
     thursday = models.FloatField(choices=IRRIGATION_CHOICES, default=0)
 
 class FertilizerInit(models.Model):
-    week1 = models.IntegerField("Week 1, Pre-plant Nitrogen", blank=False, default=0, choices=FERT_CHOICES_1)
+    week1 = models.IntegerField("Week 1, At-plant Nitrogen", blank=False, default=0, choices=FERT_CHOICES_1)
     week6 = models.IntegerField("Week 6, Side-Dress Nitrogen", blank=False, default=0, choices=FERT_CHOICES_1)
     week9 = models.IntegerField("Week 9, V9 Fertigation Nitrogen", blank=False, default=0, choices=FERT_CHOICES_2)
     week10 = models.IntegerField("Week 10, V12 Fertigation Nitrogen", blank=False, default=0, choices=FERT_CHOICES_2)
