@@ -851,9 +851,12 @@ def getFinalYield(gameOutputs):
         if items[0] == '@' and not readingVariables:
             readingVariables = True
         elif readingVariables and items[0].startswith('Yield'):
-            finalYield = float(items[-2]) / 62.77
-            finalYield = finalYield / 0.845                #Based on Rintu's Calibration (9/8/2025)
-            return round(finalYield, 1)
+            print("raw yield:", items[-2])
+            finalYield = float(items[-2]) / 0.845                #Based on Rintu's Calibration (9/8/2025)  
+            print("adjusted yield:", finalYield)
+            finalYield = finalYield / 62.77
+            print("converted yield:", finalYield)       
+            return round(finalYield, 2)
 
 def plotAquaSpy(date, start_day, gameInputs, gameOutputs, yAxis=-1):
     
@@ -1235,9 +1238,9 @@ def uploadInputs(gameInputs, gamePath):
             zip_file.writestr(gameInputs['MZX_name'], "\n".join(gameInputs['MZX_content']))
         
         if 'SOL_name' not in gameInputs:
-            with open("UN.SOL", 'r') as f:
+            with open("NE.SOL", 'r') as f:
                 contents = f.read()
-                zip_file.writestr("UN.SOL", contents)
+                zip_file.writestr("NE.SOL", contents)
         else:
             zip_file.writestr(gameInputs['SOL_name'], "\n".join(gameInputs['SOL_content']))
 
@@ -1311,9 +1314,9 @@ def downloadOutputs(gamePath):
                 # elif name[-4:] == '.INP':
                 #     for line in content:
                 #         print("INP LINE:", line)
-                elif name == 'WARNING.OUT':
-                    for line in content:
-                        print(line)
+                # elif name == 'WARNING.OUT':
+                #     for line in content:
+                #         print(line)
 
         return data
     except:
