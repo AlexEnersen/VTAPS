@@ -851,11 +851,8 @@ def getFinalYield(gameOutputs):
         if items[0] == '@' and not readingVariables:
             readingVariables = True
         elif readingVariables and items[0].startswith('Yield'):
-            print("raw yield:", items[-2])
             finalYield = float(items[-2]) / 0.845                #Based on Rintu's Calibration (9/8/2025)  
-            print("adjusted yield:", finalYield)
-            finalYield = finalYield / 62.77
-            print("converted yield:", finalYield)       
+            finalYield = finalYield / 62.77   
             return round(finalYield, 2)
 
 def plotAquaSpy(date, start_day, gameInputs, gameOutputs, yAxis=-1):
@@ -1308,6 +1305,9 @@ def downloadOutputs(gamePath):
                 elif name[-4:] == '.OPN':
                     data['OPN_name'] = name
                     data['OPN_content'] = content
+                elif name[-4:] == '.OME':
+                    data['OME_name'] = name
+                    data['OME_content'] = content
                 elif name == 'SoilNiBal.OUT':
                     data['NiBal_name'] = name
                     data['NiBal_content'] = content
@@ -1404,79 +1404,102 @@ def getSeedCost(hybrid, seeding_rate):
 
 def getGDU(date, gameOutputs):
     reading = False
-    gdu = 0
-    for line in gameOutputs['OPG_content']:
-        items = line.strip().split(" ")
-        if len(items) <= 1:
-            continue
+    day = int(date[len(date) - 3:])
 
-        dtt = items[-1].replace("\r", "")
+    leaves = 0
+    maxLeaves = 0
+
+    stage = 0
+
+    gwad = 0
+    maxGWAD = 0
+    for line in gameOutputs['OPG_content']:
+        items = list(filter(None, line.split(" ")))
+        if len(items) <= 1:
+            if reading:
+                break
+            else:
+                continue
         
-        if reading == False and dtt == 'DTTD':
+        if reading == False and items[0] == '@YEAR':
             reading = True
             continue
-
+        
+        
         if reading == True:
-            gdu += float(dtt)
-            if int(items[1]) >= int(date[-3:]):
+            doy = items[1]
+            leafNum = float(items[4])
+            gwadNum = int(items[9])
+
+            if str(day) == str(doy):
+                leaves = leafNum
+                gwad = gwadNum
+
+            if leafNum > maxLeaves:
+                maxLeaves = leafNum
+
+            if gwadNum > maxGWAD:
+                maxGWAD = gwadNum
+
+            # stageNum = int(items[5])
+            # if stageNum == 3:
+            #     stage = 'R1'
+            # elif stageNum == 4:
+            #     stage = 'R2'
+            # elif stageNum == 5:
+            #     stage = 'R6'
+
+    reading = False
+    reading2 = False
+    for line in gameOutputs['OME_content']:
+        items = list(filter(None, line.split(" ")))
+        if len(items) < 1:
+            continue
+        elif reading2 and len(items) < 9:
+            break
+
+        if reading == False and items[0] == '@RUN':
+            reading = True
+            continue
+        elif reading == True and reading2 == False:
+            reading2 = True
+            continue
+
+        if reading2 == True:
+            doy = items[4]
+            stageNum = items[8]
+
+            if int(doy) <= int(day):
+                if stageNum == '03':
+                    stage = "R1"
+                elif stageNum == '04':
+                    stage = 'R2'
+                elif stageNum == '05':
+                    stage = 'R6'
+            elif int(doy) > int(day):
                 break
+    
+    gwadRatio = gwad/maxGWAD
 
-    # if gdu < 120:
-    #     return 'Planting'
-    # elif gdu < 160: 
-    #     return 'VE'
-    # elif gdu < 200: 
-    #     return 'V1'
-    # elif gdu < 350:
-    #     return 'V2'
-    # elif gdu < 475:
-    #     return 'V3'
-    # elif gdu < 610:
-    #     return 'V5/6'
-    # elif gdu < 740:
-    #     return 'V8'
-    # elif gdu < 1135:
-    #     return 'V10'
-    # elif gdu < 1385:
-    #     return 'VT'
-    # elif gdu < 1660:
-    #     return 'R1'
-    # elif gdu < 1790:
-    #     return 'R2'
-    # elif gdu < 1925:
-    #     return 'R3'
-    # elif gdu < 2450:
-    #     return 'R4'
-    # elif gdu < 2700:
-    #     return 'R5'
-    # else:
-    #     return 'R6'
+    print("leaves:", leaves)
+    print("max:", maxLeaves)
 
-    if gdu < 93:
-        return 'V2'
-    elif gdu < 174:
-        return 'V4'
-    elif gdu < 246:
-        return 'V6'
-    elif gdu < 321:
-        return 'V8'
-    elif gdu < 393:
-        return 'V10'
-    elif gdu < 466:
-        return 'V12'
-    elif gdu < 538:
-        return 'V14'
-    elif gdu < 613:
-        return 'R1'
-    elif gdu < 760:
-        return 'R2'
-    elif gdu < 904:
-        return 'R3'
-    elif gdu < 1052:
-        return 'R4'
-    elif gdu < 1199:
-        return 'R4.7'
-    elif gdu < 1343:
-        return 'R5.5'
-    else:
-        return 'R6'
+    if stage != 0:
+        if stage == 'R6':
+            return stage
+        elif gwadRatio >= 0.25:
+            if gwadRatio >= 0.75:
+                return "R5"
+            elif gwadRatio >= 0.5:
+                return "R4"
+            else:
+                return "R3"
+        else:
+            return stage
+    elif leaves >= maxLeaves:
+        return 'VT'
+    elif leaves < maxLeaves:
+        if leaves == 0:
+            return 'Planting'
+        else:
+            return f'V{int(leaves)}'
