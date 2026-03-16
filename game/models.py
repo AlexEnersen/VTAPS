@@ -111,6 +111,7 @@ class GameProfile(models.Model):
     nitrogen_leaching = models.FloatField(default=0)
     nitrogen_leaching_array = ArrayField(models.FloatField(default=0), default=list, blank=True)
     nitrogen_uptake = models.FloatField(default=0)
+    nitrogen_sufficiency = models.FloatField(default=0)
     wnipi = models.FloatField(default=0)
     
     partialFactorProductivity = models.FloatField(default=-1)

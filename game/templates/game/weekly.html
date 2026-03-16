@@ -217,6 +217,13 @@
           <td class="historyData">{{weekly_Nleach|floatformat:2}} lbs.</td>
           <td class="historyData">{{total_Nleach|floatformat:2}} lbs.</td>
         </tr>
+        {% if week > 1 %}
+        <tr>
+          <td class="historyLabel lightlyBold">N Sufficiency</td>
+          <td class="historyData"></td>
+          <td class="historyData">{{nitrogen_sufficiency|floatformat:0}}%</td>
+        </tr>
+        {% endif %}
         <tr>
           <td class="historyLabel lightlyBold">Growth Stage</td>
           <td class="historyData"></td>

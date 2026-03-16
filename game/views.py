@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('agg')
 import io
+import copy
 import zipfile
 import boto3
 import environ
@@ -251,10 +252,6 @@ def weeklySelection(request, game):
 
             gameInputs['WTH_content'] = changeWeatherYear(fileContents, 2020)
 
-
-
-
-
             altForecast = False
             gameInputs['forecast_content'] = altForecastWeather(gameInputs['WTH_content']) if altForecast else forecastWeather(gameInputs['WTH_content'])
             # gameInputs['forecast_content'] = forecastWeather(fileContents)
@@ -262,6 +259,23 @@ def weeklySelection(request, game):
             game.initialized = True
             game.week = 0
             gameInputs = downloadInputs(gamePath)
+
+            # gameInputsSimulated = gameInputs.copy()
+            gameInputsSimulated = copy.deepcopy(gameInputs)
+            for weekNum in range(21):
+                fertQuantity = 0
+                if weekNum == 0 or weekNum == 5:
+                    fertQuantity = 75
+                elif weekNum == 8 or weekNum == 9 or weekNum == 11 or weekNum == 13 or weekNum == 14:
+                    fertQuantity = 30
+
+
+                gameInputsSimulated['MZX_content'] = addIrrigation(gameInputsSimulated['MZX_content'], [1, 1], fertQuantity, int(date) + (7 * weekNum), weekNum)
+                gameInputsSimulated['MZX_content'] = addFertilizer(gameInputsSimulated['MZX_content'], fertQuantity, int(date) + (7 * weekNum))
+
+            gamePathSimulated = gamePath + "_simulated"
+
+            computeDSSAT(game.hybrid, gameInputsSimulated, gamePathSimulated)
 
         else:
             game.computing = True
@@ -301,12 +315,14 @@ def weeklySelection(request, game):
 
     gameInputs = downloadInputs(gamePath)
     gameOutputs = downloadOutputs(gamePath)
+
     if gameOutputs is False:
         computeDSSAT(game.hybrid, gameInputs, gamePath)
         time.sleep(5)
         return None
     elif len(gameOutputs) == 0:
         return False
+    
     
     if game.week > 1:
         game.computing = False
@@ -316,6 +332,14 @@ def weeklySelection(request, game):
         context['growth_stage_graph'] = plotOneAttribute(date, start_day, gameOutputs['OPG_content'], 'GSTD', 'Stage', 'Growth Stage')
         context['nitrogen_stress_graph'] = plotOneAttribute(date, start_day, gameOutputs['NiBal_content'], 'RLCH', 'Nitrate Leached (lbs/a)', 'Nitrate Leaching')
         context['water_layer_graph'] = plotWaterLayers(date, start_day, gameOutputs)
+
+        gameOutputsSimulated = downloadOutputs(gamePath + "_simulated")
+        simulatedNUptake = getNitrogenUptake(date, gameOutputsSimulated)
+        if simulatedNUptake > 0:
+            context['nitrogen_sufficiency'] = (game.nitrogen_uptake / simulatedNUptake) * 100
+        else:
+            context['nitrogen_sufficiency'] = 100
+        game.nitrogen_sufficiency = context['nitrogen_sufficiency']
         
     context['gdu'] = getGDU(date, gameOutputs)
 
@@ -422,61 +446,7 @@ def finalResults(request, gameProfile):
         computeDSSAT(gameProfile.hybrid, controlGameInputs, controlGamePath)
     controlGameOutputs = downloadOutputs(controlGamePath)
 
-    ### IRRIGATED GAME
-    # irrigatedGameInputs = gameInputs.copy()
-    # with open(f"mzx_files/cleaned/{irrigatedGameInputs['MZX_name'][:-4]}-irrigated.MZX", 'r') as f:
-    #     irrigatedGameInputs['MZX_content'] = f.read().split("\n")
-    # irrigatedGameInputs['MZX_content'] = setHybrid(irrigatedGameInputs['MZX_content'], gameProfile.hybrid)
-    # irrigatedGameInputs['MZX_content'] = setSeedingRate(irrigatedGameInputs['MZX_content'], gameProfile.seeding_rate)
 
-    # irrigatedGamePath = gamePath + 'irrigated'
-     
-    # if checkBucket(irrigatedGamePath) == False:
-    #     computeDSSAT(gameProfile.hybrid, irrigatedGameInputs, irrigatedGamePath)
-    # irrigatedGameOutputs = downloadOutputs(irrigatedGamePath)
-    # irrigatedFinalYield = getFinalYield(irrigatedGameOutputs)
-
-
-    ### FERTILIZED GAME
-    # fertilizedGameInputs = gameInputs.copy()
-    # with open(f"mzx_files/cleaned/{fertilizedGameInputs['MZX_name'][:-4]}-fertilized.MZX", 'r') as f:
-    #     fertilizedGameInputs['MZX_content'] = f.read().split("\n")
-    # fertilizedGameInputs['MZX_content'] = setHybrid(fertilizedGameInputs['MZX_content'], gameProfile.hybrid)
-    # fertilizedGameInputs['MZX_content'] = setSeedingRate(fertilizedGameInputs['MZX_content'], gameProfile.seeding_rate)
-
-    # fertilizedGamePath = gamePath + 'fertilized'
-     
-    # if checkBucket(fertilizedGamePath) == False:
-    #     computeDSSAT(gameProfile.hybrid, fertilizedGameInputs, fertilizedGamePath)
-    # fertilizedGameOutputs = downloadOutputs(fertilizedGamePath)
-    # fertilizedFinalYield = getFinalYield(fertilizedGameOutputs)
-
-
-    ### PROCEEDING
-    # controlHistory = getHistory(date, start_day, controlGameInputs, controlGameOutputs, [0])['history']
-    # controlFinalYield = getFinalYield(controlGameOutputs)
-
-    # WNIPI_yield = ((finalYield / controlFinalYield) - 1)
-
-    # final_irr = sum(history['irr'])
-    # control_et = sum(controlHistory['et'])
-    # WNIPI_irr = (1 + (final_irr / control_et))
-
-    # final_fert = sum(history['fert'])
-    # control_fert_uptake = getNitrogenUptake(date, controlGameOutputs)
-    # WNIPI_fert = (1 + (final_fert / control_fert_uptake))
-
-    # WNIPI_total = (WNIPI_yield / (WNIPI_irr * WNIPI_fert))
-    # gameProfile.wnipi = WNIPI_total
-    # context['WNIPI'] = round(WNIPI_total, 4)
-    
-    # agronomicEfficiency = (finalYield - fertilizedFinalYield)/(final_fert + 0.001)
-    # gameProfile.agronomic_efficiency = agronomicEfficiency
-    # context['AE'] = agronomicEfficiency
-
-    # irrigationWaterUseEfficiency = (finalYield - irrigatedFinalYield)/(final_irr + 0.001)
-    # gameProfile.irrigation_water_use_efficiency = irrigationWaterUseEfficiency
-    # context['IWUE'] = irrigationWaterUseEfficiency
 
     totalFert = max(sum(history['fert']), 1)
     totalIrr = max(sum(history['irr']), 1)
@@ -1068,6 +1038,7 @@ def getHistory(date, start_day, gameInputs, gameOutputs, weeklyFertilizer):
 
     fertCount = 0
     weeklyFertilizer = [fertilizer for fertilizer in weeklyFertilizer if fertilizer > 0]
+    print("Weekly:", weeklyFertilizer)
     for line in gameInputs['MZX_content']:
         items = line.split(" ")
         items = [x for x in items if x]
