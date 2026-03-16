@@ -270,8 +270,8 @@ def weeklySelection(request, game):
                     fertQuantity = 30
 
 
-                gameInputsSimulated['MZX_content'] = addIrrigation(gameInputsSimulated['MZX_content'], [1, 1], fertQuantity, int(date) + (7 * weekNum), weekNum)
-                gameInputsSimulated['MZX_content'] = addFertilizer(gameInputsSimulated['MZX_content'], fertQuantity, int(date) + (7 * weekNum))
+                gameInputsSimulated['MZX_content'] = addIrrigation(gameInputsSimulated['MZX_content'], [1, 1], fertQuantity, int(date) + (7 * (weekNum+1)), weekNum)
+                gameInputsSimulated['MZX_content'] = addFertilizer(gameInputsSimulated['MZX_content'], fertQuantity, int(date) + (7 * (weekNum+1)))
 
             gamePathSimulated = gamePath + "_simulated"
 
@@ -336,10 +336,13 @@ def weeklySelection(request, game):
         gameOutputsSimulated = downloadOutputs(gamePath + "_simulated")
         simulatedNUptake = getNitrogenUptake(date, gameOutputsSimulated)
         if simulatedNUptake > 0:
-            context['nitrogen_sufficiency'] = (game.nitrogen_uptake / simulatedNUptake) * 100
+            context['nitrogen_sufficiency'] = round((game.nitrogen_uptake / simulatedNUptake) * 100, 0)
         else:
             context['nitrogen_sufficiency'] = 100
         game.nitrogen_sufficiency = context['nitrogen_sufficiency']
+
+        print("original uptake:", game.nitrogen_uptake)
+        print("simulated uptake:", simulatedNUptake)
         
     context['gdu'] = getGDU(date, gameOutputs)
 
@@ -454,6 +457,7 @@ def finalResults(request, gameProfile):
     n_uptake = round(getNitrogenUptake(date, gameOutputs), 1)
     gameProfile.nitrogen_uptake = n_uptake
 
+    context['NSufficiency'] = gameProfile.nitrogen_sufficiency
     context['PFP'] = round(totalFert / finalYield, 2)
     context['NUE'] = round((getNitrogenUptake(date, gameOutputs) / totalFert) * 100, 0)
     context['WUE'] = round(finalYield / totalET, 1)
@@ -479,7 +483,7 @@ def finalResults(request, gameProfile):
 
     gameProfile.save()
 
-    csv = createCSV(context['irr_amount'], context['fert_amount'], context['yield'], context['bushel_cost'], context['PFP'], context['NUE'], context['WUE'], context['WP'], context['NLeaching'], gameProfile)
+    csv = createCSV(context['irr_amount'], context['fert_amount'], context['yield'], context['bushel_cost'], context['PFP'], context['NUE'], context['WUE'], context['WP'], context['NLeaching'], context['NSufficiency'], gameProfile)
     s3.put_object(
         Bucket="finalresultsbucket",
         Key=f"{gamePath}/final_summary.csv",
@@ -1132,7 +1136,7 @@ def getNitrogenUptake(date, gameOutputs):
             nitrogenUptake = (float(items[itemIndex]))
             totalNitrogenUptake += nitrogenUptake
             if int(items[1]) == day:
-                return nitrogenUptake
+                return totalNitrogenUptake
         
     return totalNitrogenUptake
 
@@ -1293,11 +1297,11 @@ def downloadOutputs(gamePath):
     except:
         return False
     
-def createCSV(irr_total, fert_total, final_yield, final_bushel_cost, pfp, nue, wue, wp, nleaching, gameProfile):
+def createCSV(irr_total, fert_total, final_yield, final_bushel_cost, pfp, nue, wue, wp, nleaching, nsufficiency, gameProfile):
     buf = io.StringIO(newline='')
     writer = csv.writer(buf)
-    writer.writerow(["Irrigation Total (in)", "Fertilizer Total (lbs)", "Final Yield (bu/ac)", "Cost Per Bushel", "Nitrogen Use Efficiency (lbs. N/bu)", "Nitrogen Utilization Efficiency (%)", "Water Utilization Efficiency (bu/in)", "Water Productivity (bu/in)", "N Leaching (lbs/ac)"])
-    writer.writerow([irr_total, fert_total, final_yield, final_bushel_cost, pfp, nue, wue, wp, nleaching])
+    writer.writerow(["Irrigation Total (in)", "Fertilizer Total (lbs)", "Final Yield (bu/ac)", "Cost Per Bushel", "Nitrogen Use Efficiency (lbs. N/bu)", "Nitrogen Utilization Efficiency (%)", "Water Utilization Efficiency (bu/in)", "Water Productivity (bu/in)", "N Leaching (lbs/ac)", "N Sufficiency (%)"])
+    writer.writerow([irr_total, fert_total, final_yield, final_bushel_cost, pfp, nue, wue, wp, nleaching, nsufficiency])
 
     writer.writerow([])
     writer.writerow(['Week', 'Projected Yield (bu/ac)', "Monday Irrigation (in)", "Thursday Irrigation (in)", "Fertilizer (lbs)"])

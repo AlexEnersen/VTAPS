@@ -551,7 +551,7 @@ def downloadClass(request, id):
 
     buf = io.StringIO(newline='')
     writer = csv.writer(buf)
-    writer.writerow(['Username', "Irrigation Total (in)", "Fertilizer Total (lbs)", "Final Yield (bu/ac)", "Cost Per Bushel", "Nitrogen Use Efficiency (lbs. N/bu)", "Nitrogen Utilization Efficiency (%)", "Water Utilization Efficiency (bu/in)", "Water Productivity (bu/in)", "N Leaching (lbs/ac)", "N uptake (lbs/ac)"])
+    writer.writerow(['Username', "Irrigation Total (in)", "Fertilizer Total (lbs)", "Final Yield (bu/ac)", "Cost Per Bushel", "Nitrogen Use Efficiency (lbs. N/bu)", "Nitrogen Utilization Efficiency (%)", "Water Utilization Efficiency (bu/in)", "Water Productivity (bu/in)", "N Leaching (lbs/ac)", "N uptake (lbs/ac)", "N sufficiency (%)"])
     for index, player in enumerate(game.players):
         try:
             student = Student.objects.get(username=player, code=game.code)
@@ -559,7 +559,6 @@ def downloadClass(request, id):
         except:
             continue
         
-        print("gameProfile.projected_yields:", gameProfile.projected_yields)
         if len(gameProfile.projected_yields) > 0:
             irr_total = sum(gameProfile.monday_irrigation) + sum(gameProfile.thursday_irrigation)
             fert_total = sum(gameProfile.weekly_fertilizer)
@@ -571,6 +570,7 @@ def downloadClass(request, id):
             wp = gameProfile.waterProductivity
             n_leaching = gameProfile.nitrogen_leaching
             n_uptake = gameProfile.nitrogen_uptake
+            n_sufficiency = gameProfile.nitrogen_sufficiency
         else:
             irr_total = -1
             fert_total = -1
@@ -582,8 +582,9 @@ def downloadClass(request, id):
             wp = -1
             n_leaching = -1
             n_uptake = -1
+            n_sufficiency = -1
         
-        writer.writerow([player, irr_total, fert_total, final_yield, cost_per_bushel, pfp, nue, wue, wp, n_leaching, n_uptake])
+        writer.writerow([player, irr_total, fert_total, final_yield, cost_per_bushel, pfp, nue, wue, wp, n_leaching, n_uptake, n_sufficiency])
 
     data = buf.getvalue().encode("utf-8-sig")
         
