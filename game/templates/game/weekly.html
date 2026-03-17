@@ -279,8 +279,7 @@
         <p class="irrigationField">{{iform.thursday}} in.</p>
       </div>
 
-      {% csrf_token %} {% if week == 1 or week == 6 or week == 9 or week == 10
-      or week == 12 or week == 14 or week == 15 %}
+      {% csrf_token %} {% if week == 1 or week == 6 or week == 9 or week == 10 or week == 12 or week == 14 or week == 15 %}
       <div class="inputRow">
         {% if week == 1 %}
         <p class="irrigationLabel">Week {{week}} At-Plant Fertilizer:</p>
