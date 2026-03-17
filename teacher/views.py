@@ -551,7 +551,7 @@ def downloadClass(request, id):
 
     buf = io.StringIO(newline='')
     writer = csv.writer(buf)
-    writer.writerow(['Username', "Irrigation Total (in)", "Fertilizer Total (lbs)", "Final Yield (bu/ac)", "Cost Per Bushel", "Nitrogen Use Efficiency (lbs. N/bu)", "Nitrogen Utilization Efficiency (%)", "Water Utilization Efficiency (bu/in)", "Water Productivity (bu/in)", "N Leaching (lbs/ac)", "N uptake (lbs/ac)", "N sufficiency (%)"])
+    writer.writerow(['Username', "Irrigation Total (in)", "Fertilizer Total (lbs)", "Final Yield (bu/ac)", "Cost Per Bushel", "Nitrogen Use Efficiency (lbs. N/bu)", "Nitrogen Utilization Efficiency (%)", "Water Utilization Efficiency (bu/in)", "Water Productivity (bu/in)", "N Leaching (lbs/ac)", "N uptake (lbs/ac)", "N sufficiency Index (%)"])
     for index, player in enumerate(game.players):
         try:
             student = Student.objects.get(username=player, code=game.code)

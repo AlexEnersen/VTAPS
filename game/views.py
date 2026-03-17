@@ -559,17 +559,13 @@ def getTotalIrrigationCost(text, date):
 
     for line in text:
         lines = list(filter(None, line.strip("\n").split(" ")))
-        print("lines:", lines)
         if (len(lines) < 4):
-            print("Hi?")
             if (onIrrigation):
                 break
             else:
                 continue
 
         if (onIrrigation):
-            print("irr")
-            print("date:", date)
             if (lines[0].startswith("*") or lines[0].startswith("@")):
                 break
             else:
@@ -1301,7 +1297,7 @@ def downloadOutputs(gamePath):
 def createCSV(irr_total, fert_total, final_yield, final_bushel_cost, pfp, nue, wue, wp, nleaching, nsufficiency, gameProfile):
     buf = io.StringIO(newline='')
     writer = csv.writer(buf)
-    writer.writerow(["Irrigation Total (in)", "Fertilizer Total (lbs)", "Final Yield (bu/ac)", "Cost Per Bushel", "Nitrogen Use Efficiency (lbs. N/bu)", "Nitrogen Utilization Efficiency (%)", "Water Utilization Efficiency (bu/in)", "Water Productivity (bu/in)", "N Leaching (lbs/ac)", "N Sufficiency (%)"])
+    writer.writerow(["Irrigation Total (in)", "Fertilizer Total (lbs)", "Final Yield (bu/ac)", "Cost Per Bushel", "Nitrogen Use Efficiency (lbs. N/bu)", "Nitrogen Utilization Efficiency (%)", "Water Utilization Efficiency (bu/in)", "Water Productivity (bu/in)", "N Leaching (lbs/ac)", "N Sufficiency Index (%)"])
     writer.writerow([irr_total, fert_total, final_yield, final_bushel_cost, pfp, nue, wue, wp, nleaching, nsufficiency])
 
     writer.writerow([])

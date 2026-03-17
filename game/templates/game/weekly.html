@@ -10,7 +10,7 @@
   </div>
   {% endif %}
   <div class="titleContainer">
-    <a class="introLink" href={{intro_url}}>Introduction</a>
+    <a class="introLink" href="{{intro_url}}">Introduction</a>
     <p class="title">Week {{week}}/21</p>
     <p class="subTitle">Next week forecast</p>
   </div>
@@ -219,7 +219,7 @@
         </tr>
         {% if week > 1 %}
         <tr>
-          <td class="historyLabel lightlyBold">Nitrogen Sufficiency</td>
+          <td class="historyLabel lightlyBold">Nitrogen Sufficiency Index</td>
           <td class="historyData"></td>
           <td class="historyData">{{nitrogen_sufficiency|floatformat:0}}%</td>
         </tr>
@@ -279,14 +279,15 @@
         <p class="irrigationField">{{iform.thursday}} in.</p>
       </div>
 
-      {% csrf_token %} {% if week == 1 or week == 6 or week == 9 or week == 10 or week == 12 or week == 14 or week == 15 %}
+      {% csrf_token %} {% if week == 1 or week == 6 or week == 9 or week == 10
+      or week == 12 or week == 14 or week == 15 %}
       <div class="inputRow">
         {% if week == 1 %}
-          <p class="irrigationLabel">Week {{week}} At-Plant Fertilizer:</p>
+        <p class="irrigationLabel">Week {{week}} At-Plant Fertilizer:</p>
         {% elif week == 6 %}
-          <p class="irrigationLabel">Week {{week}} Side-Dress:</p>
+        <p class="irrigationLabel">Week {{week}} Side-Dress:</p>
         {% else %}
-          <p class="irrigationLabel">Week {{week}} Fertigation:</p>
+        <p class="irrigationLabel">Week {{week}} Fertigation:</p>
         {% endif %}
         <p class="irrigationField">{{fform.fertilizer}} lbs</p>
       </div>
