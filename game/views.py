@@ -559,19 +559,21 @@ def getTotalIrrigationCost(text, date):
 
     for line in text:
         lines = list(filter(None, line.strip("\n").split(" ")))
+        print("lines:", lines)
         if (len(lines) < 4):
+            print("Hi?")
             if (onIrrigation):
                 break
             else:
                 continue
 
         if (onIrrigation):
+            print("irr")
+            print("date:", date)
             if (lines[0].startswith("*") or lines[0].startswith("@")):
                 break
-            elif (int(lines[1]) < int(date)):
-                totalIrrigationCost += mmToInches(float(lines[3])) * 6.1
             else:
-                break
+                totalIrrigationCost += mmToInches(float(lines[3])) * 6.1
 
         if (lines[3] == "IRVAL"):
             onIrrigation = True
@@ -1042,7 +1044,6 @@ def getHistory(date, start_day, gameInputs, gameOutputs, weeklyFertilizer):
 
     fertCount = 0
     weeklyFertilizer = [fertilizer for fertilizer in weeklyFertilizer if fertilizer > 0]
-    print("Weekly:", weeklyFertilizer)
     for line in gameInputs['MZX_content']:
         items = line.split(" ")
         items = [x for x in items if x]
