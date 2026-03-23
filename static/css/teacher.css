@@ -68,3 +68,27 @@ form.weekChangeField {
   flex-direction: column;
   width: 50%;
 }
+
+.deleteWarningContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 72px 0px;
+}
+
+.deleteWarning {
+  font-size: 24px;
+}
+
+.deleteOptionContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 20%;
+}
+
+.deleteOptionContainer a {
+  width: 40%;
+}

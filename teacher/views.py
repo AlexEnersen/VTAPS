@@ -96,6 +96,7 @@ def teacherHome(response):
         for index, game in enumerate(user.games):
             try:
                 gameObject = Game.objects.get(id = game)
+                gameObject.deleteURL = f'/teacher/deleteWarning/{game}'
                 userGames.append(gameObject)
             except:
                 toDelete.append(index)
@@ -103,6 +104,16 @@ def teacherHome(response):
             del user.games[dIndex]
         user.save()
         return render(response, "teacher/t_home.html", {"user": user, "games": userGames})
+    
+def deleteGameWarning(response, id):
+    gameObject = Game.objects.get(id = id)
+    gameObject.deleteURL = f'/teacher/delete/{id}'
+    return render(response, "teacher/t_delete.html", {"game": gameObject})
+
+def deleteGame(response, id):
+    gameObject = Game.objects.get(id = id)
+    gameObject.delete()
+    return redirect("/teacher")
 
 def teacherRegister(response):
     if response.method == "POST":

@@ -1,35 +1,43 @@
 {% extends "t_base.html" %} {% block content %} {% load static %}
 <div>
-    {% if user.is_authenticated %}
-        <h1>Welcome, {{user.username}}</h1>
-        {% if user.teacher.authorized %}
-            <h2>Current Games</h2>
-            <div class="gameList">
-                <a class="gameLinkContainer createLink" href="/teacher/newGame">   
-                    <img class="createIcon" src="{% static 'images/create-icon.svg' %}" alt="create" />
-                    <p class="createLinkText" >Create New Game</p>
-                </a>
-                {% for game in games %}
-                    <a href={{ game.url }} class="gameLinkContainer" >
-                        <p class="gameLink">{{game.name}}</p>
-                    </a>
-                {% endfor %}
-            </div>
-        {% elif user.teacher.confirmed %}
-            <p>Your email needs to be confirmed by our administrator.</p>
-        {% else %}
-            <h2>You still haven't confirmed your email yet</h2>
-            <h3>Click <a href="/teacher/sendEmail">here</a> to send it again</h3>
-        {% endif %}
-            <a class="logoutButton" href="/teacher/logout">Logout</a>
+  {% if user.is_authenticated %}
+  <h1>Welcome, {{user.username}}</h1>
+  {% if user.teacher.authorized %}
+  <h2>Current Games</h2>
+  <div class="gameList">
+    <a class="gameLinkContainer createLink" href="/teacher/newGame">
+      <img
+        class="createIcon"
+        src="{% static 'images/create-icon.svg' %}"
+        alt="create"
+      />
+      <p class="createLinkText">Create New Game</p>
+    </a>
+    {% for game in games %}
+    <div class="gameLinkContainer">
+      <a href={{ game.url }} class="gameLink">
+        <p class="gameLink">{{game.name}}</p>
+      </a>
+      <a class="gameDeleteLink" href={{ game.deleteURL }}><img class="deleteIcon" src="{% static 'images/trash-can.png' %}" alt="delete" /></a>
+    </div>
+    {% endfor %}
+  </div>
+  {% elif user.teacher.confirmed %}
+  <p>Your email needs to be confirmed by our administrator.</p>
+  {% else %}
+  <h2>You still haven't confirmed your email yet</h2>
+  <h3>Click <a href="/teacher/sendEmail">here</a> to send it again</h3>
+  {% endif %}
+  <a class="logoutButton" href="/teacher/logout">Logout</a>
 
-    {% else %}
-        <div class="accountAuth">
-            <h1 class="accountHeader">Teacher Account</h1>
-            <a class="logoutButton homeButton" href="/teacher/login"><h1>Login</h1></a>
-            <a class="ctaButton homeButton homeButtonMain" href="/teacher/register"><h1>Register</h1></a>
-            <a href="/" class="backText">Back</a>
-        </div>
-    {% endif %}
-    {% endblock %}
+  {% else %}
+  <div class="accountAuth">
+    <h1 class="accountHeader">Teacher Account</h1>
+    <a class="logoutButton homeButton" href="/teacher/login"><h1>Login</h1></a>
+    <a class="ctaButton homeButton homeButtonMain" href="/teacher/register"
+      ><h1>Register</h1></a
+    >
+    <a href="/" class="backText">Back</a>
+  </div>
+  {% endif %} {% endblock %}
 </div>
