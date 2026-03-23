@@ -302,7 +302,20 @@ def weeklySelection(request, game):
                 nitrogen_leaching = getNitrogenLeaching(nextDate, start_day, gameOutputs)
                 game.nitrogen_leaching_array.append(nitrogen_leaching)
                 game.nitrogen_leaching = nitrogen_leaching
-                game.nitrogen_uptake = getNitrogenUptake(nextDate, gameOutputs)
+
+                gameOutputsSimulated = downloadOutputs(gamePath + "_simulated")
+                
+                simulatedNUptake = getNitrogenUptake(date, gameOutputsSimulated)
+                game.nitrogen_uptake = simulatedNUptake
+                
+                if simulatedNUptake > 0:
+                    nitrogen_sufficiency = round((game.nitrogen_uptake / simulatedNUptake) * 100, 0)
+                    game.nitrogen_sufficiency = nitrogen_sufficiency
+                    game.nitrogen_sufficiency_array.append(nitrogen_sufficiency)
+                else:
+                    game.nitrogen_sufficiency = 100
+                    game.nitrogen_sufficiency_array.append(100)
+
             game.monday_irrigation.append(request.POST.get('monday'))
             game.thursday_irrigation.append(request.POST.get('thursday'))
             if request.POST.get('fertilizer') != None:
@@ -335,15 +348,12 @@ def weeklySelection(request, game):
 
         gameOutputsSimulated = downloadOutputs(gamePath + "_simulated")
         simulatedNUptake = getNitrogenUptake(date, gameOutputsSimulated)
-        if simulatedNUptake > 0:
-            context['nitrogen_sufficiency'] = round((game.nitrogen_uptake / simulatedNUptake) * 100, 0)
-        else:
-            context['nitrogen_sufficiency'] = 100
-        game.nitrogen_sufficiency = context['nitrogen_sufficiency']
-
-        print("original uptake:", game.nitrogen_uptake)
-        print("simulated uptake:", simulatedNUptake)
         
+        if simulatedNUptake > 0:
+            context['nitrogen_sufficiency'] = game.nitrogen_sufficiency_array[-1]
+        else:
+            context['nitrogen_sufficiency'] = -1
+
     context['gdu'] = getGDU(date, gameOutputs)
 
     historyDict = getHistory(date, start_day, gameInputs, gameOutputs, game.weekly_fertilizer)

@@ -221,7 +221,11 @@
         <tr>
           <td class="historyLabel lightlyBold">Nitrogen Sufficiency Index</td>
           <td class="historyData"></td>
-          <td class="historyData">{{nitrogen_sufficiency|floatformat:0}}%</td>
+          {% if nitrogen_sufficiency == -1 %}
+            <td class="historyData">--%</td>
+          {% else %}
+            <td class="historyData">{{nitrogen_sufficiency|floatformat:0}}%</td>
+          {% endif %}
         </tr>
         {% endif %}
         <tr>

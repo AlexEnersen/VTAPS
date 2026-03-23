@@ -275,6 +275,7 @@ def gamePage(game):
     context['group_cost_graph'] = groupAttributeGraph(game, studentList, 'Cost')
     context['group_yield_graph'] = groupAttributeGraph(game, studentList, 'Yield')
     context['group_leaching_graph'] = groupAttributeGraph(game, studentList, 'Leaching')
+    context['group_sufficiency_graph'] = groupAttributeGraph(game, studentList, 'Sufficiency')
     if context['finalWeek']:
         # context['group_ae_graph'] = groupAttributeGraph(game, studentList, 'AE')
         # context['group_iwue_graph'] = groupAttributeGraph(game, studentList, 'IWUE')
@@ -388,6 +389,8 @@ def groupAttributeGraph(game, studentList, attribute):
             elif attribute == 'Yield':
                 attributeAmount.append(gameProfile.projected_yields)    
                 attributeNames.append(student.username)
+            elif attribute == 'Sufficiency':
+                attributeAmount.append(gameProfile.nitrogen_sufficiency_array)
 
         except:
             if attribute != 'Yield':
@@ -440,6 +443,10 @@ def groupAttributeGraph(game, studentList, attribute):
         xlabel = 'Week'
         ylabel = 'Projected Yield'
         title = "Projected Yield Per Student"
+    elif attribute == 'Sufficiency':
+        xlabel = 'Week'
+        ylabel = 'Nitrogen Sufficiency'
+        title = "Nitrogen Sufficiency Per Student"
 
         tickerLength = 0
         for layer in attributeAmount:  
@@ -458,7 +465,6 @@ def groupAttributeGraph(game, studentList, attribute):
 
         tickerLength = 0
         for layer in attributeAmount:  
-            print("layer:", layer)
             if layer == 0:
                 continue    
             if len(layer) > tickerLength:
