@@ -343,7 +343,7 @@ def weeklySelection(request, game):
         context['aquaspy_graph'] = plotAquaSpy(date, start_day, gameInputs, gameOutputs)[0]
         context['root_depth_graph'] = plotOneAttribute(date, start_day, gameOutputs['OPG_content'], 'RDPD', 'Inches (in)', 'Root Depth')
         context['growth_stage_graph'] = plotOneAttribute(date, start_day, gameOutputs['OPG_content'], 'GSTD', 'Stage', 'Growth Stage')
-        context['nitrogen_stress_graph'] = plotOneAttribute(date, start_day, gameOutputs['NiBal_content'], 'RLCH', 'Nitrate Leached (lbs/a)', 'Nitrate Leaching')
+        context['nitrogen_stress_graph'] = plotOneAttribute(date, start_day, gameOutputs['NiBal_content'], 'RLCH', 'Nitrate Leached (lbs/ac)', 'Nitrate Leaching')
         context['water_layer_graph'] = plotWaterLayers(date, start_day, gameOutputs)
 
         gameOutputsSimulated = downloadOutputs(gamePath + "_simulated")
