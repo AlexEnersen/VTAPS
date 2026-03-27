@@ -5,12 +5,9 @@ from .models import Teacher, Game
 from student.models import Student
 from game.models import GameProfile
 from main.models import User
-from django.core import mail
-from django.core.mail import EmailMultiAlternatives
 import random
 import string
-import time
-from django.http import HttpResponse    
+import time  
 import os
 import io
 from uuid import uuid4
@@ -25,6 +22,8 @@ environment = os.environ['ENV']
 
 secret_name = "S3_Keys"
 region_name = "us-east-1"
+
+characters = string.ascii_letters + string.digits
 
 if environment == 'prod':
     logging.basicConfig(level=logging.INFO)
@@ -121,7 +120,6 @@ def teacherRegister(response):
         if form.is_valid():
             user = form.save()
 
-            # sendConfirmationEmail(user)
             return render(response, "teacher/t_submission.html")
         else:
             return render(response, "error_register.html")
@@ -141,10 +139,6 @@ def teacherLogin(response):
 
 def teacherLogout(response):
     logout(response)
-    return redirect("/teacher")
-
-def teacherSendEmail(response):
-    sendConfirmationEmail(response.user)
     return redirect("/teacher")
 
 def newGame(response):
@@ -228,9 +222,7 @@ def editGame(game):
 
 def passwordPage(game):
     context = {'players': [], "code": game.code, 'url': f'/teacher/game/{game.id}'}
-    characters = string.ascii_letters + string.digits
     
-    playerList = {}
     for player in game.players:
         newPassword = ''.join(random.choice(characters) for _ in range(6))
 
@@ -280,6 +272,7 @@ def gamePage(game):
         except:
             playerInfo['week'] = 0
         
+        playerInfo['change_password_url'] = f"/teacher/changePassword/{game.id}/{player}"
         studentList.append(student)
         context['players'].append(playerInfo)
 
@@ -301,27 +294,6 @@ def gamePage(game):
 
     return context
 
-
-def sendConfirmationEmail(user):
-    try:
-        while(1):
-            activation_key = "".join(random.sample(string.ascii_uppercase, 10))
-            Teacher.objects.get(activation_key=activation_key)
-    except:
-        teacher = user.teacher
-        teacher.activation_key = activation_key
-        teacher.key_expires = time.time() + (60 * 60 * 24 * 7)
-        teacher.save()
-
-        connection = mail.get_connection()
-        connection.open()
-
-        message = EmailMultiAlternatives("Hello from VTAPS!", "VTAPS Confirmation", "enersen1995@gmail.com", [user.email], connection=connection)
-        message.attach_alternative(f"<p>Hello, {user.username}. This is a confirmation email for VTAPS.org. If you did not create an account recently, please disregard this message</br></br>Click <a href='https://vtaps.org/teacher/confirm/{activation_key}'> here</a> to finalize your registration with VTAPS.org</p>", "text/html")
-        message.send()
-
-        connection.close()
-
 def teacherConfirm(response, activation_key):
     try:
         teacher = Teacher.objects.get(activation_key=activation_key)
@@ -340,37 +312,13 @@ def createGame(response, id):
     game.save()
 
     for player in game.players:
-        connection = mail.get_connection()
-        connection.open()
-        try:
-            user = User.objects.get(email=player)
-            student = user.student
-            student.games.append(id)
-            student.save()
-            message = EmailMultiAlternatives("Hello from VTAPS!", "VTAPS Confirmation", "enersen1995@gmail.com", [player], connection=connection)
-            message.attach_alternative(f"<p>Hello, {player}. Your teacher has added you to a VTAPS game.<br></br>Click <a href='{'http://localhost:8000' if environment == 'dev' else 'https://vtaps.org'}/student/login'> here</a> to login to VTAPS.org</p>", "text/html")
-            message.send()
-        except:
-            user = User(email=player, username=player)
-            user.set_unusable_password()
-            user.save()
-            student = Student(user=user)
-            student.games.append(id)
-            student.save()
-            try:
-                while(1):
-                    activation_key = "".join(random.sample(string.ascii_uppercase, 10))
-                    Teacher.objects.get(activation_key=activation_key)
-            except:
-                student.activation_key = activation_key
-                student.key_expires = time.time() + (60 * 60 * 24 * 7)
-                student.save()
-                message = EmailMultiAlternatives("Hello from VTAPS!", "VTAPS Confirmation", "enersen1995@gmail.com", [player], connection=connection)
-                message.attach_alternative(f"<p>Hello, {player}. Your teacher has added you to a VTAPS game.<br></br>Click <a href='{'http://localhost:8000' if environment == 'dev' else 'https://vtaps.org'}/student/confirm/{activation_key}'> here</a> to make an account with VTAPS.org</p>", "text/html")
-                message.send()
-
-        connection.close()
-
+            
+        user = User(username=player)
+        user.set_unusable_password()
+        user.save()
+        student = Student(user=user)
+        student.games.append(id)
+        student.save()
 
     return redirect('/teacher')
 
@@ -398,6 +346,7 @@ def groupAttributeGraph(game, studentList, attribute):
                 attributeAmount.append(gameProfile.nitrogen_leaching_array) 
                 attributeNames.append(student.username)
             elif attribute == 'Yield':
+                print("yield:", gameProfile.projected_yields)
                 attributeAmount.append(gameProfile.projected_yields)    
                 attributeNames.append(student.username)
             elif attribute == 'Sufficiency':
@@ -416,20 +365,6 @@ def groupAttributeGraph(game, studentList, attribute):
         title = 'Cost Per Student'
         ax.bar(attributeNames, attributeAmount, color='skyblue')
         ax.set_ylim(bottom=750)
-    # elif attribute == 'AE':
-    #     xlabel = 'Students'
-    #     ylabel = 'Agronimic Efficiency'
-    #     title = 'Agronomic Efficiency Per Student'
-    #     ax.bar(attributeNames, attributeAmount, color='skyblue')
-    # elif attribute == 'IWUE':
-    #     xlabel = 'Students'
-    #     ylabel = 'Irrigation Water Use Efficiency'
-    #     title = 'Irrigation Water Use Efficiency Per Student'
-    #     ax.bar(attributeNames, attributeAmount, color='skyblue')
-    # elif attribute == 'WNIPI':
-    #     xlabel = 'Students'
-    #     ylabel = 'Overall Efficiency Efficiency'
-    #     title = 'Overall Efficiency Per Student'
     elif attribute == 'PFP':
         xlabel = 'Students'
         ylabel = 'Nitrogen Use Efficiency'
@@ -454,6 +389,17 @@ def groupAttributeGraph(game, studentList, attribute):
         xlabel = 'Week'
         ylabel = 'Projected Yield'
         title = "Projected Yield Per Student"
+
+        tickerLength = 0
+        for layer in attributeAmount:  
+            if layer == 0:
+                continue    
+            if len(layer) > tickerLength:
+                tickerLength = len(layer)
+            ax.plot(range(1, len(layer)+1, 1), layer)
+        ax.set_xticks(range(1, tickerLength+1))    
+        ax.legend(attributeNames, loc="upper left")
+        ax.set_ylim(bottom=0)
     elif attribute == 'Sufficiency':
         xlabel = 'Week'
         ylabel = 'Nitrogen Sufficiency'
@@ -535,9 +481,6 @@ def downloadStudents(request, id):
             elif index2 < 21:
                 playerInfo.append("-")
 
-            # if index == 0 and index2 == 0:
-            #     playerInfo.append('')
-            #     playerInfo.append()
             writer.writerow(playerInfo)
 
             if index2 == len(gameProfile.projected_yields)-1:
@@ -575,7 +518,7 @@ def downloadClass(request, id):
             gameProfile = GameProfile.objects.get(user=student.user)
         except:
             continue
-        
+
         if len(gameProfile.projected_yields) > 0:
             irr_total = sum(gameProfile.monday_irrigation) + sum(gameProfile.thursday_irrigation)
             fert_total = sum(gameProfile.weekly_fertilizer)
@@ -622,3 +565,21 @@ def downloadClass(request, id):
         ExpiresIn=60
     )
     return HttpResponseRedirect(presigned)
+
+def changePassword(request, id, username):
+    context = {}
+    game = Game.objects.get(id = id)
+    student = Student.objects.get(username=username, code=game.code)
+
+
+    newPassword = ''.join(random.choice(characters) for _ in range(6))
+    student.tempPassword = True
+    student.user.set_password(newPassword)
+    student.user.save()
+    student.save()
+
+    context['username'] = username
+    context['new_password'] = newPassword
+    context['back_url'] = f"/teacher/game/{id}"
+
+    return render(request, 'game/change_password.html', context)

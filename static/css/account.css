@@ -78,6 +78,20 @@
   transition: opacity 0.1s
 }
 
+
+.resetIcon {
+  position: relative;
+  padding-top: 4px;
+  height: 26px;
+  width: auto;
+  opacity: 0.5;
+  transition: opacity 0.1s
+}
+.resetIcon:hover {
+  opacity: 0.8;
+  transition: opacity 0.1s
+}
+
 .createLink {
   text-decoration: none;
   display: flex;

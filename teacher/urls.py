@@ -11,9 +11,9 @@ urlpatterns = [
     path('game/<int:id>', views.game, name="game"),
     path('deleteWarning/<int:id>', views.deleteGameWarning, name="deleteGameWarning"),
     path('delete/<int:id>', views.deleteGame, name="deleteGame"),
-    path('sendEmail', views.teacherSendEmail, name="teacherSendEmail"),
     path('confirm/<str:activation_key>/', views.teacherConfirm, name='teacherConfirm'),
     path('createGame/<int:id>/', views.createGame, name="createGame"),
     path('game/<int:id>/downloadStudents', views.downloadStudents, name="downloadStudents"),
-    path('game/<int:id>/downloadClass', views.downloadClass, name="downloadClass")
+    path('game/<int:id>/downloadClass', views.downloadClass, name="downloadClass"),
+    path('changePassword/<int:id>/<str:username>', views.changePassword, name="changePassword")
 ]

@@ -8,18 +8,21 @@
           <th class="gameSummaryCell gameSummaryHeader">Player</th>
           <th class="gameSummaryCell gameSummaryHeader">Next Week</th>
           <th class="gameSummaryCell gameSummaryHeader">Caught Up</th>
+          <th class="gameSummaryCell gameSummaryHeader">Reset Password</th>
         </tr>
         {% for player in players %} {% if player.week > week_limit %}
         <tr class="gameSummaryRow">
           <td class="gameSummaryCell">{{player.username}}</td>
           <td class="gameSummaryCell">{{player.week}}</td>
           <td class="gameSummaryCell">X</td>
+          <td class="gameSummaryCell"><a href="{{ player.change_password_url}}"><img class="resetIcon" src="{% static 'images/reset.png' %}" alt="reset" /></a></td>
         </tr>
         {% else %}
         <tr class="gameSummaryRow">
           <td class="gameSummaryCell">{{player.username}}</td>
           <td class="gameSummaryCell">{{player.week}}</td>
           <td class="gameSummaryCell"></td>
+          <td class="gameSummaryCell"><a href="{{ player.change_password_url}}"><img class="resetIcon" src="{% static 'images/reset.png' %}" alt="reset" /></a></td>
         </tr>
         {% endif %} {% endfor %}
       </table>
