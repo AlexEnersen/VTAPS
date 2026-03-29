@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate, logout
-from .forms import LoginTeacherForm, RegisterTeacherForm, SuperuserForm, WeekForm
+from django.contrib.auth import login, authenticate, logout, update_session_auth_hash
+from .forms import LoginTeacherForm, RegisterTeacherForm, SuperuserForm, WeekForm, passwordChangeForm, passwordChangeConfirmationForm
 from .models import Teacher, Game
 from student.models import Student
 from game.models import GameProfile
@@ -18,6 +18,9 @@ import watchtower, logging
 import boto3
 from django.http import HttpResponseRedirect
 from botocore.config import Config
+from django.core import mail
+from django.core.mail import EmailMultiAlternatives
+
 environment = os.environ['ENV']
 
 secret_name = "S3_Keys"
@@ -272,7 +275,7 @@ def gamePage(game):
         except:
             playerInfo['week'] = 0
         
-        playerInfo['change_password_url'] = f"/teacher/changePassword/{game.id}/{player}"
+        playerInfo['change_password_url'] = f"/teacher/changeStudentPassword/{game.id}/{player}"
         studentList.append(student)
         context['players'].append(playerInfo)
 
@@ -293,18 +296,6 @@ def gamePage(game):
     context['urlTeacher'] = f'/teacher/game/{game.id}/downloadClass'
 
     return context
-
-def teacherConfirm(response, activation_key):
-    try:
-        teacher = Teacher.objects.get(activation_key=activation_key)
-        if teacher.key_expires > time.time():
-            teacher.confirmed = True
-            teacher.save()
-            return render(response, "teacher/t_confirmation.html")
-        else:
-            return render(response, 'teacher/t_failure.html')
-    except:
-        return render(response, 'teacher/t_failure.html')
     
 def createGame(response, id):
     game = Game.objects.get(id=id)
@@ -566,7 +557,7 @@ def downloadClass(request, id):
     )
     return HttpResponseRedirect(presigned)
 
-def changePassword(request, id, username):
+def changeStudentPassword(request, id, username):
     context = {}
     game = Game.objects.get(id = id)
     student = Student.objects.get(username=username, code=game.code)
@@ -583,3 +574,75 @@ def changePassword(request, id, username):
     context['back_url'] = f"/teacher/game/{id}"
 
     return render(request, 'game/change_password.html', context)
+
+def changeTeacherPassword(request):
+    context = {}
+
+    if request.method == "POST":
+        try:
+            print("email:", request.POST['email'])
+            teacher = Teacher.objects.get(email = request.POST['email'])
+
+            try:
+                while(1):
+                    activation_key = "".join(random.sample(string.ascii_uppercase, 10))
+                    Teacher.objects.get(activation_key=activation_key)
+            except:
+                teacher.activation_key = activation_key
+                teacher.key_expires = time.time() + (60 * 60 * 10)
+                teacher.save()
+
+                connection = mail.get_connection()
+                connection.open()
+
+                resetURL = f"{"https://vtaps.org" if environment == "prod" else "localhost:8000"}/teacher/confirm/{activation_key}"
+
+                message = EmailMultiAlternatives("VTAPS Password Reset", "VTAPS Password Reset", "enersen1995@gmail.com", [teacher.email], connection=connection)
+                message.attach_alternative(f"<p>Hello, {teacher.user.username}. This is an email to reset your VTAPS password. If you did not request this, disregard this message</br></br>Click <a href={resetURL}>here</a> or the link below to proceed with your password reset. </br></br><p>{resetURL}</p>", "text/html")
+                message.send()
+
+                connection.close()
+
+                context['email'] = teacher.email
+
+                return render(request, "teacher/t_success.html", context)
+                    
+        except:
+            return render(request, "teacher/t_failure.html", context)
+
+
+    form = passwordChangeForm()
+
+    context['passwordChangeForm'] = form
+
+    return render(request, "teacher/t_passwordchange.html", context)
+
+def teacherConfirm(request, activation_key):
+    context = {}
+    try:
+        teacher = Teacher.objects.get(activation_key=activation_key)
+        if request.method == 'POST':
+            form = passwordChangeConfirmationForm(request.POST)
+            if form.is_valid():
+                password = form.cleaned_data['password']
+                confirm_password = form.cleaned_data['confirm_password']
+
+                print("confirm_password:", confirm_password)
+                
+                if password != confirm_password:
+                    form.add_error('confirm_password', 'Passwords do not match.')
+                else:
+                    teacher.user.set_password(password)
+                    teacher.user.save()
+                    update_session_auth_hash(request, teacher.user)
+                    return render(request, 'teacher/t_accepted.html', context)
+        elif teacher.key_expires > time.time():
+            teacher.confirmed = True
+            teacher.save()
+            context['form'] = passwordChangeConfirmationForm()
+            print("form:", context['form'])
+            return render(request, "teacher/t_teacherPasswordChange.html", context)
+        else:
+            return render(request, 'teacher/t_inactive.html')
+    except:
+        return render(request, 'teacher/t_inactive.html')

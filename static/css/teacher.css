@@ -92,3 +92,44 @@ form.weekChangeField {
 .deleteOptionContainer a {
   width: 40%;
 }
+
+.changePasswordContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.changePasswordContainer div * {
+  margin-right: 16px;
+  height: 28px;
+}
+
+.changePasswordContainer input {
+  padding: 4px 8px;
+}
+
+.backRow {
+  display: flex;
+  flex-direction: row;
+  width: 50%;
+  justify-content: space-between;
+}
+
+.changeTeacherPasswordContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 50%;
+}
+.changeTeacherPasswordContainer input {
+  margin: 24px 0;
+}
+.changeTeacherPasswordContainer div {
+  display: flex;
+  flex-direction: row;
+  margin: 12px 0;
+  align-items: center;
+  justify-content: space-between;
+}
+/* .changeTeacherPasswordContainer div label {
+  margin-right: 18px;
+} */

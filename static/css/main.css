@@ -301,7 +301,7 @@ em {
   max-width: 360px;
   padding: 8px 24px;
   font-weight: bold;
-  border: 3px solid var(--primary-color)
+  border: 3px solid var(--primary-color);
 }
 
 .titleHeader {
@@ -311,7 +311,6 @@ em {
 .wide {
   width: 100%;
 }
-
 
 .downloadButton {
   display: flex;
@@ -330,12 +329,16 @@ em {
   border: 2px solid var(--primary-color);
   text-decoration: none;
   max-width: inherit;
-  transition: background-color 0.2s, border 0.2s;
+  transition:
+    background-color 0.2s,
+    border 0.2s;
 }
 .downloadButton:hover {
   background-color: var(--darkened-primary-color);
   border: 2px solid var(--darkened-primary-color);
-  transition: background-color 0.2s, border 0.2s;
+  transition:
+    background-color 0.2s,
+    border 0.2s;
 }
 .downloadIcon {
   height: 24px;
@@ -350,8 +353,13 @@ em {
 
 .backText {
   text-decoration: underline;
-  opacity: 0.8;
+  opacity: 0.7;
   color: var(--light-text-color);
   font-size: 18px;
   margin-top: 24px;
+  transition: opacity 0.2s
+}
+.backText:hover {
+  opacity: 1.0;
+  transition: opacity 0.2s
 }

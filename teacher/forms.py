@@ -14,7 +14,6 @@ class RegisterTeacherForm(UserCreationForm):
         fields = ["username", "email"]
 
     def save(self, commit=True):
-        print("Hi?")
         user = super().save(commit=False)
         if commit:
             user.save()
@@ -56,9 +55,23 @@ class LoginTeacherForm(AuthenticationForm):
         return cleaned
 
 class SuperuserForm(forms.Form):
-    email = forms.CharField(label="email")
+    email = forms.CharField(label="Email")
 
 class WeekForm(ModelForm):
     class Meta:
         model = WeekEntries
         fields = '__all__'
+
+class passwordChangeForm(forms.Form):
+    email = forms.CharField(label="Email")
+
+class passwordChangeConfirmationForm(forms.Form):
+    password = forms.CharField(
+        widget=forms.PasswordInput(),
+        label="New Password"
+    )
+    confirm_password = forms.CharField(
+        widget=forms.PasswordInput(),
+        label="Confirm New Password"
+    )
+    

@@ -40,6 +40,11 @@ if env_var == 'prod':
             SecretId='DB_PASS'
         )
         db_pass = eval(get_db_pass_response['SecretString'])['DB_PASS']
+        
+        get_smtp_pass_response = client.get_secret_value(
+            SecretId='SMTP_PASS'
+        )
+        smtp_pass = eval(get_smtp_pass_response['SecretString'])['SMTP_PASS']
 
     except ClientError as e:
         raise e
@@ -49,6 +54,8 @@ else:
     environ.Env.read_env(os.path.join(ROOT_DIR, '.env'))
     secret_key = env('SECRET_KEY')
     db_pass = env('DB_PASS')
+
+    smtp_pass = env("SMTP_PASS")
 
 SECRET_KEY = secret_key
 
@@ -213,4 +220,4 @@ EMAIL_USE_TLS = False
 EMAIL_PORT = 465
 EMAIL_USE_SSL = True
 EMAIL_HOST_USER = 'enersen1995@gmail.com'
-EMAIL_HOST_PASSWORD = 'kfxa gtuf vjhw ugiy'
+EMAIL_HOST_PASSWORD = smtp_pass
