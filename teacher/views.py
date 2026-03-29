@@ -595,7 +595,8 @@ def changeTeacherPassword(request):
                 connection = mail.get_connection()
                 connection.open()
 
-                resetURL = f"{"https://vtaps.org" if environment == "prod" else "localhost:8000"}/teacher/confirm/{activation_key}"
+                baseURL = "https://vtaps.org" if environment == "prod" else "localhost:8000"
+                resetURL = f"{baseURL}/teacher/confirm/{activation_key}"
 
                 message = EmailMultiAlternatives("VTAPS Password Reset", "VTAPS Password Reset", "enersen1995@gmail.com", [teacher.email], connection=connection)
                 message.attach_alternative(f"<p>Hello, {teacher.user.username}. This is an email to reset your VTAPS password. If you did not request this, disregard this message</br></br>Click <a href={resetURL}>here</a> or the link below to proceed with your password reset. </br></br><p>{resetURL}</p>", "text/html")
