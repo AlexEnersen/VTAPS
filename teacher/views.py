@@ -580,7 +580,6 @@ def changeTeacherPassword(request):
 
     if request.method == "POST":
         try:
-            print("email:", request.POST['email'])
             teacher = Teacher.objects.get(email = request.POST['email'])
 
             try:
@@ -589,9 +588,7 @@ def changeTeacherPassword(request):
                     Teacher.objects.get(activation_key=activation_key)
             except:
                 teacher.activation_key = activation_key
-                teacher.key_expires = time.time() + (60 * 60 * 10)
-                print("time:", time.time())
-                print("key expires:", teacher.key_expires)
+                teacher.key_expires = time.time() + (60 * 10)
                 teacher.save()
 
                 connection = mail.get_connection()
@@ -624,8 +621,6 @@ def teacherConfirm(request, activation_key):
     context = {}
     try:
         teacher = Teacher.objects.get(activation_key=activation_key)
-        print("key_expires:", teacher.key_expires)
-        print("time:", time.time())
         if teacher.key_expires < time.time():
             return render(request, 'teacher/t_inactive.html')
         elif request.method == 'POST':
