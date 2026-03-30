@@ -622,7 +622,9 @@ def teacherConfirm(request, activation_key):
     context = {}
     try:
         teacher = Teacher.objects.get(activation_key=activation_key)
-        if request.method == 'POST':
+        if teacher.key_expires > time.time():
+            return render(request, 'teacher/t_inactive.html')
+        elif request.method == 'POST':
             form = passwordChangeConfirmationForm(request.POST)
             if form.is_valid():
                 password = form.cleaned_data['password']
@@ -637,13 +639,8 @@ def teacherConfirm(request, activation_key):
                     teacher.user.save()
                     update_session_auth_hash(request, teacher.user)
                     return render(request, 'teacher/t_accepted.html', context)
-        elif teacher.key_expires > time.time():
-            teacher.confirmed = True
-            teacher.save()
-            context['form'] = passwordChangeConfirmationForm()
-            print("form:", context['form'])
-            return render(request, "teacher/t_teacherPasswordChange.html", context)
         else:
-            return render(request, 'teacher/t_inactive.html')
+            context['form'] = passwordChangeConfirmationForm()
+            return render(request, "teacher/t_teacherPasswordChange.html", context)
     except:
         return render(request, 'teacher/t_inactive.html')
