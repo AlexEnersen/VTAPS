@@ -305,11 +305,13 @@ def weeklySelection(request, game):
 
                 gameOutputsSimulated = downloadOutputs(gamePath + "_simulated")
                 
+                trueUptake = getNitrogenUptake(date, gameOutputs)
                 simulatedNUptake = getNitrogenUptake(date, gameOutputsSimulated)
-                game.nitrogen_uptake = simulatedNUptake
+
+                game.nitrogen_uptake = trueUptake
                 
                 if simulatedNUptake > 0:
-                    nitrogen_sufficiency = round((game.nitrogen_uptake / simulatedNUptake) * 100, 0)
+                    nitrogen_sufficiency = round((trueUptake / simulatedNUptake) * 100, 0)
                     game.nitrogen_sufficiency = nitrogen_sufficiency
                     game.nitrogen_sufficiency_array.append(nitrogen_sufficiency)
                 else:
@@ -1462,9 +1464,6 @@ def getGDU(date, gameOutputs):
                 break
     
     gwadRatio = gwad/maxGWAD
-
-    print("leaves:", leaves)
-    print("max:", maxLeaves)
 
     if stage != 0:
         if stage == 'R6':
