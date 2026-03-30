@@ -590,6 +590,8 @@ def changeTeacherPassword(request):
             except:
                 teacher.activation_key = activation_key
                 teacher.key_expires = time.time() + (60 * 60 * 10)
+                print("time:", time.time())
+                print("key expires:", teacher.key_expires)
                 teacher.save()
 
                 connection = mail.get_connection()
@@ -622,15 +624,15 @@ def teacherConfirm(request, activation_key):
     context = {}
     try:
         teacher = Teacher.objects.get(activation_key=activation_key)
-        if teacher.key_expires > time.time():
+        print("key_expires:", teacher.key_expires)
+        print("time:", time.time())
+        if teacher.key_expires < time.time():
             return render(request, 'teacher/t_inactive.html')
         elif request.method == 'POST':
             form = passwordChangeConfirmationForm(request.POST)
             if form.is_valid():
                 password = form.cleaned_data['password']
                 confirm_password = form.cleaned_data['confirm_password']
-
-                print("confirm_password:", confirm_password)
                 
                 if password != confirm_password:
                     form.add_error('confirm_password', 'Passwords do not match.')

@@ -118,7 +118,7 @@ form.weekChangeField {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  width: 50%;
+  width: 30%;
 }
 .changeTeacherPasswordContainer input {
   margin: 24px 0;
