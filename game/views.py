@@ -1184,6 +1184,8 @@ def checkOutputs(gamePath):
 
 def checkBucket(gamePath):
 
+    print("gamePath:", gamePath)
+
     key = f'{gamePath}.zip'
 
     try:

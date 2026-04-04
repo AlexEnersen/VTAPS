@@ -3,6 +3,7 @@
   <div class="teacherGamePage">
     <div class="teacherGameColumnLeft">
       <h1 class="header">Players</h1>
+      <p class="weekChangeField">Code: {{code}}</p>
       <table class="gameSummaryTable">
         <tr class="gameSummaryRow">
           <th class="gameSummaryCell gameSummaryHeader">Player</th>
@@ -26,6 +27,24 @@
         </tr>
         {% endif %} {% endfor %}
       </table>
+      <div class="rowContainer">
+        <p class="weekChangeField">Week Limit: {{week_limit_display}}</p>
+        <a class="addStudentLink" href="{{ urlAddStudents }}">
+          <img
+            class="addIcon"
+            src="{% static 'images/plus-icon.svg' %}"
+            alt=""
+          />Add Students</a>
+      </div>
+      <form method="post" class="row center weekChangeField">
+        {% csrf_token %}
+        <p class="weekChangeField">{{week_form.week}}</p>
+        <input
+          class="secondaryButton weekButton"
+          type="submit"
+          value="Change Week Limit"
+        />
+      </form>
       <div class="row left">
         <a class="downloadButton" href="{{ urlStudent }}">
           <img
@@ -46,17 +65,6 @@
           Download Total Results
         </a>
       </div>
-      <p class="weekChangeField">Code: {{code}}</p>
-      <p class="weekChangeField">Week Limit: {{week_limit_display}}</p>
-      <form method="post" class="row center weekChangeField">
-        {% csrf_token %}
-        <p class="weekChangeField">{{week_form.week}}</p>
-        <input
-          class="secondaryButton weekButton"
-          type="submit"
-          value="Change Week Limit"
-        />
-      </form>
       <a class="secondaryButton backButton" href="/teacher">Back</a>
     </div>
     <div class="teacherGameColumnRight center">

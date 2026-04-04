@@ -109,8 +109,10 @@ def teacherHome(response):
     
 def deleteGameWarning(response, id):
     gameObject = Game.objects.get(id = id)
-    gameObject.deleteURL = f'/teacher/delete/{id}'
-    return render(response, "teacher/t_delete.html", {"game": gameObject})
+    context = {'game': gameObject, 'deleteURL' : f'/teacher/delete/{id}'}
+    print("WARNING")
+    print("context:", context)
+    return render(response, "teacher/t_delete.html", context)
 
 def deleteGame(response, id):
     gameObject = Game.objects.get(id = id)
@@ -223,10 +225,13 @@ def editGame(game):
     return context
 
 
-def passwordPage(game):
+def passwordPage(game, players = []):
     context = {'players': [], "code": game.code, 'url': f'/teacher/game/{game.id}'}
+
+    if len(players) == 0:
+        players = game.players
     
-    for player in game.players:
+    for player in players:
         newPassword = ''.join(random.choice(characters) for _ in range(6))
 
         try:
@@ -294,6 +299,7 @@ def gamePage(game):
 
     context['urlStudent'] = f'/teacher/game/{game.id}/downloadStudents'
     context['urlTeacher'] = f'/teacher/game/{game.id}/downloadClass'
+    context['urlAddStudents'] = f'/teacher/game/{game.id}/addStudents'
 
     return context
     
@@ -641,3 +647,34 @@ def teacherConfirm(request, activation_key):
             return render(request, "teacher/t_teacherPasswordChange.html", context)
     except:
         return render(request, 'teacher/t_inactive.html')
+    
+def addStudents(request, id):
+    context = {}
+    game = Game.objects.get(id=id)
+
+    if request.method == "POST":
+
+        newPlayers = []
+        uniquePlayers = dict.fromkeys(game.players, 1)
+        for player in request.POST['players'].split("\n"):
+            player = player.replace("\r", "")
+            player = player.strip()
+            if len(player) <= 0:
+                continue
+            player = player.strip()  
+            
+            if player in uniquePlayers:
+                uniquePlayers[player] += 1
+                player = f'{player}{uniquePlayers[player]}'
+            else:
+                uniquePlayers[player] = 1
+            
+            newPlayers.append(player)
+
+        game.players = game.players + newPlayers
+        game.save()
+
+        context = passwordPage(game, newPlayers)
+        return render(request, 'game/password_page.html', context)
+
+    return render(request, 'game/add_students.html', context)

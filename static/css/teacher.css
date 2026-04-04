@@ -133,3 +133,39 @@ form.weekChangeField {
 /* .changeTeacherPasswordContainer div label {
   margin-right: 18px;
 } */
+
+.rowContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+  position: relative;
+  height: 2%;
+  margin-top: 4px;
+  margin-bottom: 16px;
+}
+
+.addStudentLink {
+  text-decoration: none;
+  border-bottom: 1px solid black;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 100%;
+  position: relative;
+  color: black;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.addStudentLink:hover {
+  opacity: 1.0;
+  transition: opacity 0.2s;
+}
+
+.addIcon {
+  height: 50%;
+  width: auto;
+  margin-right: 8px;
+}

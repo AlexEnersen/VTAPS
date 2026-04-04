@@ -1,0 +1,22 @@
+{% extends "t_base.html" %} {% block content %}
+<div class="accountWrapper">
+  <div class="row newGameContainer">
+    <div class="newGameSubContainer">
+      <h1>Add Players</h1>
+      <form method="post" class="column">
+        {% csrf_token %}
+        <label for="players"></label>
+        <textarea
+          id="players"
+          name="players"
+          class="newGameTextBox"
+          placeholder="student1@gmail.com&#10;student2@gmail.com&#10;student3@gmail.com"
+        ></textarea>
+        <input type="submit" value="Add Players" class="ctaButton"/>
+      </form>
+      <div></div>
+      <a class="secondaryButton backButton" href="/teacher">Back</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

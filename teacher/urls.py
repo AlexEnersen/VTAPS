@@ -15,6 +15,7 @@ urlpatterns = [
     path('createGame/<int:id>/', views.createGame, name="createGame"),
     path('game/<int:id>/downloadStudents', views.downloadStudents, name="downloadStudents"),
     path('game/<int:id>/downloadClass', views.downloadClass, name="downloadClass"),
+    path('game/<int:id>/addStudents', views.addStudents, name="addStudents"),
     path('changeStudentPassword/<int:id>/<str:username>', views.changeStudentPassword, name="changeStudentPassword"),
     path('changeTeacherPassword', views.changeTeacherPassword, name="changeTeacherPassword")
 ]
