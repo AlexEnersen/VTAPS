@@ -260,23 +260,6 @@ def weeklySelection(request, game):
             game.week = 0
             gameInputs = downloadInputs(gamePath)
 
-            # gameInputsSimulated = gameInputs.copy()
-            gameInputsSimulated = copy.deepcopy(gameInputs)
-            for weekNum in range(21):
-                fertQuantity = 0
-                if weekNum == 0 or weekNum == 5:
-                    fertQuantity = 75
-                elif weekNum == 8 or weekNum == 9 or weekNum == 11 or weekNum == 13 or weekNum == 14:
-                    fertQuantity = 30
-
-
-                gameInputsSimulated['MZX_content'] = addIrrigation(gameInputsSimulated['MZX_content'], [1, 1], fertQuantity, int(date) + (7 * (weekNum+1)), weekNum)
-                gameInputsSimulated['MZX_content'] = addFertilizer(gameInputsSimulated['MZX_content'], fertQuantity, int(date) + (7 * (weekNum+1)))
-
-            gamePathSimulated = gamePath + "_simulated"
-
-            computeDSSAT(game.hybrid, gameInputsSimulated, gamePathSimulated)
-
         else:
             game.computing = True
             game.save()
@@ -302,6 +285,8 @@ def weeklySelection(request, game):
                 nitrogen_leaching = getNitrogenLeaching(nextDate, start_day, gameOutputs)
                 game.nitrogen_leaching_array.append(nitrogen_leaching)
                 game.nitrogen_leaching = nitrogen_leaching
+                        
+                createSimulatedGame(date, game, gamePath, gameInputs)
 
                 gameOutputsSimulated = downloadOutputs(gamePath + "_simulated")
                 
@@ -331,6 +316,8 @@ def weeklySelection(request, game):
     gameInputs = downloadInputs(gamePath)
     gameOutputs = downloadOutputs(gamePath)
 
+    
+
     if gameOutputs is False:
         computeDSSAT(game.hybrid, gameInputs, gamePath)
         time.sleep(5)
@@ -348,7 +335,9 @@ def weeklySelection(request, game):
         context['nitrogen_stress_graph'] = plotOneAttribute(date, start_day, gameOutputs['NiBal_content'], 'RLCH', 'Nitrate Leached (lbs/ac)', 'Nitrate Leaching')
         context['water_layer_graph'] = plotWaterLayers(date, start_day, gameOutputs)
 
-        gameOutputsSimulated = downloadOutputs(gamePath + "_simulated")
+        simulatedGamePath = gamePath + "_simulated"
+
+        gameOutputsSimulated = downloadOutputs(simulatedGamePath)
         simulatedNUptake = getNitrogenUptake(date, gameOutputsSimulated)
         
         if simulatedNUptake > 0:
@@ -1184,8 +1173,6 @@ def checkOutputs(gamePath):
 
 def checkBucket(gamePath):
 
-    print("gamePath:", gamePath)
-
     key = f'{gamePath}.zip'
 
     try:
@@ -1486,3 +1473,20 @@ def getGDU(date, gameOutputs):
             return 'Planting'
         else:
             return f'V{int(leaves)}'
+        
+def createSimulatedGame(date, game, gamePath, gameInputs):
+        simulatedGamePath = gamePath + "_simulated"
+        if checkBucket(simulatedGamePath) is False:    
+            gameInputsSimulated = copy.deepcopy(gameInputs)
+            for weekNum in range(21):
+                fertQuantity = 0
+                if weekNum == 0 or weekNum == 5:
+                    fertQuantity = 75
+                elif weekNum == 8 or weekNum == 9 or weekNum == 11 or weekNum == 13 or weekNum == 14:
+                    fertQuantity = 30
+
+
+                gameInputsSimulated['MZX_content'] = addIrrigation(gameInputsSimulated['MZX_content'], [1, 1], fertQuantity, int(date) + (7 * (weekNum+1)), weekNum)
+                gameInputsSimulated['MZX_content'] = addFertilizer(gameInputsSimulated['MZX_content'], fertQuantity, int(date) + (7 * (weekNum+1)))
+
+            computeDSSAT(game.hybrid, gameInputsSimulated, simulatedGamePath)
