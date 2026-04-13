@@ -160,12 +160,24 @@ form.weekChangeField {
 }
 
 .addStudentLink:hover {
-  opacity: 1.0;
+  opacity: 1;
   transition: opacity 0.2s;
 }
 
 .addIcon {
   height: 50%;
   width: auto;
+  margin-right: 8px;
+}
+
+.setupItemContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin: 16px 0;
+}
+
+.setupItem {
   margin-right: 8px;
 }

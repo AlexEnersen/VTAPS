@@ -4,7 +4,7 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
 from main.models import User
-from .models import Teacher, WeekEntries
+from .models import Teacher, WeekEntries, GameSetup
 
 class RegisterTeacherForm(UserCreationForm):
     
@@ -74,4 +74,8 @@ class passwordChangeConfirmationForm(forms.Form):
         widget=forms.PasswordInput(),
         label="Confirm New Password"
     )
-    
+
+class GameSetupForm(ModelForm):
+    class Meta:
+        model = GameSetup
+        fields = "__all__"

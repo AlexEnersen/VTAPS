@@ -365,6 +365,7 @@ def weeklySelection(request, game):
     gameInputs['MZX_content'] = gameInputs['MZX_content']
 
     context['week'] = game.week
+    context['corn_price'] = game.game.cornPrice
 
     iform = IrrigationEntriesForm()
     if iform.is_valid():
@@ -383,8 +384,8 @@ def weeklySelection(request, game):
 
     context['weather'] = getWeather(date, gameInputs)
 
-    total_irrigation_cost = getTotalIrrigationCost(gameInputs['MZX_content'], date)
-    total_fertilizer_cost = getTotalFertilizerCost(gameInputs['MZX_content'], date)
+    total_irrigation_cost = getTotalIrrigationCost(gameInputs['MZX_content'], date, game.game.irrigationCost)
+    total_fertilizer_cost = getTotalFertilizerCost(game.weekly_fertilizer, date, game.game.nitrogenCost)
 
     context['seed_cost'] = round(getSeedCost(game.hybrid, game.seeding_rate), 2)
     context['irr_cost'] = round(total_irrigation_cost, 2)
@@ -413,8 +414,8 @@ def finalResults(request, gameProfile):
     start_day = int(str(start_date)[len(str(start_date)) - 3:])
     date = str(int(start_date) + (gameProfile.week * 7))
 
-    total_irrigation_cost = round(getTotalIrrigationCost(gameInputs['MZX_content'], date), 2)
-    total_fertilizer_cost = round(getTotalFertilizerCost(gameInputs['MZX_content'], date), 2)
+    total_irrigation_cost = round(getTotalIrrigationCost(gameInputs['MZX_content'], date, gameProfile.game.irrigationCost), 2)
+    total_fertilizer_cost = round(getTotalFertilizerCost(gameProfile.weekly_fertilizer, date, gameProfile.game.nitrogenCost), 2)
 
     context['seed_cost'] = round(getSeedCost(gameProfile.hybrid, gameProfile.seeding_rate), 2)
     context['irr_cost'] = total_irrigation_cost
@@ -477,6 +478,9 @@ def finalResults(request, gameProfile):
     context['fert_amount'] = sum(history['fert'])
     context['et_amount'] = sum(history['et'])
     context['rain_amount'] = sum(history['rain'])
+    
+    context['corn_price'] = gameProfile.game.cornPrice
+    context['profit'] = context['corn_price'] - context['bushel_cost']
 
     context['control_aquaspy_graph'] = plotAquaSpy(date, start_day, controlGameInputs, controlGameOutputs, yAxis)[0]
     # context['control_nitrogen_stress_graph'] = plotOneAttribute(date, start_day, controlGameOutputs['OPG_content'], 'NSTD', 'N Stress', 'Nitrogen Stress')
@@ -554,7 +558,7 @@ def addIrrigation(text, irrigationQuantity, fertilizerQuantity, date, week):
             return text
     return text
 
-def getTotalIrrigationCost(text, date):
+def getTotalIrrigationCost(text, date, irrigationCost):
     onIrrigation = False
     totalIrrigationCost = 0
 
@@ -570,7 +574,7 @@ def getTotalIrrigationCost(text, date):
             if (lines[0].startswith("*") or lines[0].startswith("@")):
                 break
             else:
-                totalIrrigationCost += mmToInches(float(lines[3])) * 6.1
+                totalIrrigationCost += mmToInches(float(lines[3])) * irrigationCost
 
         if (lines[3] == "IRVAL"):
             onIrrigation = True
@@ -599,56 +603,18 @@ def addFertilizer(text, fertilizerQuantity, date):
             return text
     
 
-def getTotalFertilizerCost(text, date):
-    onFertilizer = False
+def getTotalFertilizerCost(weeklyFertilizer, date, fertilizerCost):
     totalFertilizerCost = 0
-    startIndex = -1
 
-    for i, line in enumerate(text):
-        lines = list(filter(None, line.strip("\n").split(" ")))
-        if (len(lines) < 6):
-            if (onFertilizer):
-                break
-            else:
-                continue
-
-        elif (onFertilizer):
-            if (lines[0].startswith("*") or lines[0].startswith("@")):
-                break
-            elif (int(lines[1]) < int(date)):
-                if float(lines[5]) == 0:
-                    startIndex += 1
-                    continue
-                if (i - startIndex < 3):
-                    totalFertilizerCost += (float(lines[5]) * 0.6 / 1.12085) + 8.50
-                else:
-                    totalFertilizerCost += (float(lines[5]) * 0.6 / 1.12085) + 1.25
-            else:
-                break
-
-        elif (lines[5] == "FAMN"):
-            onFertilizer = True
-            startIndex = i
+    for index, fertilizer in enumerate(weeklyFertilizer):
+        if (index == 0 or index == 1):
+            totalFertilizerCost += (fertilizer * fertilizerCost) + 8.50
+        else:
+            totalFertilizerCost += (fertilizer * fertilizerCost) + 1.25
 
     return totalFertilizerCost
 
 def getNitrogenLeaching(date, start_day, gameOutputs):
-
-    # totalLeaching = 0
-    # readingLeaching = False
-    # for line in gameOutputs['NiBal_content']:
-    #     items = list(filter(None, line.strip("\n").split(" ")))
-    #     print("items:", items)
-    #     if readingLeaching and (len(items) < 14 or int(items[1]) >= day):
-    #         break
-    #     elif not readingLeaching and items[0].startswith("@"):
-    #         readingLeaching = True
-    #     elif readingLeaching and int(items[1]) >= start_day:
-    #         totalLeaching += float(items[13])
-    # print(totalLeaching)
-    # return totalLeaching * 0.892
-
-
     day = int(date[len(date) - 3:])
     totalLeaching = 0
     for line in gameOutputs['NiBal_content']:

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout, update_session_auth_hash
-from .forms import LoginTeacherForm, RegisterTeacherForm, SuperuserForm, WeekForm, passwordChangeForm, passwordChangeConfirmationForm
+from .forms import LoginTeacherForm, RegisterTeacherForm, SuperuserForm, WeekForm, passwordChangeForm, passwordChangeConfirmationForm, GameSetupForm
 from .models import Teacher, Game
 from student.models import Student
 from game.models import GameProfile
@@ -110,8 +110,6 @@ def teacherHome(response):
 def deleteGameWarning(response, id):
     gameObject = Game.objects.get(id = id)
     context = {'game': gameObject, 'deleteURL' : f'/teacher/delete/{id}'}
-    print("WARNING")
-    print("context:", context)
     return render(response, "teacher/t_delete.html", context)
 
 def deleteGame(response, id):
@@ -161,7 +159,6 @@ def newGame(response):
             game.save()
             break
     
-    
     teacher.save()
 
     return redirect(game.url)
@@ -176,6 +173,7 @@ def game(response, id):
         return redirect("/teacher")
     if game.created == False:
         if response.method == 'POST':
+            print("resp:", response.POST)
             players = []
             uniquePlayers = {}
             for player in response.POST['players'].split("\n"):
@@ -195,6 +193,11 @@ def game(response, id):
 
             game.players = players
             game.name = response.POST['gameName']
+            
+            game.nitrogenCost = response.POST['nitrogenCost']
+            game.irrigationCost = response.POST['irrigationCost']
+            game.cornPrice = response.POST['cornPrice']
+
             game.created = True
             game.save()
             return redirect(f"/teacher/game/{game.id}")
@@ -220,6 +223,10 @@ def editGame(game):
 
     game.name = "New Game"
     game.save()
+
+    gameSetupForm = GameSetupForm()
+
+    context['gameSetupForm'] = gameSetupForm    
 
     context['game'] = game
     return context
@@ -309,7 +316,6 @@ def createGame(response, id):
     game.save()
 
     for player in game.players:
-            
         user = User(username=player)
         user.set_unusable_password()
         user.save()

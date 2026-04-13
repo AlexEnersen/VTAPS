@@ -1,16 +1,30 @@
 {% extends "t_base.html" %} {% block content %}
 <div class="accountWrapper">
-  <div class="row newGameContainer">
-    <div class="newGameSubContainer">
-      <h1>New Game</h1>
-      <div class="newGameColumn">
-        <p>Class Code: {{game.code}}</p>
-        <a class="secondaryButton" href="/teacher">Back</a>
+  <div class="row">
+    <form method="post" class="row newGameContainer">
+      <div class="newGameSubContainer">
+        <h1>New Game</h1>
+        <div class="newGameColumn">
+          <div class="column">
+            <div class="setupItemContainer">
+              <div class="setupItem">{{gameSetupForm.irrigationCost.label}}</div>
+              <div>{{gameSetupForm.irrigationCost}}</div>
+            </div>
+            <div class="setupItemContainer">
+              <div class="setupItem">{{gameSetupForm.nitrogenCost.label}}</div>
+              <div>{{gameSetupForm.nitrogenCost}}</div>
+            </div>
+            <div class="setupItemContainer">
+              <div class="setupItem">{{gameSetupForm.cornPrice.label}}</div>
+              <div>{{gameSetupForm.cornPrice}}</div>
+            </div>
+          </div>
+
+          <a class="secondaryButton" href="/teacher">Back</a>
+        </div>
       </div>
-    </div>
-    <div class="newGameSubContainer">
-      <h1>Add Players</h1>
-      <form method="post" class="column">
+      <div class="column">
+        <h1>Add Players</h1>
         {% csrf_token %}
         <div class="row">
           <label for="gameName" class="gameNameLabel">Game Title:</label>
@@ -20,8 +34,10 @@
             name="gameName"
             class="gameName"
             placeholder="{{game.name}}"
+            required
           />
         </div>
+        <b style="margin: 12px 0px">Class Code: {{game.code}}</b>
         <label for="players"></label>
         <textarea
           id="players"
@@ -29,9 +45,9 @@
           class="newGameTextBox"
           placeholder="student1@gmail.com&#10;student2@gmail.com&#10;student3@gmail.com"
         ></textarea>
-        <input type="submit" value="Add Players" class="ctaButton"/>
-      </form>
-    </div>
+        <input type="submit" value="Create Game" class="ctaButton" />
+      </div>
+    </form>
   </div>
 </div>
 {% endblock %}
