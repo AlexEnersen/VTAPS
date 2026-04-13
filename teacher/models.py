@@ -143,14 +143,14 @@ class Game(models.Model):
     created = models.BooleanField(default = False)
     passwordsFinished = models.BooleanField(default = False)
     
-    nitrogenCost = models.FloatField(default=0.5)
-    irrigationCost = models.FloatField(default=5.0)
-    cornPrice = models.FloatField(default=3.5)
+    nitrogenCost = models.FloatField(default=0.6)
+    irrigationCost = models.FloatField(default=6.50)
+    cornPrice = models.FloatField(default=4.25)
 
 class WeekEntries(models.Model):
     week = models.IntegerField("Week Limit", blank=False, choices=WEEK_CHOICES)
 
 class GameSetup(models.Model):
-    nitrogenCost = models.DecimalField("Fertilizer Cost (per lb.)", choices=N_COST_CHOICES, default = Decimal('0.5'), max_digits = 4, decimal_places = 2)
-    irrigationCost = models.DecimalField("Irrigation Cost (per in.)", choices=I_COST_CHOICES, default = Decimal('5.00'), max_digits = 4, decimal_places = 2)
-    cornPrice = models.DecimalField("Corn Price:", choices=CORN_PRICES, default = Decimal('3.50'), max_digits = 4, decimal_places = 2)
+    nitrogenCost = models.DecimalField("Fertilizer Cost (per lb.)", choices=N_COST_CHOICES, default = Decimal('0.6'), max_digits = 4, decimal_places = 2)
+    irrigationCost = models.DecimalField("Irrigation Cost (per in.)", choices=I_COST_CHOICES, default = Decimal('6.50'), max_digits = 4, decimal_places = 2)
+    cornPrice = models.DecimalField("Corn Price:", choices=CORN_PRICES, default = Decimal('4.25'), max_digits = 4, decimal_places = 2)
