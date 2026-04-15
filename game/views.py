@@ -278,7 +278,9 @@ def weeklySelection(request, game):
 
         if game.week > 0:
             gameOutputs = downloadOutputs(gamePath)
+            print("Hi1")
             if gameOutputs is not False and 'OOV_content' in gameOutputs:
+                print("Hi2")
                 projectedYield = getFinalYield(gameOutputs)
                 game.projected_yields.append(projectedYield)
 
@@ -337,8 +339,16 @@ def weeklySelection(request, game):
 
         simulatedGamePath = gamePath + "_simulated"
 
+        if not checkBucket(simulatedGamePath):
+            print("creating")
+            createSimulatedGame(date, game, gamePath, gameInputs)
+
         gameOutputsSimulated = downloadOutputs(simulatedGamePath)
+
         simulatedNUptake = getNitrogenUptake(date, gameOutputsSimulated)
+
+        if len(game.nitrogen_sufficiency_array) == 0:
+            game.nitrogen_sufficiency_array = [100]
         
         if simulatedNUptake > 0:
             context['nitrogen_sufficiency'] = game.nitrogen_sufficiency_array[-1]
