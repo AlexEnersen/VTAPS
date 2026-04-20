@@ -120,6 +120,65 @@ CORN_PRICES = [
     (Decimal('7.5'), '$ 7.50')
 ]
 
+WATER_N_CHOICES = [
+    (Decimal('1'), '1.00'),
+    (Decimal('2'), '2.00'),
+    (Decimal('3'), '3.00'),
+    (Decimal('4'), '4.00'),
+    (Decimal('5'), '5.00'),
+    (Decimal('6'), '6.00'),
+    (Decimal('7'), '7.00'),
+    (Decimal('8'), '8.00'),
+    (Decimal('9'), '9.00'),
+    (Decimal('10'), '10.00'),
+    (Decimal('11'), '11.00'),
+    (Decimal('12'), '12.00'),
+    (Decimal('13'), '13.00'),
+    (Decimal('14'), '14.00'),
+    (Decimal('15'), '15.00'),
+    (Decimal('16'), '16.00'),
+    (Decimal('17'), '17.00'),
+    (Decimal('18'), '18.00'),
+    (Decimal('19'), '19.00'),
+    (Decimal('20'), '20.00'),
+    (Decimal('21'), '21.00'),
+    (Decimal('22'), '22.00'),
+    (Decimal('23'), '23.00'),
+    (Decimal('24'), '24.00'),
+    (Decimal('25'), '25.00'),
+    (Decimal('26'), '26.00'),
+    (Decimal('27'), '27.00'),
+    (Decimal('28'), '28.00'),
+    (Decimal('29'), '29.00'),
+    (Decimal('30'), '30.00'),
+    (Decimal('31'), '31.00'),
+    (Decimal('32'), '32.00'),
+    (Decimal('33'), '33.00'),
+    (Decimal('34'), '34.00'),
+    (Decimal('35'), '35.00'),
+    (Decimal('36'), '36.00'),
+    (Decimal('37'), '37.00'),
+    (Decimal('38'), '38.00'),
+    (Decimal('39'), '39.00'),
+    (Decimal('40'), '40.00'),
+    (Decimal('39'), '39.00'),
+    (Decimal('40'), '40.00'),
+    (Decimal('39'), '39.00'),
+    (Decimal('40'), '40.00'),
+    (Decimal('39'), '39.00'),
+    (Decimal('40'), '40.00'),
+    (Decimal('41'), '41.00'),
+    (Decimal('42'), '42.00'),
+    (Decimal('43'), '43.00'),
+    (Decimal('44'), '44.00'),
+    (Decimal('45'), '45.00'),
+    (Decimal('46'), '46.00'),
+    (Decimal('47'), '47.00'),
+    (Decimal('48'), '48.00'),
+    (Decimal('49'), '49.00'),
+    (Decimal('50'), '50.00'),
+]
+
 class Teacher(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
@@ -145,6 +204,7 @@ class Game(models.Model):
     
     nitrogenCost = models.FloatField(default=0.6)
     irrigationCost = models.FloatField(default=6.50)
+    waterNitrates = models.FloatField(default=25.0)
     cornPrice = models.FloatField(default=4.25)
 
 class WeekEntries(models.Model):
@@ -153,4 +213,5 @@ class WeekEntries(models.Model):
 class GameSetup(models.Model):
     nitrogenCost = models.DecimalField("Fertilizer Cost (per lb.)", choices=N_COST_CHOICES, default = Decimal('0.6'), max_digits = 4, decimal_places = 2)
     irrigationCost = models.DecimalField("Irrigation Cost (per in.)", choices=I_COST_CHOICES, default = Decimal('6.50'), max_digits = 4, decimal_places = 2)
+    waterNitrates = models.DecimalField("Water Nitrates (ppm per in.)", choices=WATER_N_CHOICES, default = Decimal('25.0'), max_digits = 4, decimal_places = 2)
     cornPrice = models.DecimalField("Corn Price:", choices=CORN_PRICES, default = Decimal('4.25'), max_digits = 4, decimal_places = 2)

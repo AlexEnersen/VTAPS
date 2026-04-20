@@ -120,9 +120,10 @@ class GameProfile(models.Model):
     waterUseEfficiency = models.FloatField(default=-1)
     waterProductivity = models.FloatField(default=-1)
     
-    nitrogenCost = models.FloatField(default=0.6)
-    irrigationCost = models.FloatField(default=6.50)
-    cornPrice = models.FloatField(default=4.25)
+    # nitrogenCost = models.FloatField(default=0.6)
+    # irrigationCost = models.FloatField(default=6.50)
+    # waterNitrates = models.FloatField(default=25.00)
+    # cornPrice = models.FloatField(default=4.25)
 
 class FertilizerEntries1(models.Model):
     fertilizer = models.IntegerField(blank=False, default=0, choices=FERT_CHOICES_1)

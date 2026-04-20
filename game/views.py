@@ -268,7 +268,8 @@ def weeklySelection(request, game):
             fertilizerQuantity = request.POST.get('fertilizer')
             irrigationQuantity = getIrrigation(request)
             # if not fertilizerQuantity == None:
-            gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fertilizerQuantity, irrigationQuantity, int(date))
+            print("ppm:", game.game.waterNitrates)
+            gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fertilizerQuantity, irrigationQuantity, int(date), game.game.waterNitrates)
             gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], irrigationQuantity, fertilizerQuantity, int(date), game.week)
             
         
@@ -593,12 +594,11 @@ def getTotalIrrigationCost(text, date, irrigationCost):
     return totalIrrigationCost
 
         
-def addFertilizer(text, fertilizerQuantity, irrigationQuantity, date):
+def addFertilizer(text, fertilizerQuantity, irrigationQuantity, date, nitratePPM):
 
     onFertilizer = False
 
     beforeSpaces = " " * (6-len(str(fertilizerQuantity)))
-
 
     for i, line in enumerate(text):
         if (line.startswith("@F")):
@@ -609,7 +609,7 @@ def addFertilizer(text, fertilizerQuantity, irrigationQuantity, date):
                 newString = " 1 %s FE036 AP004     3%s%s     0     0     0     0   -99 -99" % (str(date), beforeSpaces, fertilizerQuantity)
                 text.insert(i, newString)
             for irr in irrigationQuantity:
-                newString = " 1 %s FE036 AP004     3%s%s     0     0     0     0   -99 1" % (str(date), beforeSpaces, float(irr) * 0.23 * 25)
+                newString = " 1 %s FE036 AP004     3%s%s     0     0     0     0   -99 1" % (str(date), beforeSpaces, float(irr) * 0.23 * nitratePPM)
                 text.insert(i, newString)
             onFertilizer = False
             return text
@@ -1469,6 +1469,6 @@ def createSimulatedGame(date, game, gamePath, gameInputs):
 
 
                 gameInputsSimulated['MZX_content'] = addIrrigation(gameInputsSimulated['MZX_content'], [1, 1], fertQuantity, int(date) + (7 * (weekNum+1)), weekNum)
-                gameInputsSimulated['MZX_content'] = addFertilizer(gameInputsSimulated['MZX_content'], fertQuantity, [1, 1], int(date) + (7 * (weekNum+1)))
+                gameInputsSimulated['MZX_content'] = addFertilizer(gameInputsSimulated['MZX_content'], fertQuantity, [1, 1], int(date) + (7 * (weekNum+1)), game.game.waterNitrates)
 
             computeDSSAT(game.hybrid, gameInputsSimulated, simulatedGamePath)

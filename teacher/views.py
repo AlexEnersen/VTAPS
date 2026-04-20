@@ -196,6 +196,7 @@ def game(response, id):
             
             game.nitrogenCost = response.POST['nitrogenCost']
             game.irrigationCost = response.POST['irrigationCost']
+            game.waterNitrates = response.POST['waterNitrates']
             game.cornPrice = response.POST['cornPrice']
 
             game.created = True
