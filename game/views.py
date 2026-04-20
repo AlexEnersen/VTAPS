@@ -267,8 +267,8 @@ def weeklySelection(request, game):
 
             fertilizerQuantity = request.POST.get('fertilizer')
             irrigationQuantity = getIrrigation(request)
-            if not fertilizerQuantity == None:
-                gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fertilizerQuantity, int(date))
+            # if not fertilizerQuantity == None:
+            gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fertilizerQuantity, irrigationQuantity, int(date))
             gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], irrigationQuantity, fertilizerQuantity, int(date), game.week)
             
         
@@ -278,9 +278,7 @@ def weeklySelection(request, game):
 
         if game.week > 0:
             gameOutputs = downloadOutputs(gamePath)
-            print("Hi1")
             if gameOutputs is not False and 'OOV_content' in gameOutputs:
-                print("Hi2")
                 projectedYield = getFinalYield(gameOutputs)
                 game.projected_yields.append(projectedYield)
 
@@ -368,6 +366,8 @@ def weeklySelection(request, game):
     context['total_irr'] = round(sum(history['irr']), 2)
     context['weekly_fert'] = round(sum(recentHistory['fert']), 2)
     context['total_fert'] = round(sum(history['fert']), 2)
+    context['weekly_nitrates'] = round(sum(recentHistory['nitrates']), 2)
+    context['total_nitrates'] = round(sum(history['nitrates']), 2)
     context['weekly_Nleach'] = round(sum(recentHistory['Nleach']), 2)
     context['total_Nleach'] = round(sum(history['Nleach']), 2)
         
@@ -486,6 +486,7 @@ def finalResults(request, gameProfile):
 
     context['irr_amount'] = sum(history['irr'])
     context['fert_amount'] = sum(history['fert'])
+    context['nitrate_amount'] = sum(history['nitrates'])
     context['et_amount'] = sum(history['et'])
     context['rain_amount'] = sum(history['rain'])
     
@@ -592,11 +593,7 @@ def getTotalIrrigationCost(text, date, irrigationCost):
     return totalIrrigationCost
 
         
-def addFertilizer(text, fertilizerQuantity, date):
-    fertilizerQuantity = round(float(fertilizerQuantity) * 1.12085)
-    
-    if fertilizerQuantity == None or fertilizerQuantity == 0:
-        return text
+def addFertilizer(text, fertilizerQuantity, irrigationQuantity, date):
 
     onFertilizer = False
 
@@ -607,8 +604,13 @@ def addFertilizer(text, fertilizerQuantity, date):
         if (line.startswith("@F")):
             onFertilizer = True
         if (onFertilizer and line == ""):
-            newString = " 1 %s FE036 AP004     3%s%s     0     0     0     0   -99 -99" % (str(date), beforeSpaces, fertilizerQuantity)
-            text.insert(i, newString)
+            if fertilizerQuantity is not None:
+                fertilizerQuantity = round(float(fertilizerQuantity) * 1.12085)
+                newString = " 1 %s FE036 AP004     3%s%s     0     0     0     0   -99 -99" % (str(date), beforeSpaces, fertilizerQuantity)
+                text.insert(i, newString)
+            for irr in irrigationQuantity:
+                newString = " 1 %s FE036 AP004     3%s%s     0     0     0     0   -99 1" % (str(date), beforeSpaces, float(irr) * 0.23 * 25)
+                text.insert(i, newString)
             onFertilizer = False
             return text
     
@@ -991,8 +993,8 @@ def getRootDepth(date, gameOutputs):
 def getHistory(date, start_day, gameInputs, gameOutputs, weeklyFertilizer):
     day = int(date[len(date) - 3:])
 
-    history = {"rain": [0.0], "et": [0.0], "irr": [0.0], "fert": [0.0], "Nleach": [0.0]}
-    recentHistory = {"rain": [0.0], "et": [0.0], "irr": [0.0], "fert": [0.0], "Nleach": [0.0]}
+    history = {"rain": [0.0], "et": [0.0], "irr": [0.0], "fert": [0.0], "nitrates": [0.0], "Nleach": [0.0]}
+    recentHistory = {"rain": [0.0], "et": [0.0], "irr": [0.0], "fert": [0.0], "nitrates": [0.0], "Nleach": [0.0]}
 
     for line in gameInputs['WTH_content']:
         items = line.split(" ")
@@ -1042,16 +1044,20 @@ def getHistory(date, start_day, gameInputs, gameOutputs, weeklyFertilizer):
         elif (len(items) >= 6 and items[5] == "FAMN"):
             onIrrigation = False
             onFertilizer = True
-
         elif (onFertilizer):
             if (int(items[1]) < int(date)):
-                if int(items[5]) == 0:
+                if float(items[5]) == 0:
                     continue
-                fertilizer = weeklyFertilizer[fertCount]
-                fertCount += 1
-                history['fert'].append(fertilizer)
-                if (int(items[1]) >= int(date) - 7):
-                    recentHistory['fert'].append(fertilizer)
+                elif float(items[-1]) == 1:
+                    history['nitrates'].append(float(items[5]))
+                    if (int(items[1]) >= int(date) - 7):
+                        recentHistory['nitrates'].append(float(items[5]))
+                else:
+                    fertilizer = weeklyFertilizer[fertCount]
+                    fertCount += 1
+                    history['fert'].append(fertilizer)
+                    if (int(items[1]) >= int(date) - 7):
+                        recentHistory['fert'].append(fertilizer)
 
     for line in gameOutputs['OEB_content']:
         items = line.split(" ")
@@ -1463,6 +1469,6 @@ def createSimulatedGame(date, game, gamePath, gameInputs):
 
 
                 gameInputsSimulated['MZX_content'] = addIrrigation(gameInputsSimulated['MZX_content'], [1, 1], fertQuantity, int(date) + (7 * (weekNum+1)), weekNum)
-                gameInputsSimulated['MZX_content'] = addFertilizer(gameInputsSimulated['MZX_content'], fertQuantity, int(date) + (7 * (weekNum+1)))
+                gameInputsSimulated['MZX_content'] = addFertilizer(gameInputsSimulated['MZX_content'], fertQuantity, [1, 1], int(date) + (7 * (weekNum+1)))
 
             computeDSSAT(game.hybrid, gameInputsSimulated, simulatedGamePath)
