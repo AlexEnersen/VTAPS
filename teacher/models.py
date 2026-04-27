@@ -179,6 +179,30 @@ WATER_N_CHOICES = [
     (Decimal('50'), '50.00'),
 ]
 
+WEATHER_CHOICES = [
+    ("NEME0401.WTH", '2004'),
+    ("NEME0501.WTH", '2005'),
+    ("NEME0601.WTH", '2006'),
+    ("NEME0701.WTH", '2007'),
+    ("NEME0801.WTH", '2008'),
+    ("NEME0901.WTH", '2009'),
+    ("NEME1001.WTH", '2010'),
+    ("NEME1101.WTH", '2011'),
+    ("NEME1201.WTH", '2012'),
+    ("NEME1301.WTH", '2013'),
+    ("NEME1401.WTH", '2014'),
+    ("NEME1501.WTH", '2015'),
+    ("NEME1601.WTH", '2016'),
+    ("NEME1701.WTH", '2017'),
+    ("NEME1801.WTH", '2018'),
+    ("NEME1901.WTH", '2019'),
+    ("NEME2001.WTH", '2020'),
+    ("NEME2101.WTH", '2021'),
+    ("NEME2201.WTH", '2022'),
+    ("NEME2301.WTH", '2023'),
+    ("NEME2401.WTH", '2024'),
+]
+
 class Teacher(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
@@ -206,6 +230,8 @@ class Game(models.Model):
     irrigationCost = models.FloatField(default=6.50)
     waterNitrates = models.FloatField(default=25.0)
     cornPrice = models.FloatField(default=4.25)
+    otherCosts = models.DecimalField(default=742.79, decimal_places=2, max_digits=6)
+    weatherFile = models.CharField(default="NEME2101.WTH")
 
 class WeekEntries(models.Model):
     week = models.IntegerField("Week Limit", blank=False, choices=WEEK_CHOICES)
@@ -215,3 +241,5 @@ class GameSetup(models.Model):
     irrigationCost = models.DecimalField("Irrigation Cost (per in.)", choices=I_COST_CHOICES, default = Decimal('6.50'), max_digits = 4, decimal_places = 2)
     waterNitrates = models.DecimalField("Water Nitrates (ppm per in.)", choices=WATER_N_CHOICES, default = Decimal('25.0'), max_digits = 4, decimal_places = 2)
     cornPrice = models.DecimalField("Corn Price:", choices=CORN_PRICES, default = Decimal('4.25'), max_digits = 4, decimal_places = 2)
+    otherCosts = models.DecimalField(default=742.79, decimal_places=2, max_digits=6)
+    weatherFile = models.CharField("North Platte Weather:", choices=WEATHER_CHOICES, default="NEME2101.WTH", max_length=40)

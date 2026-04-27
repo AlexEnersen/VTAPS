@@ -198,6 +198,8 @@ def game(response, id):
             game.irrigationCost = response.POST['irrigationCost']
             game.waterNitrates = response.POST['waterNitrates']
             game.cornPrice = response.POST['cornPrice']
+            game.otherCosts = response.POST['otherCosts']
+            game.weatherFile = response.POST['weatherFile']
 
             game.created = True
             game.save()

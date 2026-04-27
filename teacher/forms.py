@@ -79,3 +79,10 @@ class GameSetupForm(ModelForm):
     class Meta:
         model = GameSetup
         fields = "__all__"
+        widgets = {
+            'otherCosts': forms.NumberInput(attrs={
+                'step': '0.01',
+                'max': '9999.99',
+                'min': '0',
+            })
+        }

@@ -246,7 +246,7 @@ def weeklySelection(request, game):
             gameInputs['WTH_name'] = "NEME2001.WTH"
 
             # fileContents = yearlyRandomizer()
-            file = open("weather_files/NEME2101.WTH")
+            file = open(f"weather_files/{game.game.weatherFile}")
             fileContents = file.read().split("\n")
             file.close()
 
@@ -268,7 +268,6 @@ def weeklySelection(request, game):
             fertilizerQuantity = request.POST.get('fertilizer')
             irrigationQuantity = getIrrigation(request)
             # if not fertilizerQuantity == None:
-            print("ppm:", game.game.waterNitrates)
             gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fertilizerQuantity, irrigationQuantity, int(date), game.game.waterNitrates)
             gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], irrigationQuantity, fertilizerQuantity, int(date), game.week)
             
@@ -401,9 +400,9 @@ def weeklySelection(request, game):
     context['seed_cost'] = round(getSeedCost(game.hybrid, game.seeding_rate), 2)
     context['irr_cost'] = round(total_irrigation_cost, 2)
     context['fert_cost'] = round(total_fertilizer_cost, 2)
-    context['other_costs'] = round(742.79, 2)
+    context['other_costs'] = round(game.game.otherCosts, 2)
 
-    context['total_cost'] = round(context['seed_cost'] + context['irr_cost'] + context['fert_cost'] + context['other_costs'], 2)
+    context['total_cost'] = round(context['seed_cost'] + context['irr_cost'] + context['fert_cost'] + float(context['other_costs']), 2)
     game.total_cost = context['total_cost']
 
     game.save()
