@@ -132,8 +132,8 @@ def runGame(request, game_id=None):
             context['fert_form'] = fert_form
             return render(request, "game/init.html", context)
         else:
-            if gameProfile.week < 22 and not gameProfile.finished:              ##### NORMAL MODE
-            # if gameProfile.week <= 1 and not gameProfile.finished:            ##### FINAL PAGE    DEBUG MODE
+            # if gameProfile.week < 22 and not gameProfile.finished:              ##### NORMAL MODE
+            if gameProfile.week <= 1 and not gameProfile.finished:            ##### FINAL PAGE    DEBUG MODE
                 if user != None and gameProfile.week > game.weekLimit:
                     return render(request, "game/caughtup.html", context)
                 else:
@@ -591,6 +591,8 @@ def getTotalIrrigationCost(text, date, irrigationCost):
 
         
 def addFertilizer(text, fertilizerQuantity, irrigationQuantity, date, nitratePPM):
+
+    print("date:", date)
 
     onFertilizer = False
 
@@ -1464,7 +1466,7 @@ def createSimulatedGame(date, game, gamePath, gameInputs):
                     fertQuantity = 30
 
 
-                gameInputsSimulated['MZX_content'] = addIrrigation(gameInputsSimulated['MZX_content'], [1, 1], fertQuantity, int(date) + (7 * (weekNum+1)), weekNum)
-                gameInputsSimulated['MZX_content'] = addFertilizer(gameInputsSimulated['MZX_content'], fertQuantity, [1, 1], int(date) + (7 * (weekNum+1)), game.game.waterNitrates)
+                gameInputsSimulated['MZX_content'] = addIrrigation(gameInputsSimulated['MZX_content'], [1, 1], fertQuantity, int(date) + (7 * (weekNum)), weekNum)
+                gameInputsSimulated['MZX_content'] = addFertilizer(gameInputsSimulated['MZX_content'], fertQuantity, [1, 1], int(date) + (7 * (weekNum)), game.game.waterNitrates)
 
             computeDSSAT(game.hybrid, gameInputsSimulated, simulatedGamePath)
