@@ -316,16 +316,14 @@ def weeklySelection(request, game):
     gameInputs = downloadInputs(gamePath)
     gameOutputs = downloadOutputs(gamePath)
 
-    
-
     if gameOutputs is False:
         computeDSSAT(game.hybrid, gameInputs, gamePath)
         time.sleep(5)
         return None
     elif len(gameOutputs) == 0:
         return False
-    
-    
+
+
     if game.week > 1:
         game.computing = False
         game.save()
@@ -338,7 +336,6 @@ def weeklySelection(request, game):
         simulatedGamePath = gamePath + "_simulated"
 
         if not checkBucket(simulatedGamePath):
-            print("creating")
             createSimulatedGame(date, game, gamePath, gameInputs)
 
         gameOutputsSimulated = downloadOutputs(simulatedGamePath)
