@@ -20,6 +20,7 @@ from django.http import HttpResponseRedirect
 from botocore.config import Config
 from django.core import mail
 from django.core.mail import EmailMultiAlternatives
+from .functions.random import *
 
 environment = os.environ['ENV']
 
@@ -199,7 +200,15 @@ def game(response, id):
             game.waterNitrates = response.POST['waterNitrates']
             game.cornPrice = response.POST['cornPrice']
             game.otherCosts = response.POST['otherCosts']
-            game.weatherFile = response.POST['weatherFile']
+
+            if response.POST['weatherFile'] == 'Random':
+                fileName = f'weather{id}.WTH'
+                game.weatherFile = fileName
+                fileContents = io.BytesIO(yearlyRandomizer().encode('utf-8'))
+                s3.upload_fileobj(fileContents, 'vtapsweatherbucket', fileName)
+
+            else:
+                game.weatherFile = response.POST['weatherFile']
 
             game.created = True
             game.save()

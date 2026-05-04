@@ -6,7 +6,6 @@ import time
 from game.forms import IrrigationEntriesForm, FertilizerEntriesForm1, FertilizerEntriesForm2, GameProfileForm, FertilizerInitForm
 from .models import GameProfile, FertilizerInit
 from teacher.models import Game
-import numpy as np
 from datetime import datetime
 import matplotlib.pyplot as plt
 import matplotlib
@@ -19,7 +18,6 @@ import environ
 import watchtower, logging
 from .functions.functions import *
 from .functions.fileSearch import *
-import pandas as pd
 import csv
 from django.http import HttpResponseRedirect
 from botocore.config import Config
@@ -245,16 +243,29 @@ def weeklySelection(request, game):
 
             gameInputs['WTH_name'] = "NEME2001.WTH"
 
-            # fileContents = yearlyRandomizer()
-            file = open(f"weather_files/{game.game.weatherFile}")
-            fileContents = file.read().split("\n")
-            file.close()
+            weatherFile = game.game.weatherFile
+            if weatherFile.startswith('weather'):
+                try:          
+                    buffer = io.BytesIO()
+                    s3.download_fileobj('vtapsweatherbucket', weatherFile, buffer)
+                    buffer.seek(0)
+                    fileContents = buffer.read().decode('utf-8').split("\n")
+                except Exception as error:
+                    if environment == 'prod':
+                        logger.info(error)
+                    else:
+                        print('WEATHER FILE NOT FOUND:', error)
+
+            else:
+                file = open(f"weather_files/{weatherFile}")
+                fileContents = file.read().split("\n")
+                file.close()
 
             gameInputs['WTH_content'] = changeWeatherYear(fileContents, 2020)
 
             altForecast = False
             gameInputs['forecast_content'] = altForecastWeather(gameInputs['WTH_content']) if altForecast else forecastWeather(gameInputs['WTH_content'])
-            # gameInputs['forecast_content'] = forecastWeather(fileContents)
+
             uploadInputs(gameInputs, gamePath)
             game.initialized = True
             game.week = 0

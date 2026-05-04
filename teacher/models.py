@@ -180,6 +180,7 @@ WATER_N_CHOICES = [
 ]
 
 WEATHER_CHOICES = [
+    ("Random", "Random Weather"),
     ("NEME0401.WTH", '2004'),
     ("NEME0501.WTH", '2005'),
     ("NEME0601.WTH", '2006'),
