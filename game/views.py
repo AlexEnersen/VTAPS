@@ -871,32 +871,34 @@ def plotAquaSpy(date, start_day, gameInputs, gameOutputs, yAxis=-1):
             else:
                 depthTracker = 0
                 modifier = 2.5
-                for index, soilLayer in enumerate(soilArray):
-                    waterLayer = float(items[index2 + index])
-                    soilDepth = soilLayer['depth'] - depthTracker
-
-                    try:
-                        rootDepth = rootArray[rootDay] - depthTracker
-                    except:
-                        ### In case the root data terminates early ###
-                        break
-
-                    if rootDepth < soilDepth:
-                        currentArray.append(round(waterLayer * rootDepth, 3))
-                        ulimitTempArray.append(round(soilLayer['upperLimit'] * rootDepth, 3))
-                        llimitTempArray.append(round(((soilLayer['upperLimit'] + soilLayer['lowerLimit'])/2) * rootDepth, 3))
-                        break
-                    else:
-                        currentArray.append(round(waterLayer * soilDepth, 3))
-                        ulimitTempArray.append(round(soilLayer["upperLimit"] * soilDepth, 3))
-                        llimitTempArray.append(round(((soilLayer['upperLimit'] + soilLayer['lowerLimit'])/2) * soilDepth, 3))
-                    depthTracker += soilDepth
-
-                rootDay += 1
                 
-                waterArray.append(round(sum(currentArray) / modifier, 3))
-                ulimitArray.append(round(sum(ulimitTempArray) / modifier, 3))
-                llimitArray.append(round(sum(llimitTempArray) / modifier, 3))
+                try:
+                    for index, soilLayer in enumerate(soilArray):
+                        waterLayer = float(items[index2 + index])
+                        soilDepth = soilLayer['depth'] - depthTracker
+
+                        rootDepth = rootArray[rootDay] - depthTracker
+
+                        if rootDepth < soilDepth:
+                            currentArray.append(round(waterLayer * rootDepth, 3))
+                            ulimitTempArray.append(round(soilLayer['upperLimit'] * rootDepth, 3))
+                            llimitTempArray.append(round(((soilLayer['upperLimit'] + soilLayer['lowerLimit'])/2) * rootDepth, 3))
+                            break
+                        else:
+                            currentArray.append(round(waterLayer * soilDepth, 3))
+                            ulimitTempArray.append(round(soilLayer["upperLimit"] * soilDepth, 3))
+                            llimitTempArray.append(round(((soilLayer['upperLimit'] + soilLayer['lowerLimit'])/2) * soilDepth, 3))
+                        depthTracker += soilDepth
+
+                    rootDay += 1
+                    
+                    waterArray.append(round(sum(currentArray) / modifier, 3))
+                    ulimitArray.append(round(sum(ulimitTempArray) / modifier, 3))
+                    llimitArray.append(round(sum(llimitTempArray) / modifier, 3))
+            
+                except:
+                    ### In case the root data terminates early ###
+                    break
 
     limitRange = range(1, len(ulimitArray)+1)
     waterRange = range(1, len(waterArray)+1)
