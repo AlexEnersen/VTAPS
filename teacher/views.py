@@ -361,7 +361,6 @@ def groupAttributeGraph(game, studentList, attribute):
                 attributeAmount.append(gameProfile.nitrogen_leaching_array) 
                 attributeNames.append(student.username)
             elif attribute == 'Yield':
-                print("yield:", gameProfile.projected_yields)
                 attributeAmount.append(gameProfile.projected_yields)    
                 attributeNames.append(student.username)
             elif attribute == 'Sufficiency':

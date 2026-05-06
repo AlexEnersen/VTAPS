@@ -607,6 +607,8 @@ def addFertilizer(text, fertilizerQuantity, irrigationQuantity, date, nitratePPM
 
     beforeSpaces = " " * (6-len(str(fertilizerQuantity)))
 
+    print("irrQuant:", irrigationQuantity)
+
     for i, line in enumerate(text):
         if (line.startswith("@F")):
             onFertilizer = True
@@ -615,9 +617,9 @@ def addFertilizer(text, fertilizerQuantity, irrigationQuantity, date, nitratePPM
                 fertilizerQuantity = round(float(fertilizerQuantity) * 1.12085)
                 newString = " 1 %s FE036 AP004     3%s%s     0     0     0     0   -99 -99" % (str(date), beforeSpaces, fertilizerQuantity)
                 text.insert(i, newString)
-            for irr in irrigationQuantity:
-                newString = " 1 %s FE036 AP004     3%s%s     0     0     0     0   -99 1" % (str(date), beforeSpaces, float(irr) * 0.23 * nitratePPM)
-                text.insert(i, newString)
+            for index, irr in enumerate(irrigationQuantity):
+                newString = " 1 %s FE036 AP004     3%s%s     0     0     0     0   -99 1" % (str(date+(3*index)), beforeSpaces, round(float(irr) * 0.23 * nitratePPM, 3))
+                text.insert(i+(index+1), newString)
             onFertilizer = False
             return text
     
@@ -1223,6 +1225,10 @@ def downloadInputs(gamePath):
             if name[-4:] == '.MZX':
                 data['MZX_name'] = name
                 data['MZX_content'] = zipFile.read(name).decode('utf-8').split("\n")
+                index = 0
+                for line in data['MZX_content']:
+                    index += 1
+                    print(index, " MZX LINE: ", line)
             elif name[-4:] == '.SOL':
                 data['SOL_name'] = name
                 data['SOL_content'] = zipFile.read(name).decode('utf-8').split("\n")
@@ -1273,12 +1279,14 @@ def downloadOutputs(gamePath):
                 elif name == 'SoilNiBal.OUT':
                     data['NiBal_name'] = name
                     data['NiBal_content'] = content
-                # elif name[-4:] == '.INP':
-                #     for line in content:
-                #         print("INP LINE:", line)
-                # elif name == 'WARNING.OUT':
-                #     for line in content:
-                #         print(line)
+                elif name[-4:] == '.INP':
+                    index = 0
+                    for line in content:
+                        index += 1
+                        print(index, " INP LINE:", line)
+                elif name == 'WARNING.OUT':
+                    for line in content:
+                        print(line)
 
         return data
     except:
