@@ -65,76 +65,11 @@ def forecastWeather(weather_text):
 
     return forecast_text
 
-
-
 def forecastData(previousArray):
     mean = np.mean(previousArray)
     std = np.std(previousArray)
     value = np.random.normal(mean, std/2, 1)
     return(value[0])
-
-def altForecastWeather(weather_text):
-
-    tempDay = 1
-    numDivisions = 6
-
-    monthlyData = []
-
-    for index, endPoint in enumerate(monthRanges):
-        monthlyItems = []
-        for line in weather_text:
-            items = line.split(" ")
-            items = [x for x in items if x]
-
-            if len(items) == 0 or not items[0].isdigit():
-                continue
-            
-            else:
-                day = int(items[0][4:])
-                if day < tempDay:
-                    continue
-                elif day >= endPoint - 1:
-                    tempDay = day
-                    break
-                else:
-                    monthlyItems.append(items)
-        monthlyData.append(monthlyItems)
-
-    monthlyForecast = []
-    for month in monthlyData:
-        maxTemp = float(month[0][2])
-        minTemp = float(month[0][3])
-        for day in month:
-            highTemp = float(day[2])
-            if highTemp > maxTemp:
-                maxTemp = highTemp
-            lowTemp = float(day[3])
-            if lowTemp < minTemp:
-                minTemp = lowTemp
-
-        tempRange = maxTemp - minTemp
-        divider = tempRange/numDivisions
-        
-        tempRanges = [round(minTemp + (divider * (div+1)), 1) for div in range(numDivisions)]
-
-        for day in month:
-            highTemp = float(day[2])
-            lowTemp = float(day[3])
-
-    
-            for index, highBound in enumerate(tempRanges):
-                lowBound = tempRanges[index-1] if index > 0 else minTemp
-                if (lowTemp <= highBound and lowTemp >= lowBound):
-                    randLowTemp = round(np.random.uniform(lowBound, highBound), 1)
-                if (highTemp <= highBound and highTemp >= lowBound) or index == len(tempRanges)-1:
-                    randHighTemp = round(np.random.uniform(lowBound, highBound), 1)
-                    break
-
-            forecastString = f"{day[0]:<7}{day[1]:>6}{float(randHighTemp):>6}{randLowTemp:>6}{day[4]:>6}{day[5]:>6}{day[6]:>6}"
-            print("forecastString:", forecastString)
-            monthlyForecast.append(forecastString)
-
-    return monthlyForecast
 
 def changeWeatherYear(weatherText, year):
     newText = []

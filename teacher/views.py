@@ -204,7 +204,7 @@ def game(response, id):
             if response.POST['weatherFile'] == 'Random':
                 fileName = f'weather{id}.WTH'
                 game.weatherFile = fileName
-                fileContents = io.BytesIO(yearlyRandomizer().encode('utf-8'))
+                fileContents = io.BytesIO(monthlyFabricator(yearlyRandomizer()).encode('utf-8'))
                 s3.upload_fileobj(fileContents, 'vtapsweatherbucket', fileName)
 
             else:

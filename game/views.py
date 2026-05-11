@@ -255,7 +255,6 @@ def weeklySelection(request, game):
                         logger.info(error)
                     else:
                         print('WEATHER FILE NOT FOUND:', error)
-
             else:
                 file = open(f"weather_files/{weatherFile}")
                 fileContents = file.read().split("\n")
@@ -263,8 +262,7 @@ def weeklySelection(request, game):
 
             gameInputs['WTH_content'] = changeWeatherYear(fileContents, 2020)
 
-            altForecast = False
-            gameInputs['forecast_content'] = altForecastWeather(gameInputs['WTH_content']) if altForecast else forecastWeather(gameInputs['WTH_content'])
+            gameInputs['forecast_content'] = forecastWeather(gameInputs['WTH_content'])
 
             uploadInputs(gameInputs, gamePath)
             game.initialized = True
@@ -327,6 +325,7 @@ def weeklySelection(request, game):
     gameInputs = downloadInputs(gamePath)
     gameOutputs = downloadOutputs(gamePath)
 
+    print("gameOutputs:", gameOutputs)
     if gameOutputs is False:
         computeDSSAT(game.hybrid, gameInputs, gamePath)
         time.sleep(5)
@@ -1286,9 +1285,9 @@ def downloadOutputs(gamePath):
                 #     for line in content:
                 #         index += 1
                 #         print(index, " INP LINE:", line)
-                # elif name == 'WARNING.OUT':
-                #     for line in content:
-                #         print(line)
+                elif name == 'WARNING.OUT':
+                    for line in content:
+                        print(line)
 
         return data
     except:
@@ -1402,6 +1401,7 @@ def getGDU(date, gameOutputs):
             doy = items[1]
             leafNum = float(items[4])
             gwadNum = int(items[9])
+            print("gwad:", gwadNum)
 
             if str(day) == str(doy):
                 leaves = leafNum
@@ -1409,6 +1409,7 @@ def getGDU(date, gameOutputs):
 
             if leafNum > maxLeaves:
                 maxLeaves = leafNum
+
 
             if gwadNum > maxGWAD:
                 maxGWAD = gwadNum
@@ -1451,7 +1452,10 @@ def getGDU(date, gameOutputs):
             elif int(doy) > int(day):
                 break
     
-    gwadRatio = gwad/maxGWAD
+    if maxGWAD > 0:
+        gwadRatio = gwad/maxGWAD
+    else:
+        gwadRatio = 0
 
     if stage != 0:
         if stage == 'R6':
