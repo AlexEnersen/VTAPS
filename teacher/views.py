@@ -224,7 +224,7 @@ def game(response, id):
 
                 zip_buffer = io.BytesIO()
                 with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-                    file = f'weather_files/{response.POST['weatherFile']}'
+                    file = f'weather_files/{response.POST["weatherFile"]}'
                     filetext = open(file, 'r')
                     weather = changeWeatherYear(filetext.readlines(), 2020)
                     filetext.close()

@@ -1266,9 +1266,9 @@ def downloadOutputs(gamePath):
                 #     for line in content:
                 #         index += 1
                 #         print(index, " INP LINE:", line)
-                elif name == 'WARNING.OUT':
-                    for line in content:
-                        print(line)
+                # elif name == 'WARNING.OUT':
+                #     for line in content:
+                #         print(line)
 
         return data
     except:
