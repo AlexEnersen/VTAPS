@@ -249,20 +249,42 @@ def weeklySelection(request, game):
                     buffer = io.BytesIO()
                     s3.download_fileobj('vtapsweatherbucket', weatherFile, buffer)
                     buffer.seek(0)
-                    fileContents = buffer.read().decode('utf-8').split("\n")
+
+                    count = 0
+                    with zipfile.ZipFile(buffer) as zipFile:
+                        for name in zipFile.namelist():
+                            if name == "weather.txt":
+                                weatherContents = zipFile.read(name).decode('utf-8').split("\n")
+                                count += 1
+                            elif name == "forecast.txt":
+                                forecastContents = zipFile.read(name).decode('utf-8').split("\n")
+                                count += 1
+                    
+                    if count < 2:
+                        raise
+                    else:
+                        gameInputs['WTH_content'] = weatherContents
+                        gameInputs['forecast_content'] = forecastContents
+                    
+
                 except Exception as error:
                     if environment == 'prod':
                         logger.info(error)
                     else:
-                        print('WEATHER FILE NOT FOUND:', error)
+                        print('WEATHER FILES NOT FOUND:', error)
+                        file = open(f"weather_files/{weatherFile}")
+                        fileContents = file.read().split("\n")
+                        gameInputs['WTH_content'] = changeWeatherYear(fileContents, 2020)
+                        gameInputs['forecast_content'] = forecastWeather(gameInputs['WTH_content']).split("\n")
+                        file.close()
             else:
                 file = open(f"weather_files/{weatherFile}")
                 fileContents = file.read().split("\n")
+                gameInputs['WTH_content'] = changeWeatherYear(fileContents, 2020)
+                gameInputs['forecast_content'] = forecastWeather(gameInputs['WTH_content']).split("\n")
                 file.close()
 
-            gameInputs['WTH_content'] = changeWeatherYear(fileContents, 2020)
 
-            gameInputs['forecast_content'] = forecastWeather(gameInputs['WTH_content'])
 
             uploadInputs(gameInputs, gamePath)
             game.initialized = True
@@ -325,7 +347,6 @@ def weeklySelection(request, game):
     gameInputs = downloadInputs(gamePath)
     gameOutputs = downloadOutputs(gamePath)
 
-    print("gameOutputs:", gameOutputs)
     if gameOutputs is False:
         computeDSSAT(game.hybrid, gameInputs, gamePath)
         time.sleep(5)
@@ -704,38 +725,6 @@ def getWeather(date, gameInputs):
             logger.info(error)
         else:
             print('getWeather error:', error)
-
-# def getRecap(date, gameInputs):
-#     dateFound = False
-#     weatherInfo = []
-
-#     day = date[len(date) - 3:]
-
-#     try:
-#         for index, line in enumerate(gameInputs['forecast_content']):
-#             items = list(filter(None, line.split(" ")))
-#             items = [x for x in items if x]
-            
-#             weatherDay = items[0][len(items[0]) - 3:]
-
-#             if weatherDay == day:
-#                 dateFound = True
-
-#             if dateFound:
-#                 wth_row = list(filter(None, gameInputs['WTH_content'][index].split(" ")))
-#                 weatherData = {"fHigh": round(float(items[2]) * (9/5) + 32, 1), "fLow": round(float(items[3]) * (9/5) + 32, 1), "fRain": mmToInches(float(items[4])), "aHigh": round(float(wth_row[2]) * (9/5) + 32, 1), "aLow": round(float(wth_row[3]) * (9/5) + 32, 1), "aRain": mmToInches(float(wth_row[4]))}
-
-#                 weatherInfo.append(weatherData)
-
-#                 if int(weatherDay) - int(day) >= 6:
-#                     dateFound = False
-#                     return weatherInfo
-    
-#     except Exception as error:
-#         if environment == 'prod':
-#             logger.info(error)
-#         else:
-#             print('getWeather error:', error)
 
 def mmToInches(mm):
     inches = round(float(0.0393701 * mm), 2)
@@ -1210,6 +1199,8 @@ def uploadInputs(gameInputs, gamePath):
         else:
             zip_file.writestr(gameInputs['SOL_name'], "\n".join(gameInputs['SOL_content']))
 
+        print("WTH:", gameInputs['forecast_content'])
+        print("WTH join:", "\n".join(gameInputs['forecast_content']))
 
         zip_file.writestr(gameInputs["WTH_name"], "\n".join(gameInputs["WTH_content"]))
         zip_file.writestr("forecast.txt", "\n".join(gameInputs["forecast_content"]))
@@ -1401,7 +1392,6 @@ def getGDU(date, gameOutputs):
             doy = items[1]
             leafNum = float(items[4])
             gwadNum = int(items[9])
-            print("gwad:", gwadNum)
 
             if str(day) == str(doy):
                 leaves = leafNum

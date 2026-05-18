@@ -10,6 +10,7 @@ import string
 import time  
 import os
 import io
+import zipfile
 from uuid import uuid4
 import matplotlib.pyplot as plt
 import csv
@@ -202,10 +203,18 @@ def game(response, id):
             game.otherCosts = response.POST['otherCosts']
 
             if response.POST['weatherFile'] == 'Random':
-                fileName = f'weather{id}.WTH'
+                fileName = f'weather{id}.zip'
                 game.weatherFile = fileName
-                fileContents = io.BytesIO(monthlyFabricator(yearlyRandomizer()).encode('utf-8'))
-                s3.upload_fileobj(fileContents, 'vtapsweatherbucket', fileName)
+                
+                zip_buffer = io.BytesIO()
+                with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+                    random_weather = monthlyFabricator(yearlyRandomizer()).encode('utf-8')
+                    zip_file.writestr("weather.txt", random_weather)
+                    zip_file.writestr("forecast.txt", forecastWeather(random_weather).encode('utf-8'))
+                zip_buffer.seek(0)     
+
+                # Upload to S3
+                s3.upload_fileobj(zip_buffer, 'vtapsweatherbucket', fileName)
 
             else:
                 game.weatherFile = response.POST['weatherFile']

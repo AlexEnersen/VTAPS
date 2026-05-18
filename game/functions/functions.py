@@ -1,6 +1,7 @@
 
 import numpy as np
 import os
+import random
 import watchtower, logging
 
 environment = os.environ['ENV']
@@ -15,9 +16,6 @@ monthRanges = [32, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 367]
 
 def forecastWeather(weather_text):  
 
-    lowArray = []
-    highArray = []
-    rainArray = []
     forecast_text = []
 
     for line in weather_text:
@@ -30,46 +28,31 @@ def forecastWeather(weather_text):
 
         if not weatherDate.isnumeric():
             continue
-            
-        weatherDay = weatherDate[len(weatherDate) - 3:]
 
-        # high = str(round(float(items[2]) * (9/5) + 32, 1))
-        # low = str(round(float(items[3]) * (9/5) + 32, 1))
-        # rain = str(round(float(items[4])))
         srad = str(round(float(items[1]), 1))
-        high = str(round(float(items[2]), 1))
-        low = str(round(float(items[3]), 1))
-        rain = str(round(float(items[4]), 1))
-
-        # highArray.append(round((float(items[2]) * (9/5)) + 32, 1))
-        # lowArray.append(round((float(items[3]) * (9/5)) + 32, 1))
-        # rainArray.append(float(items[4].strip()))
-
-        # if len(lowArray) >= 21:
-        #     highArray.pop(0)
-        #     lowArray.pop(0)
-        #     rainArray.pop(0)
+        high = round(float(items[2]), 1)
+        low = round(float(items[3]), 1)
+        rain = round(float(items[4]), 1)
             
-        # high_forecast = str(round(forecastData(highArray), 1))
-        # low_forecast = str(round(forecastData(lowArray), 1 ))
-        # rain_forecast = str(abs(round(forecastData(rainArray), 2)))
-        
-        # if high_forecast < low_forecast:
-        #     low_forecast = str(round(float(high_forecast) - 1, 1))
-        
-        # weather_string = weatherDay + " " + high_forecast + " " + low_forecast + " " + rain_forecast
+        high_forecast = str(round(forecastTemp(high), 1))
+        low_forecast = str(round(forecastTemp(low), 1 ))
+        rain_forecast = str(abs(round(forecastRain(rain), 2)))
 
-        weather_string = weatherDay + " " + srad + " " + high + " " + low + " " + rain
+        weather_string = weatherDate + " " + srad + " " + high_forecast + " " + low_forecast + " " + rain_forecast + "\n"
         
         forecast_text.append(weather_string)
 
-    return forecast_text
+    return "".join(forecast_text)
 
-def forecastData(previousArray):
-    mean = np.mean(previousArray)
-    std = np.std(previousArray)
-    value = np.random.normal(mean, std/2, 1)
-    return(value[0])
+def forecastTemp(temp):
+    value = random.uniform(temp-2, temp+2)
+    return(value)
+
+def forecastRain(rain):
+    value = random.uniform(rain-1, rain+1)
+    if value < 0:
+        value = 0
+    return(value)
 
 def changeWeatherYear(weatherText, year):
     newText = []

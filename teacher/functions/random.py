@@ -1,6 +1,7 @@
 import os
 import watchtower, logging
 import numpy as np
+import random
 
 environment = os.environ['ENV']
 
@@ -132,3 +133,45 @@ def monthlyFabricator(weather_text):
             monthlyForecast += forecastString
         
     return "".join([preamble, monthlyForecast])
+
+
+
+def forecastWeather(weather_text):  
+
+    forecast_text = []
+
+    for line in weather_text:
+        items = list(filter(None, line.split(" ")))
+
+        if len(items) < 1:
+            continue
+
+        weatherDate = items[0]
+
+        if not weatherDate.isnumeric():
+            continue
+
+        srad = str(round(float(items[1]), 1))
+        high = round(float(items[2]), 1)
+        low = round(float(items[3]), 1)
+        rain = round(float(items[4]), 1)
+            
+        high_forecast = str(round(forecastTemp(high), 1))
+        low_forecast = str(round(forecastTemp(low), 1 ))
+        rain_forecast = str(abs(round(forecastRain(rain), 2)))
+
+        weather_string = weatherDate + " " + srad + " " + high_forecast + " " + low_forecast + " " + rain_forecast + "\n"
+        
+        forecast_text.append(weather_string)
+
+    return "".join(forecast_text)
+
+def forecastTemp(temp):
+    value = random.uniform(temp-2, temp+2)
+    return(value)
+
+def forecastRain(rain):
+    value = random.uniform(rain-1, rain+1)
+    if value < 0:
+        value = 0
+    return(value)
