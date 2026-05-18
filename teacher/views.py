@@ -175,7 +175,6 @@ def game(response, id):
         return redirect("/teacher")
     if game.created == False:
         if response.method == 'POST':
-            print("resp:", response.POST)
             players = []
             uniquePlayers = {}
             for player in response.POST['players'].split("\n"):
@@ -202,22 +201,41 @@ def game(response, id):
             game.cornPrice = response.POST['cornPrice']
             game.otherCosts = response.POST['otherCosts']
 
+            forecasting = response.POST.get('forecasting', False)
+
             if response.POST['weatherFile'] == 'Random':
                 fileName = f'weather{id}.zip'
                 game.weatherFile = fileName
                 
                 zip_buffer = io.BytesIO()
                 with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-                    random_weather = monthlyFabricator(yearlyRandomizer()).encode('utf-8')
-                    zip_file.writestr("weather.txt", random_weather)
-                    zip_file.writestr("forecast.txt", forecastWeather(random_weather).encode('utf-8'))
+                    random_weather = changeWeatherYear(monthlyFabricator(yearlyRandomizer()), 2020)
+                    forecast_weather = forecastWeather(random_weather.split("\n"), forecasting)
+                    zip_file.writestr("weather.txt", random_weather.encode('utf-8'))
+                    zip_file.writestr("forecast.txt", forecast_weather.encode('utf-8'))
                 zip_buffer.seek(0)     
 
                 # Upload to S3
                 s3.upload_fileobj(zip_buffer, 'vtapsweatherbucket', fileName)
 
             else:
-                game.weatherFile = response.POST['weatherFile']
+                fileName = f'weather{id}.zip'
+                game.weatherFile = fileName
+
+                zip_buffer = io.BytesIO()
+                with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+                    file = f'weather_files/{response.POST['weatherFile']}'
+                    filetext = open(file, 'r')
+                    weather = changeWeatherYear(filetext.readlines(), 2020)
+                    filetext.close()
+
+                    forecast_weather = forecastWeather(weather.split("\n"), forecasting)
+                    zip_file.writestr("weather.txt", weather.encode('utf-8'))
+                    zip_file.writestr("forecast.txt", forecast_weather.encode('utf-8'))
+                zip_buffer.seek(0)     
+
+                # Upload to S3
+                s3.upload_fileobj(zip_buffer, 'vtapsweatherbucket', fileName)
 
             game.created = True
             game.save()

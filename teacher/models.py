@@ -242,5 +242,6 @@ class GameSetup(models.Model):
     irrigationCost = models.DecimalField("Irrigation Cost (per in.)", choices=I_COST_CHOICES, default = Decimal('6.50'), max_digits = 4, decimal_places = 2)
     waterNitrates = models.DecimalField("Water Nitrates (ppm per in.)", choices=WATER_N_CHOICES, default = Decimal('25.0'), max_digits = 4, decimal_places = 2)
     cornPrice = models.DecimalField("Corn Price:", choices=CORN_PRICES, default = Decimal('4.25'), max_digits = 4, decimal_places = 2)
-    otherCosts = models.DecimalField(default=742.79, decimal_places=2, max_digits=6)
+    otherCosts = models.DecimalField("Other Costs:", default=742.79, decimal_places=2, max_digits=6)
     weatherFile = models.CharField("North Platte Weather:", choices=WEATHER_CHOICES, default="NEME2101.WTH", max_length=40)
+    forecasting = models.BooleanField("Forecast?", default=False)

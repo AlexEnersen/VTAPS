@@ -244,45 +244,38 @@ def weeklySelection(request, game):
             gameInputs['WTH_name'] = "NEME2001.WTH"
 
             weatherFile = game.game.weatherFile
-            if weatherFile.startswith('weather'):
-                try:          
-                    buffer = io.BytesIO()
-                    s3.download_fileobj('vtapsweatherbucket', weatherFile, buffer)
-                    buffer.seek(0)
+            try:          
+                buffer = io.BytesIO()
+                s3.download_fileobj('vtapsweatherbucket', weatherFile, buffer)
+                buffer.seek(0)
 
-                    count = 0
-                    with zipfile.ZipFile(buffer) as zipFile:
-                        for name in zipFile.namelist():
-                            if name == "weather.txt":
-                                weatherContents = zipFile.read(name).decode('utf-8').split("\n")
-                                count += 1
-                            elif name == "forecast.txt":
-                                forecastContents = zipFile.read(name).decode('utf-8').split("\n")
-                                count += 1
-                    
-                    if count < 2:
-                        raise
-                    else:
-                        gameInputs['WTH_content'] = weatherContents
-                        gameInputs['forecast_content'] = forecastContents
-                    
+                count = 0
+                with zipfile.ZipFile(buffer) as zipFile:
+                    for name in zipFile.namelist():
+                        if name == "weather.txt":
+                            weatherContents = zipFile.read(name).decode('utf-8').split("\n")
+                            count += 1
+                        elif name == "forecast.txt":
+                            forecastContents = zipFile.read(name).decode('utf-8').split("\n")
+                            count += 1
+                
+                if count < 2:
+                    raise
+                else:
+                    gameInputs['WTH_content'] = weatherContents
+                    gameInputs['forecast_content'] = forecastContents
+                
 
-                except Exception as error:
-                    if environment == 'prod':
-                        logger.info(error)
-                    else:
-                        print('WEATHER FILES NOT FOUND:', error)
-                        file = open(f"weather_files/{weatherFile}")
-                        fileContents = file.read().split("\n")
-                        gameInputs['WTH_content'] = changeWeatherYear(fileContents, 2020)
-                        gameInputs['forecast_content'] = forecastWeather(gameInputs['WTH_content']).split("\n")
-                        file.close()
-            else:
-                file = open(f"weather_files/{weatherFile}")
-                fileContents = file.read().split("\n")
-                gameInputs['WTH_content'] = changeWeatherYear(fileContents, 2020)
-                gameInputs['forecast_content'] = forecastWeather(gameInputs['WTH_content']).split("\n")
-                file.close()
+            except Exception as error:
+                if environment == 'prod':
+                    logger.info(error)
+                else:
+                    print('WEATHER FILES NOT FOUND:', error)
+                    file = open(f"weather_files/{weatherFile}")
+                    fileContents = file.read().split("\n")
+                    gameInputs['WTH_content'] = changeWeatherYear(fileContents, 2020)
+                    gameInputs['forecast_content'] = forecastWeather(gameInputs['WTH_content']).split("\n")
+                    file.close()
 
 
 
@@ -1198,9 +1191,6 @@ def uploadInputs(gameInputs, gamePath):
                 zip_file.writestr("NE.SOL", contents)
         else:
             zip_file.writestr(gameInputs['SOL_name'], "\n".join(gameInputs['SOL_content']))
-
-        print("WTH:", gameInputs['forecast_content'])
-        print("WTH join:", "\n".join(gameInputs['forecast_content']))
 
         zip_file.writestr(gameInputs["WTH_name"], "\n".join(gameInputs["WTH_content"]))
         zip_file.writestr("forecast.txt", "\n".join(gameInputs["forecast_content"]))

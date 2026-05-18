@@ -136,7 +136,7 @@ def monthlyFabricator(weather_text):
 
 
 
-def forecastWeather(weather_text):  
+def forecastWeather(weather_text, forecasting=True):  
 
     forecast_text = []
 
@@ -156,9 +156,9 @@ def forecastWeather(weather_text):
         low = round(float(items[3]), 1)
         rain = round(float(items[4]), 1)
             
-        high_forecast = str(round(forecastTemp(high), 1))
-        low_forecast = str(round(forecastTemp(low), 1 ))
-        rain_forecast = str(abs(round(forecastRain(rain), 2)))
+        high_forecast = str(round(forecastTemp(high), 1)) if forecasting else str(round(high, 1))
+        low_forecast = str(round(forecastTemp(low), 1 )) if forecasting else str(round(low, 1))
+        rain_forecast = str(abs(round(forecastRain(rain), 2))) if forecasting else str(round(rain, 2))
 
         weather_string = weatherDate + " " + srad + " " + high_forecast + " " + low_forecast + " " + rain_forecast + "\n"
         
@@ -175,3 +175,16 @@ def forecastRain(rain):
     if value < 0:
         value = 0
     return(value)
+
+def changeWeatherYear(weatherText, year):
+    newText = []
+    for line in weatherText:
+        items = line.split(" ")
+        items = [x for x in items if x]
+        if len(items) == 0 or not items[0].isnumeric():
+            newText.append(line)
+            continue
+        newDate = str(year) + items[0][4:7]
+        newLine = newDate + line[7:]
+        newText.append(newLine)
+    return "".join(newText)
