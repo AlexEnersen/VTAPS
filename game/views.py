@@ -269,13 +269,12 @@ def weeklySelection(request, game):
             except Exception as error:
                 if environment == 'prod':
                     logger.info(error)
-                else:
-                    print('WEATHER FILES NOT FOUND:', error)
-                    file = open(f"weather_files/{weatherFile}")
-                    fileContents = file.read().split("\n")
-                    gameInputs['WTH_content'] = changeWeatherYear(fileContents, 2020)
-                    gameInputs['forecast_content'] = forecastWeather(gameInputs["WTH_content"]).split("\n")
-                    file.close()
+                print('WEATHER FILES NOT FOUND:', error)
+                file = open(f"weather_files/{weatherFile}")
+                fileContents = file.read().split("\n")
+                gameInputs['WTH_content'] = changeWeatherYear(fileContents, 2020)
+                gameInputs['forecast_content'] = forecastWeather(gameInputs["WTH_content"]).split("\n")
+                file.close()
 
 
 
