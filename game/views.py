@@ -274,7 +274,7 @@ def weeklySelection(request, game):
                     file = open(f"weather_files/{weatherFile}")
                     fileContents = file.read().split("\n")
                     gameInputs['WTH_content'] = changeWeatherYear(fileContents, 2020)
-                    gameInputs['forecast_content'] = forecastWeather(gameInputs['WTH_content']).split("\n")
+                    gameInputs['forecast_content'] = forecastWeather(gameInputs["WTH_content"]).split("\n")
                     file.close()
 
 
