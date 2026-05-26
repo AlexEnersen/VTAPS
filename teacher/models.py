@@ -204,6 +204,25 @@ WEATHER_CHOICES = [
     ("NEME2401.WTH", '2024'),
 ]
 
+WATER_LIMITS = [
+    (1, '1'),
+    (2, '2'),
+    (3, '3'),
+    (4, '4'),
+    (5, '5'),
+    (6, '6'),
+    (7, '7'),
+    (8, '8'),
+    (9, '9'),
+    (10, '10'),
+    (11, '11'),
+    (12, '12'),
+    (13, '13'),
+    (14, '14'),
+    (15, '15'),
+    ("unlimited", 'unlimited')
+]
+
 class Teacher(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
@@ -233,6 +252,7 @@ class Game(models.Model):
     cornPrice = models.FloatField(default=4.25)
     otherCosts = models.DecimalField(default=742.79, decimal_places=2, max_digits=6)
     weatherFile = models.CharField(default="NEME2101.WTH")
+    waterLimit = models.CharField(default="unlimited")
 
 class WeekEntries(models.Model):
     week = models.IntegerField("Week Limit", blank=False, choices=WEEK_CHOICES)
@@ -245,3 +265,4 @@ class GameSetup(models.Model):
     otherCosts = models.DecimalField("Other Costs:", default=742.79, decimal_places=2, max_digits=6)
     weatherFile = models.CharField("North Platte Weather:", choices=WEATHER_CHOICES, default="NEME2101.WTH", max_length=40)
     forecasting = models.BooleanField("Forecast?", default=False)
+    waterLimit = models.CharField("Water Limit:", choices=WATER_LIMITS, default="unlimited", max_length = 40)

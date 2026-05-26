@@ -290,9 +290,24 @@ def weeklySelection(request, game):
 
             fertilizerQuantity = request.POST.get('fertilizer')
             irrigationQuantity = getIrrigation(request)
-            # if not fertilizerQuantity == None:
-            gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fertilizerQuantity, irrigationQuantity, int(date), game.game.waterNitrates)
-            gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], irrigationQuantity, fertilizerQuantity, int(date), game.week)
+            
+            waterLimit = game.game.waterLimit
+            if waterLimit != "unlimited":
+                waterLimit = float(waterLimit)
+                for index, irr in enumerate(irrigationQuantity):
+                    if irr == None:
+                        irrigationQuantity[index] = 0
+                        continue
+                    diff = waterLimit - float(irr)
+                    if diff < 0:
+                        irrigationQuantity[index] = waterLimit
+                        diff = 0
+                    waterLimit = diff
+                game.game.waterLimit = str(waterLimit)
+                game.game.save()
+
+                gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fertilizerQuantity, irrigationQuantity, int(date), game.game.waterNitrates)
+                gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], irrigationQuantity, fertilizerQuantity, int(date), game.week)
             
         
         computeDSSAT(game.hybrid, gameInputs, gamePath)
@@ -390,6 +405,7 @@ def weeklySelection(request, game):
     context['total_nitrates'] = round(sum(history['nitrates']), 2)
     context['weekly_Nleach'] = round(sum(recentHistory['Nleach']), 2)
     context['total_Nleach'] = round(sum(history['Nleach']), 2)
+    context['water_limit'] = game.game.waterLimit if game.game.waterLimit == 'unlimited' else float(game.game.waterLimit)
         
 
     gameInputs['MZX_content'] = gameInputs['MZX_content']

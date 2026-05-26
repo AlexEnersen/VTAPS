@@ -200,6 +200,7 @@ def game(response, id):
             game.waterNitrates = response.POST['waterNitrates']
             game.cornPrice = response.POST['cornPrice']
             game.otherCosts = response.POST['otherCosts']
+            game.waterLimit = response.POST['waterLimit']
 
             forecasting = response.POST.get('forecasting', False)
 

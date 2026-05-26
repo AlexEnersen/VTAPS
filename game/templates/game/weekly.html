@@ -271,6 +271,12 @@
           <td class="costLabel">Price of Corn:</td>
           <td class="costData">${{corn_price|floatformat:2}}/bu</td>
         </tr>
+        {% if water_limit != "unlimited" %}
+        <tr class="costRow">
+          <td class="costLabel">Water Limit:</td>
+          <td class="costData">{{water_limit|floatformat:1}} in</td>
+        </tr>
+        {% endif %}
       </table>
     </div>
   </div>
@@ -282,6 +288,7 @@
     onsubmit="this.querySelector('.continueButton').disabled = true"
   >
     <div class="subRow">
+      {% if water_limit == "unlimited" or water_limit > 0 %}
       <div class="inputRow">
         <p class="irrigationLabel">Monday Irrigation:</p>
         <p class="irrigationField">{{iform.monday}} in.</p>
@@ -291,6 +298,7 @@
         <p class="irrigationLabel">Thursday Irrigation:</p>
         <p class="irrigationField">{{iform.thursday}} in.</p>
       </div>
+      {% endif %}
 
       {% csrf_token %} {% if week == 1 or week == 6 or week == 9 or week == 10 or week == 12 or week == 14 or week == 15 %}
       <div class="inputRow">
