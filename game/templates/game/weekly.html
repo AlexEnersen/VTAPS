@@ -12,7 +12,7 @@
   <div class="titleContainer">
     <a class="introLink" href="{{intro_url}}">Introduction</a>
     <p class="title">Week {{week}}/21</p>
-    <p class="subTitle">Next week forecast</p>
+    <p class="subTitle">Next week's forecast</p>
   </div>
   <div class="divRow">
     <div class="column weatherRow">
@@ -273,7 +273,7 @@
         </tr>
         {% if water_limit != "unlimited" %}
         <tr class="costRow">
-          <td class="costLabel">Water Limit:</td>
+          <td class="costLabel">Remaining Water:</td>
           <td class="costData">{{water_limit|floatformat:1}} in</td>
         </tr>
         {% endif %}
