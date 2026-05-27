@@ -128,6 +128,9 @@ def monthlyFabricator(weather_text):
                 if (rain <= highBound and rain >= lowBound):
                     randRain = round(np.random.uniform(lowBound, highBound), 1)
 
+            if randHighTemp < randLowTemp:
+                randHighTemp = randLowTemp + 1
+
 
             forecastString = f"{day[0]:<7}{day[1]:>6}{str(randHighTemp):>6}{str(randLowTemp):>6}{str(randRain):>6}{day[5]:>6}{day[6]:>6}\n"
             monthlyForecast += forecastString
@@ -160,6 +163,9 @@ def forecastWeather(weather_text, forecasting=True):
         low_forecast = str(round(forecastTemp(low), 1 )) if forecasting else str(round(low, 1))
         rain_forecast = str(abs(round(forecastRain(rain), 2))) if forecasting else str(round(rain, 2))
 
+        if float(high_forecast) < float(low_forecast):
+            high_forecast = str(float(low_forecast) + 1)
+
         weather_string = weatherDate + " " + srad + " " + high_forecast + " " + low_forecast + " " + rain_forecast + "\n"
         
         forecast_text.append(weather_string)
@@ -187,4 +193,4 @@ def changeWeatherYear(weatherText, year):
         newDate = str(year) + items[0][4:7]
         newLine = newDate + line[7:]
         newText.append(newLine)
-    return "".join(newText)
+    return "\n".join(newText)

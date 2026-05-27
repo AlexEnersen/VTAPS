@@ -210,9 +210,11 @@ def game(response, id):
                 
                 zip_buffer = io.BytesIO()
                 with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-                    random_weather = changeWeatherYear(monthlyFabricator(yearlyRandomizer()), 2020)
-                    forecast_weather = forecastWeather(random_weather.split("\n"), forecasting)
-                    zip_file.writestr("weather.txt", random_weather.encode('utf-8'))
+                    random_years = yearlyRandomizer()
+                    fabricated_months = monthlyFabricator(random_years)
+                    new_year_weather = changeWeatherYear(fabricated_months.split("\n"), 2020)
+                    forecast_weather = forecastWeather(new_year_weather.split("\n"), forecasting)
+                    zip_file.writestr("weather.txt", new_year_weather.encode('utf-8'))
                     zip_file.writestr("forecast.txt", forecast_weather.encode('utf-8'))
                 zip_buffer.seek(0)     
 
@@ -227,7 +229,9 @@ def game(response, id):
                 with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
                     file = f'weather_files/{response.POST["weatherFile"]}'
                     filetext = open(file, 'r')
-                    weather = changeWeatherYear(filetext.readlines(), 2020)
+                    weather_lines = filetext.readlines()
+                    stripped_lines = [line.strip() for line in weather_lines]
+                    weather = changeWeatherYear(stripped_lines, 2020)
                     filetext.close()
 
                     forecast_weather = forecastWeather(weather.split("\n"), forecasting)
