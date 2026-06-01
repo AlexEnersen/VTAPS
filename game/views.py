@@ -1329,7 +1329,7 @@ def createCSV(irr_total, fert_total, final_yield, final_bushel_cost, pfp, nue, w
             else:
                 fertilizer = None
         
-        writer.writerow([index+1 if index < len(gameProfile.projected_yields)-1 else 'End', round(nsi, 1), round(monday_irrigation, 1), round(thursday_irrigation, 1), round(fertilizer, 1)])
+        writer.writerow([index+1 if index < len(gameProfile.projected_yields)-1 else 'End', round(nsi, 1), round(monday_irrigation, 1), round(thursday_irrigation, 1), round(float(fertilizer), 1)])
 
     return buf.getvalue().encode("utf-8-sig")
 
