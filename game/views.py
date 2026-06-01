@@ -130,8 +130,8 @@ def runGame(request, game_id=None):
             context['fert_form'] = fert_form
             return render(request, "game/init.html", context)
         else:
-            if gameProfile.week < 22 and not gameProfile.finished:              ##### NORMAL MODE
-            # if gameProfile.week <= 1 and not gameProfile.finished:            ##### FINAL PAGE    DEBUG MODE
+            # if gameProfile.week < 22 and not gameProfile.finished:              ##### NORMAL MODE
+            if gameProfile.week <= 1 and not gameProfile.finished:            ##### FINAL PAGE    DEBUG MODE
                 if user != None and gameProfile.week > game.weekLimit:
                     return render(request, "game/caughtup.html", context)
                 else:
@@ -305,11 +305,10 @@ def weeklySelection(request, game):
                     waterLimit = diff
                 game.game.waterLimit = str(waterLimit)
                 game.game.save()
-
-                gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fertilizerQuantity, irrigationQuantity, int(date), game.game.waterNitrates)
-                gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], irrigationQuantity, fertilizerQuantity, int(date), game.week)
             
-        
+            gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fertilizerQuantity, irrigationQuantity, int(date), game.game.waterNitrates)
+            gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], irrigationQuantity, fertilizerQuantity, int(date), game.week)
+            
         computeDSSAT(game.hybrid, gameInputs, gamePath)
 
         nextDate = str(int(date)+7)
@@ -335,6 +334,8 @@ def weeklySelection(request, game):
                 
                 if simulatedNUptake > 0:
                     nitrogen_sufficiency = round((trueUptake / simulatedNUptake) * 100, 0)
+                    if nitrogen_sufficiency > 100:
+                        nitrogen_sufficiency = 100
                     game.nitrogen_sufficiency = nitrogen_sufficiency
                     game.nitrogen_sufficiency_array.append(nitrogen_sufficiency)
                 else:
@@ -528,6 +529,7 @@ def finalResults(request, gameProfile):
     
     context['corn_price'] = gameProfile.game.cornPrice
     context['profit'] = context['corn_price'] - context['bushel_cost']
+    context['profit_per_acre'] = context['profit']  * context['yield']
 
     context['control_aquaspy_graph'] = plotAquaSpy(date, start_day, controlGameInputs, controlGameOutputs, yAxis)[0]
     # context['control_nitrogen_stress_graph'] = plotOneAttribute(date, start_day, controlGameOutputs['OPG_content'], 'NSTD', 'N Stress', 'Nitrogen Stress')
@@ -645,7 +647,7 @@ def addFertilizer(text, fertilizerQuantity, irrigationQuantity, date, nitratePPM
                 text.insert(i, newString)
             for index, irr in enumerate(irrigationQuantity):
                 newString = " 1 %s FE036 AP004     3%s%s     0     0     0     0   -99 1" % (str(date+(3*index)), beforeSpaces, round(float(irr) * 0.23 * nitratePPM, 3))
-                text.insert(i+(index+1), newString)
+                text.insert(i+(index), newString)
             onFertilizer = False
             return text
     
@@ -1284,8 +1286,8 @@ def downloadOutputs(gamePath):
                 elif name == 'WARNING.OUT':
                     for line in content:
                         if environment == 'prod':
-                            logger.info(error)
-                        print(line)
+                            logger.info(line)
+                        # print(line)
 
         return data
     except:
@@ -1294,12 +1296,12 @@ def downloadOutputs(gamePath):
 def createCSV(irr_total, fert_total, final_yield, final_bushel_cost, pfp, nue, wue, wp, nleaching, nsufficiency, gameProfile):
     buf = io.StringIO(newline='')
     writer = csv.writer(buf)
-    writer.writerow(["Irrigation Total (in)", "Fertilizer Total (lbs)", "Final Yield (bu/ac)", "Cost Per Bushel", "Nitrogen Use Efficiency (lbs. N/bu)", "Nitrogen Utilization Efficiency (%)", "Water Utilization Efficiency (bu/in)", "Water Productivity (bu/in)", "N Leaching (lbs/ac)", "N Sufficiency Index (%)"])
-    writer.writerow([irr_total, fert_total, final_yield, final_bushel_cost, pfp, nue, wue, wp, nleaching, nsufficiency])
+    writer.writerow(["Irrigation Total (in)", "Fertilizer Total (lbs)", "Final Yield (bu/ac)", "$ Cost/bu", "Nitrogen Use Efficiency (lbs. N/bu)", "Nitrogen Utilization Efficiency (%)", "Water Utilization Efficiency (bu/in)", "Water Productivity (bu/in)", "N Leaching (lbs/ac)", "N Sufficiency Index (%)"])
+    writer.writerow([round(irr_total, 1), round(fert_total, 1), round(final_yield, 1), round(final_bushel_cost, 2), round(pfp, 1), round(nue, 1), round(wue, 1), round(wp, 1), round(nleaching, 1), round(nsufficiency, 1)])
 
     writer.writerow([])
-    writer.writerow(['Week', 'Projected Yield (bu/ac)', "Monday Irrigation (in)", "Thursday Irrigation (in)", "Fertilizer (lbs)"])
-    for index, pyield in enumerate(gameProfile.projected_yields):
+    writer.writerow(['Week', 'Nitrogen Sufficiency Index', "Monday Irrigation (in)", "Thursday Irrigation (in)", "Fertilizer (lbs)"])
+    for index, nsi in enumerate(gameProfile.nitrogen_sufficiency_array):
         if len(gameProfile.monday_irrigation) > index:
             monday_irrigation = gameProfile.monday_irrigation[index]
             thursday_irrigation = gameProfile.thursday_irrigation[index]
@@ -1326,7 +1328,7 @@ def createCSV(irr_total, fert_total, final_yield, final_bushel_cost, pfp, nue, w
             else:
                 fertilizer = None
         
-        writer.writerow([index+1 if index < len(gameProfile.projected_yields)-1 else 'End', pyield, monday_irrigation, thursday_irrigation, fertilizer])
+        writer.writerow([index+1 if index < len(gameProfile.projected_yields)-1 else 'End', round(nsi, 1), round(monday_irrigation, 1), round(thursday_irrigation, 1), round(fertilizer, 1)])
 
     return buf.getvalue().encode("utf-8-sig")
 

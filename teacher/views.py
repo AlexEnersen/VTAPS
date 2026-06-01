@@ -408,7 +408,7 @@ def groupAttributeGraph(game, studentList, attribute):
     if attribute == 'Cost':
         xlabel = 'Students'
         ylabel = 'Total Operational Costs'
-        title = 'Cost Per Student'
+        title = 'Cost Per Acre'
         ax.bar(attributeNames, attributeAmount, color='skyblue')
         ax.set_ylim(bottom=750)
     elif attribute == 'PFP':
@@ -448,8 +448,8 @@ def groupAttributeGraph(game, studentList, attribute):
         ax.set_ylim(bottom=0)
     elif attribute == 'Sufficiency':
         xlabel = 'Week'
-        ylabel = 'Nitrogen Sufficiency'
-        title = "Nitrogen Sufficiency Per Student"
+        ylabel = 'Nitrogen Sufficiency Index'
+        title = "Nitrogen Sufficiency Index Per Student"
 
         tickerLength = 0
         for layer in attributeAmount:  
@@ -495,7 +495,7 @@ def downloadStudents(request, id):
 
     buf = io.StringIO(newline='')
     writer = csv.writer(buf)
-    writer.writerow(['Username', 'Week', 'Projected Yield (bu/ac)', "Monday Irrigation (in)", "Thursday Irrigation (in)", "Fertilizer (lbs)"])
+    writer.writerow(['Username', 'Week', 'Nitrogen Sufficiency Index', "Monday Irrigation (in)", "Thursday Irrigation (in)", "Fertilizer (lbs)"])
     for index, player in enumerate(game.players):
         try:
             student = Student.objects.get(username=player, code=game.code)
@@ -503,10 +503,10 @@ def downloadStudents(request, id):
         except:
             continue
 
-        for index2, pyield in enumerate(gameProfile.projected_yields):
+        for index2, nsi in enumerate(gameProfile.nitrogen_sufficiency_array):
             playerInfo = [player]
             playerInfo.append(index2+1 if index2 < 21 else 'End')
-            playerInfo.append(round(pyield, 1))
+            playerInfo.append(round(nsi, 1))
             if len(gameProfile.monday_irrigation) > index2:
                 playerInfo.append(gameProfile.monday_irrigation[index2])
                 playerInfo.append(gameProfile.thursday_irrigation[index2])
@@ -557,7 +557,7 @@ def downloadClass(request, id):
 
     buf = io.StringIO(newline='')
     writer = csv.writer(buf)
-    writer.writerow(['Username', "Irrigation Total (in)", "Fertilizer Total (lbs)", "Final Yield (bu/ac)", "Cost Per Bushel", "Nitrogen Use Efficiency (lbs. N/bu)", "Nitrogen Utilization Efficiency (%)", "Water Utilization Efficiency (bu/in)", "Water Productivity (bu/in)", "N Leaching (lbs/ac)", "N uptake (lbs/ac)", "N sufficiency Index (%)"])
+    writer.writerow(['Username', "Irrigation Total (in)", "Fertilizer Total (lbs)", "Final Yield (bu/ac)", "$ Cost/bu", "Nitrogen Use Efficiency (lbs. N/bu)", "Nitrogen Utilization Efficiency (%)", "Water Utilization Efficiency (bu/in)", "Water Productivity (bu/in)", "N Leaching (lbs/ac)", "N uptake (lbs/ac)", "N sufficiency Index (%)"])
     for index, player in enumerate(game.players):
         try:
             student = Student.objects.get(username=player, code=game.code)
@@ -566,17 +566,17 @@ def downloadClass(request, id):
             continue
 
         if len(gameProfile.projected_yields) > 0:
-            irr_total = sum(gameProfile.monday_irrigation) + sum(gameProfile.thursday_irrigation)
-            fert_total = sum(gameProfile.weekly_fertilizer)
-            final_yield = gameProfile.projected_yields[-1]
-            cost_per_bushel = gameProfile.total_cost / final_yield
-            pfp = gameProfile.partialFactorProductivity
-            nue = gameProfile.nitrogenUseEfficiency
-            wue = gameProfile.waterUseEfficiency
-            wp = gameProfile.waterProductivity
-            n_leaching = gameProfile.nitrogen_leaching
-            n_uptake = gameProfile.nitrogen_uptake
-            n_sufficiency = gameProfile.nitrogen_sufficiency
+            irr_total = round(sum(gameProfile.monday_irrigation) + sum(gameProfile.thursday_irrigation), 1)
+            fert_total = round(sum(gameProfile.weekly_fertilizer), 1)
+            final_yield = round(gameProfile.projected_yields[-1], 1)
+            cost_per_bushel = round(gameProfile.total_cost / final_yield, 2)
+            pfp = round(gameProfile.partialFactorProductivity, 1)
+            nue = round(gameProfile.nitrogenUseEfficiency, 1)
+            wue = round(gameProfile.waterUseEfficiency, 1)
+            wp = round(gameProfile.waterProductivity, 1)
+            n_leaching = round(gameProfile.nitrogen_leaching, 1)
+            n_uptake = round(gameProfile.nitrogen_uptake, 1)
+            n_sufficiency = round(gameProfile.nitrogen_sufficiency, 1)
         else:
             irr_total = -1
             fert_total = -1
