@@ -130,8 +130,8 @@ def runGame(request, game_id=None):
             context['fert_form'] = fert_form
             return render(request, "game/init.html", context)
         else:
-            # if gameProfile.week < 22 and not gameProfile.finished:              ##### NORMAL MODE
-            if gameProfile.week <= 1 and not gameProfile.finished:            ##### FINAL PAGE    DEBUG MODE
+            if gameProfile.week < 22 and not gameProfile.finished:              ##### NORMAL MODE
+            # if gameProfile.week <= 1 and not gameProfile.finished:            ##### FINAL PAGE    DEBUG MODE
                 if user != None and gameProfile.week > game.weekLimit:
                     return render(request, "game/caughtup.html", context)
                 else:
@@ -362,11 +362,14 @@ def weeklySelection(request, game):
     elif len(gameOutputs) == 0:
         return False
 
+    historyDict = getHistory(date, start_day, gameInputs, gameOutputs, game.weekly_fertilizer)
+    history = historyDict['history']
+    recentHistory = historyDict['recentHistory']
 
     if game.week > 1:
         game.computing = False
         game.save()
-        context['aquaspy_graph'] = plotAquaSpy(date, start_day, gameInputs, gameOutputs)[0]
+        context['aquaspy_graph'] = plotAquaSpy(date, start_day, gameInputs, gameOutputs, history['fert'])[0]
         context['root_depth_graph'] = plotOneAttribute(date, start_day, gameOutputs['OPG_content'], 'RDPD', 'Inches (in)', 'Root Depth')
         context['growth_stage_graph'] = plotOneAttribute(date, start_day, gameOutputs['OPG_content'], 'GSTD', 'Stage', 'Growth Stage')
         context['nitrogen_stress_graph'] = plotOneAttribute(date, start_day, gameOutputs['NiBal_content'], 'RLCH', 'Nitrate Leached (lbs/ac)', 'Nitrate Leaching')
@@ -391,9 +394,6 @@ def weeklySelection(request, game):
 
     context['gdu'] = getGDU(date, gameOutputs)
 
-    historyDict = getHistory(date, start_day, gameInputs, gameOutputs, game.weekly_fertilizer)
-    history = historyDict['history']
-    recentHistory = historyDict['recentHistory']
     context['weekly_rain'] = round(sum(recentHistory['rain']), 2)
     context['total_rain'] = round(sum(history['rain']), 2)
     context['weekly_et'] = round(sum(recentHistory['et']), 2)
@@ -480,7 +480,7 @@ def finalResults(request, gameProfile):
     context['yield'] = finalYield
     context['hybrid'] = " ".join(gameProfile.hybrid.split(" ")[1:])
     
-    context['aquaspy_graph'], yAxis = plotAquaSpy(date, start_day, gameInputs, gameOutputs)
+    context['aquaspy_graph'], yAxis = plotAquaSpy(date, start_day, gameInputs, gameOutputs, history['fert'])
     # context['nitrogen_stress_graph'] = plotOneAttribute(date, start_day, gameOutputs['OPG_content'], 'NSTD', 'N Stress', 'Nitrogen Stress')
     context['nitrogen_leaching_graph'] = plotOneAttribute(date, start_day, gameOutputs['NiBal_content'], 'RLCH', 'Nitrate Leached (lbs/a)', 'Nitrate Leaching')
 
@@ -531,7 +531,7 @@ def finalResults(request, gameProfile):
     context['profit'] = context['corn_price'] - context['bushel_cost']
     context['profit_per_acre'] = context['profit']  * context['yield']
 
-    context['control_aquaspy_graph'] = plotAquaSpy(date, start_day, controlGameInputs, controlGameOutputs, yAxis)[0]
+    context['control_aquaspy_graph'] = plotAquaSpy(date, start_day, controlGameInputs, controlGameOutputs, [], yAxis)[0]
     # context['control_nitrogen_stress_graph'] = plotOneAttribute(date, start_day, controlGameOutputs['OPG_content'], 'NSTD', 'N Stress', 'Nitrogen Stress')
     context['control_nitrogen_leaching_graph'] = plotOneAttribute(date, start_day, controlGameOutputs['NiBal_content'], 'RLCH', 'Nitrate Leached (lbs/a)', 'Nitrate Leaching')
 
@@ -811,8 +811,9 @@ def getFinalYield(gameOutputs):
             finalYield = finalYield / 62.77   
             return round(finalYield, 2)
 
-def plotAquaSpy(date, start_day, gameInputs, gameOutputs, yAxis=-1):
+def plotAquaSpy(date, start_day, gameInputs, gameOutputs, fertHistory, yAxis=-1):
     
+    print("fH:", fertHistory)
     day = int(date[len(date) - 3:])
 
     start_day = int(start_day)
