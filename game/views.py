@@ -342,8 +342,9 @@ def weeklySelection(request, game):
                     game.nitrogen_sufficiency = 100
                     game.nitrogen_sufficiency_array.append(100)
 
-            game.monday_irrigation.append(request.POST.get('monday'))
-            game.thursday_irrigation.append(request.POST.get('thursday'))
+            irrigationQuantity = getIrrigation(request)
+            game.monday_irrigation.append(irrigationQuantity[0])
+            game.thursday_irrigation.append(irrigationQuantity[1])
             if request.POST.get('fertilizer') != None:
                 game.weekly_fertilizer.append(request.POST.get('fertilizer'))
 
@@ -575,6 +576,11 @@ def getDate(text):
 def getIrrigation(request):
     monday = request.POST.get('monday')
     thursday = request.POST.get('thursday')
+
+    if monday == None:
+        monday = 0
+    if thursday == None:
+        thursday = 0
 
     return [monday, thursday]
         
@@ -1307,8 +1313,8 @@ def createCSV(irr_total, fert_total, final_yield, final_bushel_cost, pfp, nue, w
             monday_irrigation = gameProfile.monday_irrigation[index]
             thursday_irrigation = gameProfile.thursday_irrigation[index]
         else:
-            monday_irrigation = None
-            thursday_irrigation = None
+            monday_irrigation = 0
+            thursday_irrigation = 0
         if index == 0:
             fertilizer = gameProfile.weekly_fertilizer[0]
         elif index == 5:
@@ -1327,8 +1333,11 @@ def createCSV(irr_total, fert_total, final_yield, final_bushel_cost, pfp, nue, w
             if index < len(gameProfile.projected_yields)-1:
                 fertilizer = "-"
             else:
-                fertilizer = None
-        
+                fertilizer = 0
+                
+        monday_irrigation = 0 if monday_irrigation == None else monday_irrigation
+        thursday_irrigation = 0 if thursday_irrigation == None else thursday_irrigation
+        fertilizer = 0 if fertilizer == "-" or fertilizer == None else fertilizer
         writer.writerow([index+1 if index < len(gameProfile.projected_yields)-1 else 'End', round(nsi, 1), round(monday_irrigation, 1), round(thursday_irrigation, 1), fertilizer])
 
     return buf.getvalue().encode("utf-8-sig")
