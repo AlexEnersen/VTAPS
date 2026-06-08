@@ -121,6 +121,8 @@ class GameProfile(models.Model):
     waterProductivity = models.FloatField(default=-1)
 
     waterLimit = models.CharField(default="unlimited")
+
+    yield_vs_et = models.FloatField(default=-1)
     
 class FertilizerEntries1(models.Model):
     fertilizer = models.IntegerField(blank=False, default=0, choices=FERT_CHOICES_1)

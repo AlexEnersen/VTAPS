@@ -278,7 +278,6 @@ def weeklySelection(request, game):
                 file.close()
 
 
-
             uploadInputs(gameInputs, gamePath)
             game.initialized = True
             game.week = 0
@@ -286,7 +285,6 @@ def weeklySelection(request, game):
 
         else:
             game.computing = True
-            game.save()
             gameInputs = downloadInputs(gamePath)
 
             fertilizerQuantity = request.POST.get('fertilizer')
@@ -305,7 +303,6 @@ def weeklySelection(request, game):
                         diff = 0
                     waterLimit = diff
                 game.waterLimit = str(waterLimit)
-                game.save()
             
             gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fertilizerQuantity, irrigationQuantity, int(date), game.game.waterNitrates)
             gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], irrigationQuantity, fertilizerQuantity, int(date), game.week)
@@ -538,6 +535,10 @@ def finalResults(request, gameProfile):
     context['control_aquaspy_graph'] = plotAquaSpy(date, start_day, controlGameInputs, controlGameOutputs, [], yAxis)[0]
     # context['control_nitrogen_stress_graph'] = plotOneAttribute(date, start_day, controlGameOutputs['OPG_content'], 'NSTD', 'N Stress', 'Nitrogen Stress')
     context['control_nitrogen_leaching_graph'] = plotOneAttribute(date, start_day, controlGameOutputs['NiBal_content'], 'RLCH', 'Nitrate Leached (lbs/a)', 'Nitrate Leaching')
+
+    controlYield = getFinalYield(controlGameOutputs)
+    context['yield_vs_et'] = round((finalYield - controlYield)/sum(history['et']), 1)
+    gameProfile.yield_vs_et = context['yield_vs_et']
 
     gameProfile.save()
 
@@ -822,7 +823,6 @@ def getFinalYield(gameOutputs):
 
 def plotAquaSpy(date, start_day, gameInputs, gameOutputs, fertHistory, yAxis=-1):
     
-    print("fH:", fertHistory)
     day = int(date[len(date) - 3:])
 
     start_day = int(start_day)
@@ -1297,7 +1297,7 @@ def downloadOutputs(gamePath):
                     for line in content:
                         if environment == 'prod':
                             logger.info(line)
-                        # print(line)fi
+                        # print(line)
 
         return data
     except:

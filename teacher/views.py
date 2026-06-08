@@ -326,7 +326,7 @@ def gamePage(game):
         try:
             gameProfile = GameProfile.objects.get(game=game, user=student.user)
             playerInfo['week'] = gameProfile.week
-            if gameProfile.week > 21:
+            if gameProfile.week > 21 or gameProfile.finished:
                 context['finalWeek'] = True
         except:
             playerInfo['week'] = 0
@@ -345,8 +345,9 @@ def gamePage(game):
         # context['group_wnipi_graph'] = groupAttributeGraph(game, studentList, 'WNIPI')
         context['group_pfp_graph'] = groupAttributeGraph(game, studentList, 'PFP')
         context['group_nue_graph'] = groupAttributeGraph(game, studentList, 'NUE')
-        context['group_wue_graph'] = groupAttributeGraph(game, studentList, 'WUE')
+        # context['group_wue_graph'] = groupAttributeGraph(game, studentList, 'WUE')
         context['group_wp_graph'] = groupAttributeGraph(game, studentList, 'WP')
+        context['group_yield_vs_et_graph'] = groupAttributeGraph(game, studentList, 'YvET')
 
     context['urlStudent'] = f'/teacher/game/{game.id}/downloadStudents'
     context['urlTeacher'] = f'/teacher/game/{game.id}/downloadClass'
@@ -397,6 +398,8 @@ def groupAttributeGraph(game, studentList, attribute):
                 attributeNames.append(student.username)
             elif attribute == 'Sufficiency':
                 attributeAmount.append(gameProfile.nitrogen_sufficiency_array)
+            elif attribute == 'YvET':
+                attributeAmount.append(gameProfile.yield_vs_et)
 
         except:
             if attribute != 'Yield':
@@ -476,6 +479,12 @@ def groupAttributeGraph(game, studentList, attribute):
         ax.set_xticks(range(1, tickerLength+1))    
         ax.legend(attributeNames, loc="upper left")
         ax.set_ylim(bottom=0)
+    elif attribute == 'YvET':
+        xlabel = 'Students'
+        ylabel = 'Yield vs ET'
+        title = 'Yield vs ET Per Student'
+        ax.bar(attributeNames, attributeAmount, color='skyblue')
+
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     
