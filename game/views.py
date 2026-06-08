@@ -344,6 +344,7 @@ def weeklySelection(request, game):
             game.monday_irrigation.append(irrigationQuantity[0])
             game.thursday_irrigation.append(irrigationQuantity[1])
             if request.POST.get('fertilizer') != None:
+
                 game.weekly_fertilizer.append(request.POST.get('fertilizer'))
 
         game.week += 1
@@ -353,8 +354,6 @@ def weeklySelection(request, game):
 
     gameInputs = downloadInputs(gamePath)
     gameOutputs = downloadOutputs(gamePath)
-
-    print("yield:", getFinalYield(gameOutputs))
 
     if gameOutputs is False:
         computeDSSAT(game.hybrid, gameInputs, gamePath)
@@ -370,7 +369,7 @@ def weeklySelection(request, game):
     if game.week > 1:
         game.computing = False
         game.save()
-        context['aquaspy_graph'] = plotAquaSpy(date, start_day, gameInputs, gameOutputs, history['fert'])[0]
+        context['aquaspy_graph'] = plotAquaSpy(date, start_day, gameInputs, gameOutputs, game.weekly_fertilizer)[0]
         context['root_depth_graph'] = plotOneAttribute(date, start_day, gameOutputs['OPG_content'], 'RDPD', 'Inches (in)', 'Root Depth')
         context['growth_stage_graph'] = plotOneAttribute(date, start_day, gameOutputs['OPG_content'], 'GSTD', 'Stage', 'Growth Stage')
         context['nitrogen_stress_graph'] = plotOneAttribute(date, start_day, gameOutputs['NiBal_content'], 'RLCH', 'Nitrate Leached (lbs/ac)', 'Nitrate Leaching')
@@ -481,7 +480,7 @@ def finalResults(request, gameProfile):
     context['yield'] = finalYield
     context['hybrid'] = " ".join(gameProfile.hybrid.split(" ")[1:])
     
-    context['aquaspy_graph'], yAxis = plotAquaSpy(date, start_day, gameInputs, gameOutputs, history['fert'])
+    context['aquaspy_graph'], yAxis = plotAquaSpy(date, start_day, gameInputs, gameOutputs, gameProfile.weekly_fertilizer)
     # context['nitrogen_stress_graph'] = plotOneAttribute(date, start_day, gameOutputs['OPG_content'], 'NSTD', 'N Stress', 'Nitrogen Stress')
     context['nitrogen_leaching_graph'] = plotOneAttribute(date, start_day, gameOutputs['NiBal_content'], 'RLCH', 'Nitrate Leached (lbs/a)', 'Nitrate Leaching')
 
@@ -932,6 +931,29 @@ def plotAquaSpy(date, start_day, gameInputs, gameOutputs, fertHistory, yAxis=-1)
         ax.set_ylim([0, yAxis])
     else:
         ax.set_ylim(bottom=0)
+
+    ax1 = ax.twinx()
+    ax1.set_ylabel("Fertilizer Applied (lbs)")
+    x_values = []
+    for i, fert in enumerate(fertHistory):
+        if i == 0:
+            x_values.append((1*7)-6)
+        if i == 1:
+            x_values.append((6*7)-6)
+        if i == 2:
+            x_values.append((9*7)-6)
+        if i == 3:
+            x_values.append((10*7)-6)
+        if i == 4:
+            x_values.append((12*7)-6)
+        if i == 5:
+            x_values.append((14*7)-6)
+        if i == 6:
+            x_values.append((15*7)-6)
+    ax1.bar(x_values, fertHistory, color="sienna", width=0.1 + (0.1 * (len(waterRange)/7)))
+    ax1.set_ylim(0, max(fertHistory)*1.1)
+    fig.tight_layout() 
+
     imgdata = io.StringIO()
     fig.savefig(imgdata, format='svg')
     imgdata.seek(0)
@@ -1041,7 +1063,7 @@ def getHistory(date, start_day, gameInputs, gameOutputs, weeklyFertilizer):
     onFertilizer = False
 
     fertCount = 0
-    weeklyFertilizer = [fertilizer for fertilizer in weeklyFertilizer if fertilizer > 0]
+    # weeklyFertilizer = [fertilizer for fertilizer in weeklyFertilizer if fertilizer > 0]
     for line in gameInputs['MZX_content']:
         items = line.split(" ")
         items = [x for x in items if x]
@@ -1069,7 +1091,7 @@ def getHistory(date, start_day, gameInputs, gameOutputs, weeklyFertilizer):
             onFertilizer = True
         elif (onFertilizer):
             if (int(items[1]) < int(date)):
-                if float(items[5]) == 0:
+                if float(items[-1]) == 0:
                     continue
                 elif float(items[-1]) == 1:
                     history['nitrates'].append(float(items[5]))
