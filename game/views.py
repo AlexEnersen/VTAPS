@@ -355,6 +355,9 @@ def weeklySelection(request, game):
     gameInputs = downloadInputs(gamePath)
     gameOutputs = downloadOutputs(gamePath)
 
+    # print("yield:", getFinalYield(gameOutputs))
+    # print("WTH:", gameInputs['WTH_content'])
+
     if gameOutputs is False:
         computeDSSAT(game.hybrid, gameInputs, gamePath)
         time.sleep(5)
@@ -951,6 +954,8 @@ def plotAquaSpy(date, start_day, gameInputs, gameOutputs, fertHistory, yAxis=-1)
         if i == 6:
             x_values.append((15*7)-6)
     ax1.bar(x_values, fertHistory, color="sienna", width=0.1 + (0.1 * (len(waterRange)/7)))
+    if len(fertHistory) == 0:
+        fertHistory = [0]
     ax1.set_ylim(0, max(fertHistory)*1.1)
     fig.tight_layout() 
 
