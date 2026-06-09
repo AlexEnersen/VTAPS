@@ -263,7 +263,9 @@ def weeklySelection(request, game):
                 if count < 2:
                     raise
                 else:
-                    gameInputs['WTH_content'] = changeWeatherYear(weatherContents, 2020)
+                    # gameInputs['WTH_content'] = changeWeatherYear(weatherContents, 2020)
+                    weatherContents[3] = "  " + weatherContents[3]
+                    gameInputs['WTH_content'] = weatherContents
                     gameInputs['forecast_content'] = forecastContents
                 
 
@@ -355,8 +357,7 @@ def weeklySelection(request, game):
     gameInputs = downloadInputs(gamePath)
     gameOutputs = downloadOutputs(gamePath)
 
-    # print("yield:", getFinalYield(gameOutputs))
-    # print("WTH:", gameInputs['WTH_content'])
+    print("yield:", getFinalYield(gameOutputs))
 
     if gameOutputs is False:
         computeDSSAT(game.hybrid, gameInputs, gamePath)
@@ -647,7 +648,6 @@ def addFertilizer(text, fertilizerQuantity, irrigationQuantity, date, nitratePPM
 
     onFertilizer = False
 
-    beforeSpaces = " " * (6-len(str(fertilizerQuantity)))
 
     for i, line in enumerate(text):
         if (line.startswith("@F")):
@@ -655,10 +655,13 @@ def addFertilizer(text, fertilizerQuantity, irrigationQuantity, date, nitratePPM
         if (onFertilizer and line == ""):
             if fertilizerQuantity is not None:
                 fertilizerQuantity = round(float(fertilizerQuantity) * 1.12085)
+                beforeSpaces = " " * (6-len(str(fertilizerQuantity)))
                 newString = " 1 %s FE036 AP004     3%s%s     0     0     0     0   -99 -99" % (str(date), beforeSpaces, fertilizerQuantity)
                 text.insert(i, newString)
             for index, irr in enumerate(irrigationQuantity):
-                newString = " 1 %s FE036 AP004     3%s%s     0     0     0     0   -99 1" % (str(date+(3*index)), beforeSpaces, round(float(irr) * 0.23 * nitratePPM, 3))
+                fertValue = round(float(irr) * 0.23 * nitratePPM, 2)
+                beforeSpaces = " " * (6-len(str(fertValue)))
+                newString = " 1 %s FE036 AP004     3%s%s     0     0     0     0   -99 1" % (str(date+(3*index)), beforeSpaces, fertValue)
                 text.insert(i+(index), newString)
             onFertilizer = False
             return text
@@ -1070,6 +1073,7 @@ def getHistory(date, start_day, gameInputs, gameOutputs, weeklyFertilizer):
     fertCount = 0
     # weeklyFertilizer = [fertilizer for fertilizer in weeklyFertilizer if fertilizer > 0]
     for line in gameInputs['MZX_content']:
+        # print("line:", line)
         items = line.split(" ")
         items = [x for x in items if x]
         if (len(items) < 1):
@@ -1096,13 +1100,17 @@ def getHistory(date, start_day, gameInputs, gameOutputs, weeklyFertilizer):
             onFertilizer = True
         elif (onFertilizer):
             if (int(items[1]) < int(date)):
+                # print("items:", items)
                 if float(items[-1]) == 0:
+                    # print("continued items:", items)
                     continue
                 elif float(items[-1]) == 1:
                     history['nitrates'].append(float(items[5]))
                     if (int(items[1]) >= int(date) - 7):
                         recentHistory['nitrates'].append(float(items[5]))
                 else:
+                    # print("weeklyFertilizer:", weeklyFertilizer)
+                    # print("fertCount:", fertCount)
                     fertilizer = weeklyFertilizer[fertCount]
                     fertCount += 1
                     history['fert'].append(fertilizer)
@@ -1171,6 +1179,12 @@ def getNitrogenUptake(date, gameOutputs):
     return totalNitrogenUptake
 
 def computeDSSAT(hybrid, gameInputs, gamePath): 
+
+    # for line in gameInputs['WTH_content']:
+    #     print(line)
+    # for line in gameInputs['MZX_content']:
+    #     print(line)
+    # print(gameInputs)
     
     uploadInputs(gameInputs, gamePath) 
     zip_buffer = io.BytesIO()
@@ -1324,7 +1338,7 @@ def downloadOutputs(gamePath):
                     for line in content:
                         if environment == 'prod':
                             logger.info(line)
-                        # print(line)
+                        print(line)
 
         return data
     except:
