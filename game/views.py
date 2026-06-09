@@ -658,11 +658,11 @@ def addFertilizer(text, fertilizerQuantity, irrigationQuantity, date, nitratePPM
                 beforeSpaces = " " * (6-len(str(fertilizerQuantity)))
                 newString = " 1 %s FE036 AP004     3%s%s     0     0     0     0   -99 -99" % (str(date), beforeSpaces, fertilizerQuantity)
                 text.insert(i, newString)
-            for index, irr in enumerate(irrigationQuantity):
-                fertValue = round(float(irr) * 0.23 * nitratePPM, 2)
-                beforeSpaces = " " * (6-len(str(fertValue)))
-                newString = " 1 %s FE036 AP004     3%s%s     0     0     0     0   -99 1" % (str(date+(3*index)), beforeSpaces, fertValue)
-                text.insert(i+(index), newString)
+            # for index, irr in enumerate(irrigationQuantity):
+            #     fertValue = round(float(irr) * 0.23 * nitratePPM, 2)
+            #     beforeSpaces = " " * (6-len(str(fertValue)))
+            #     newString = " 1 %s FE036 AP004     3%s%s     0     0     0     0   -99 1" % (str(date+(3*index)), beforeSpaces, fertValue)
+            #     text.insert(i+(index), newString)
             onFertilizer = False
             return text
     
@@ -1338,7 +1338,7 @@ def downloadOutputs(gamePath):
                     for line in content:
                         if environment == 'prod':
                             logger.info(line)
-                        print(line)
+                        # print(line)
 
         return data
     except:
