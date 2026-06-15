@@ -658,12 +658,15 @@ def addFertilizer(text, fertilizerQuantity, irrigationQuantity, date, nitratePPM
                 beforeSpaces = " " * (6-len(str(fertilizerQuantity)))
                 newString = " 1 %s FE036 AP004     3%s%s     0     0     0     0   -99 -99" % (str(date), beforeSpaces, fertilizerQuantity)
                 text.insert(i, newString)
-            # for index, irr in enumerate(irrigationQuantity):
-            #     fertValue = round(float(irr) * 0.23 * nitratePPM, 2)
-            #     beforeSpaces = " " * (6-len(str(fertValue)))
-            #     newString = " 1 %s FE036 AP004     3%s%s     0     0     0     0   -99 1" % (str(date+(3*index)), beforeSpaces, fertValue)
-            #     text.insert(i+(index), newString)
+                i = i+1
+            for index, irr in enumerate(irrigationQuantity):
+                fertValue = round(float(irr) * 0.23 * nitratePPM, 2)
+                beforeSpaces = " " * (6-len(str(fertValue)))
+                newString = " 1 %s FE036 AP004     3%s%s     0     0     0     0   -99 1" % (str(date+(3*index)), beforeSpaces, fertValue)
+                text.insert(i+(index), newString)
             onFertilizer = False
+            for line in text:
+                print('line:', line)
             return text
     
 
