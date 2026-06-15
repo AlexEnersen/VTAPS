@@ -202,6 +202,7 @@ WEATHER_CHOICES = [
     ("NEME2201.WTH", '2022'),
     ("NEME2301.WTH", '2023'),
     ("NEME2401.WTH", '2024'),
+    ("NEME2501.WTH", '2025'),
 ]
 
 WATER_LIMITS = [
