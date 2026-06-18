@@ -210,7 +210,6 @@ def intro(request, game_id=None):
 
 def weeklySelection(request, game):   
     context = {}
-
     gamePath = f"id-{game.id}"
             
     gameInputs = {}
@@ -357,14 +356,15 @@ def weeklySelection(request, game):
     gameInputs = downloadInputs(gamePath)
     gameOutputs = downloadOutputs(gamePath)
 
-    print("yield:", getFinalYield(gameOutputs))
-
     if gameOutputs is False:
         computeDSSAT(game.hybrid, gameInputs, gamePath)
         time.sleep(5)
         return None
     elif len(gameOutputs) == 0:
-        return False
+        computeDSSAT(game.hybrid, gameInputs, gamePath)
+        gameOutputs = downloadOutputs(gamePath)
+        if len(gameOutputs) == 0:
+            return False
 
     historyDict = getHistory(date, start_day, gameInputs, gameOutputs, game.weekly_fertilizer)
     history = historyDict['history']
@@ -664,9 +664,8 @@ def addFertilizer(text, fertilizerQuantity, irrigationQuantity, date, nitratePPM
                 beforeSpaces = " " * (6-len(str(fertValue)))
                 newString = " 1 %s FE036 AP004     3%s%s     0     0     0     0   -99 1" % (str(date+(3*index)), beforeSpaces, fertValue)
                 text.insert(i+(index), newString)
-            onFertilizer = False
-            for line in text:
-                print('line:', line)
+            onFertilizer = False\
+            
             return text
     
 
@@ -1076,7 +1075,6 @@ def getHistory(date, start_day, gameInputs, gameOutputs, weeklyFertilizer):
     fertCount = 0
     # weeklyFertilizer = [fertilizer for fertilizer in weeklyFertilizer if fertilizer > 0]
     for line in gameInputs['MZX_content']:
-        # print("line:", line)
         items = line.split(" ")
         items = [x for x in items if x]
         if (len(items) < 1):
@@ -1102,18 +1100,18 @@ def getHistory(date, start_day, gameInputs, gameOutputs, weeklyFertilizer):
             onIrrigation = False
             onFertilizer = True
         elif (onFertilizer):
+            print("items:", items)
+            print("fertCount:", fertCount)
             if (int(items[1]) < int(date)):
-                # print("items:", items)
                 if float(items[-1]) == 0:
-                    # print("continued items:", items)
                     continue
                 elif float(items[-1]) == 1:
                     history['nitrates'].append(float(items[5]))
                     if (int(items[1]) >= int(date) - 7):
                         recentHistory['nitrates'].append(float(items[5]))
                 else:
-                    # print("weeklyFertilizer:", weeklyFertilizer)
-                    # print("fertCount:", fertCount)
+                    if len(weeklyFertilizer) <= fertCount:
+                        break
                     fertilizer = weeklyFertilizer[fertCount]
                     fertCount += 1
                     history['fert'].append(fertilizer)
@@ -1182,12 +1180,6 @@ def getNitrogenUptake(date, gameOutputs):
     return totalNitrogenUptake
 
 def computeDSSAT(hybrid, gameInputs, gamePath): 
-
-    # for line in gameInputs['WTH_content']:
-    #     print(line)
-    # for line in gameInputs['MZX_content']:
-    #     print(line)
-    # print(gameInputs)
     
     uploadInputs(gameInputs, gamePath) 
     zip_buffer = io.BytesIO()
@@ -1230,10 +1222,10 @@ def checkBucket(gamePath):
     except ClientError as e:
         code = e.response.get("Error", {}).get("Code", "")
 
-        if environment == "prod":
-            logger.info(f"checkBucket error code={code} key={key} err={e}")
-        else:
-            print("checkBucket error:", code, e)
+        # if environment == "prod":
+        #     logger.info(f"checkBucket error code={code} key={key} err={e}")
+        # else:
+        #     print("checkBucket error:", code, e)
         
         if code in ("404", "NoSuchKey", "NotFound"):
             return False
@@ -1337,10 +1329,10 @@ def downloadOutputs(gamePath):
                 #     for line in content:
                 #         index += 1
                 #         print(index, " INP LINE:", line)
-                elif name == 'WARNING.OUT':
-                    for line in content:
-                        if environment == 'prod':
-                            logger.info(line)
+                # elif name == 'WARNING.OUT':
+                #     for line in content:
+                        # if environment == 'prod':
+                        #     logger.info(line)
                         # print(line)
 
         return data
