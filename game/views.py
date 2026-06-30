@@ -720,7 +720,7 @@ def getWeather(date, gameInputs):
                 dateFound = True
 
             if dateFound:
-                weatherDateConversion = "\n" + datetime.strptime("2025-" + weatherDay, "%Y-%j").strftime("%m-%d-%Y")
+                weatherDateConversion = "\n" + datetime.strptime("2025-" + weatherDay, "%Y-%j").strftime("%m-%d")
                 if (int(weatherDay) - int(day)) == 0:
                     weatherDateConversion = "Monday: " + weatherDateConversion
                 elif (int(weatherDay) - int(day)) == 1:
@@ -1100,8 +1100,6 @@ def getHistory(date, start_day, gameInputs, gameOutputs, weeklyFertilizer):
             onIrrigation = False
             onFertilizer = True
         elif (onFertilizer):
-            print("items:", items)
-            print("fertCount:", fertCount)
             if (int(items[1]) < int(date)):
                 if float(items[-1]) == 0:
                     continue
