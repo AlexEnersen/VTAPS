@@ -566,7 +566,7 @@ def downloadClass(request, id):
 
     buf = io.StringIO(newline='')
     writer = csv.writer(buf)
-    writer.writerow(['Username', "Irrigation Total (in)", "Fertilizer Total (lbs)", "Final Yield (bu/ac)", "$ Cost/bu", "Nitrogen Use Efficiency (lbs. N/bu)", "Nitrogen Utilization Efficiency (%)", "Water Utilization Efficiency (bu/in)", "Water Productivity (bu/in)", "N Leaching (lbs/ac)", "N uptake (lbs/ac)", "N sufficiency Index (%)"])
+    writer.writerow(['Username', "Irrigation Total (in)", "Fertilizer Total (lbs)", "Final Yield (bu/ac)", "$ Cost/bu", "Nitrogen Use Efficiency (lbs. N/bu)", "N Leaching (lbs/ac)", "Yield vs ET (bu/in)"])
     for index, player in enumerate(game.players):
         try:
             student = Student.objects.get(username=player, code=game.code)
@@ -580,26 +580,18 @@ def downloadClass(request, id):
             final_yield = round(gameProfile.projected_yields[-1], 1)
             cost_per_bushel = round(gameProfile.total_cost / final_yield, 2)
             pfp = round(gameProfile.partialFactorProductivity, 1)
-            nue = round(gameProfile.nitrogenUseEfficiency, 1)
-            wue = round(gameProfile.waterUseEfficiency, 1)
-            wp = round(gameProfile.waterProductivity, 1)
             n_leaching = round(gameProfile.nitrogen_leaching, 1)
-            n_uptake = round(gameProfile.nitrogen_uptake, 1)
-            n_sufficiency = round(gameProfile.nitrogen_sufficiency, 1)
+            yield_vs_et = round(gameProfile.yield_vs_et, 1)
         else:
             irr_total = -1
             fert_total = -1
             final_yield = -1
             cost_per_bushel = -1
             pfp = -1
-            nue = -1
-            wue = -1
-            wp = -1
             n_leaching = -1
-            n_uptake = -1
-            n_sufficiency = -1
+            yield_vs_et = -1
         
-        writer.writerow([player, irr_total, fert_total, final_yield, cost_per_bushel, pfp, nue, wue, wp, n_leaching, n_uptake, n_sufficiency])
+        writer.writerow([player, irr_total, fert_total, final_yield, cost_per_bushel, pfp, n_leaching, yield_vs_et])
 
     data = buf.getvalue().encode("utf-8-sig")
         

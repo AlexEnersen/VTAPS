@@ -535,17 +535,13 @@ def finalResults(request, gameProfile):
     context['profit'] = context['corn_price'] - context['bushel_cost']
     context['profit_per_acre'] = context['profit']  * context['yield']
 
-    context['control_aquaspy_graph'] = plotAquaSpy(date, start_day, controlGameInputs, controlGameOutputs, [], yAxis)[0]
-    # context['control_nitrogen_stress_graph'] = plotOneAttribute(date, start_day, controlGameOutputs['OPG_content'], 'NSTD', 'N Stress', 'Nitrogen Stress')
-    context['control_nitrogen_leaching_graph'] = plotOneAttribute(date, start_day, controlGameOutputs['NiBal_content'], 'RLCH', 'Nitrate Leached (lbs/a)', 'Nitrate Leaching')
-
     controlYield = getFinalYield(controlGameOutputs)
     context['yield_vs_et'] = round((finalYield - controlYield)/sum(history['et']), 1)
     gameProfile.yield_vs_et = context['yield_vs_et']
 
     gameProfile.save()
 
-    csv = createCSV(context['irr_amount'], context['fert_amount'], context['yield'], context['bushel_cost'], context['PFP'], context['NUE'], context['WUE'], context['WP'], context['NLeaching'], context['NSufficiency'], gameProfile)
+    csv = createCSV(context['irr_amount'], context['fert_amount'], context['yield'], context['bushel_cost'], context['PFP'], context['NLeaching'], context['yield_vs_et'], gameProfile)
     s3.put_object(
         Bucket="finalresultsbucket",
         Key=f"{gamePath}/final_summary.csv",
@@ -1337,11 +1333,11 @@ def downloadOutputs(gamePath):
     except:
         return False
     
-def createCSV(irr_total, fert_total, final_yield, final_bushel_cost, pfp, nue, wue, wp, nleaching, nsufficiency, gameProfile):
+def createCSV(irr_total, fert_total, final_yield, final_bushel_cost, pfp, nleaching, yieldVsET, gameProfile):
     buf = io.StringIO(newline='')
     writer = csv.writer(buf)
-    writer.writerow(["Irrigation Total (in)", "Fertilizer Total (lbs)", "Final Yield (bu/ac)", "$ Cost/bu", "Nitrogen Use Efficiency (lbs. N/bu)", "Nitrogen Utilization Efficiency (%)", "Water Utilization Efficiency (bu/in)", "Water Productivity (bu/in)", "N Leaching (lbs/ac)", "N Sufficiency Index (%)"])
-    writer.writerow([round(irr_total, 1), round(fert_total, 1), round(final_yield, 1), round(final_bushel_cost, 2), round(pfp, 1), round(nue, 1), round(wue, 1), round(wp, 1), round(nleaching, 1), round(nsufficiency, 1)])
+    writer.writerow(["Irrigation Total (in)", "Fertilizer Total (lbs)", "Final Yield (bu/ac)", "$ Cost/bu", "Nitrogen Use Efficiency (lbs. N/bu)", "N Leaching (lbs/ac)", "Yield vs ET (bu/in)"])
+    writer.writerow([round(irr_total, 1), round(fert_total, 1), round(final_yield, 1), round(final_bushel_cost, 2), round(pfp, 1), round(nleaching, 1), round(yieldVsET, 1)])
 
     writer.writerow([])
     writer.writerow(['Week', 'Nitrogen Sufficiency Index', "Monday Irrigation (in)", "Thursday Irrigation (in)", "Fertilizer (lbs)"])

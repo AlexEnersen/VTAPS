@@ -16,14 +16,28 @@
           <td class="gameSummaryCell">{{player.username}}</td>
           <td class="gameSummaryCell">{{player.week}}</td>
           <td class="gameSummaryCell">X</td>
-          <td class="gameSummaryCell"><a href="{{ player.change_password_url}}"><img class="resetIcon" src="{% static 'images/reset.png' %}" alt="reset" /></a></td>
+          <td class="gameSummaryCell">
+            <a href="{{ player.change_password_url}}"
+              ><img
+                class="resetIcon"
+                src="{% static 'images/reset.png' %}"
+                alt="reset"
+            /></a>
+          </td>
         </tr>
         {% else %}
         <tr class="gameSummaryRow">
           <td class="gameSummaryCell">{{player.username}}</td>
           <td class="gameSummaryCell">{{player.week}}</td>
           <td class="gameSummaryCell"></td>
-          <td class="gameSummaryCell"><a href="{{ player.change_password_url}}"><img class="resetIcon" src="{% static 'images/reset.png' %}" alt="reset" /></a></td>
+          <td class="gameSummaryCell">
+            <a href="{{ player.change_password_url}}"
+              ><img
+                class="resetIcon"
+                src="{% static 'images/reset.png' %}"
+                alt="reset"
+            /></a>
+          </td>
         </tr>
         {% endif %} {% endfor %}
       </table>
@@ -34,7 +48,8 @@
             class="addIcon"
             src="{% static 'images/plus-icon.svg' %}"
             alt=""
-          />Add Students</a>
+          />Add Students</a
+        >
       </div>
       <form method="post" class="row center weekChangeField">
         {% csrf_token %}
@@ -70,14 +85,12 @@
     <div class="teacherGameColumnRight center">
       <h1 class="header">Results</h1>
       <div>{{ group_cost_graph | safe }}</div>
-      <div>{{ group_yield_graph | safe }}</div>
       <div>{{ group_leaching_graph | safe }}</div>
       <div>{{ group_sufficiency_graph | safe }}</div>
       {% if finalWeek %}
-        <h1 class="header">Final Results</h1>
-        <div>{{ group_pfp_graph | safe }}</div>
-        <div>{{ group_yield_vs_et_graph | safe }}</div>
-        <div>{{ group_wp_graph | safe }}</div>
+      <h1 class="header">Final Results</h1>
+      <div>{{ group_pfp_graph | safe }}</div>
+      <div>{{ group_yield_vs_et_graph | safe }}</div>
       {% endif %}
     </div>
   </div>
