@@ -281,5 +281,5 @@ class GameSetup(models.Model):
     cornPrice = models.DecimalField("Corn Price:", choices=CORN_PRICES, default = Decimal('4.25'), max_digits = 4, decimal_places = 2)
     otherCosts = models.DecimalField("Other Costs:", default=742.79, decimal_places=2, max_digits=6)
     weatherFile = models.CharField("North Platte Weather:", choices=WEATHER_CHOICES, default="NEME2101.WTH", max_length=40)
-    forecasting = models.BooleanField("Forecast?", default=False)
+    forecasting = models.BooleanField("Forecast?", default=True)
     waterLimit = models.CharField("Water Limit:", choices=WATER_LIMITS, default="unlimited", max_length = 40)
