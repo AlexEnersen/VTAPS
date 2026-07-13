@@ -183,6 +183,7 @@ def forecastRain(rain):
     return(value)
 
 def changeWeatherYear(weatherText, year):
+    weatherText = weatherText.split("\n")
     newText = []
     for line in weatherText:
         items = line.split(" ")

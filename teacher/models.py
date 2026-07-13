@@ -121,6 +121,7 @@ CORN_PRICES = [
 ]
 
 WATER_N_CHOICES = [
+    (Decimal('0'), '0.00'),
     (Decimal('1'), '1.00'),
     (Decimal('2'), '2.00'),
     (Decimal('3'), '3.00'),
