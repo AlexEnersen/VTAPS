@@ -298,9 +298,6 @@
         <p class="irrigationLabel">Thursday Irrigation:</p>
         <p class="irrigationField">{{iform.thursday}} in.</p>
       </div>
-      {% else %}
-      <div class="inputRow">Your water limit has been reached. No more irrigation can be applied</div>
-      {% endif %}
 
       {% csrf_token %} {% if week == 1 or week == 6 or week == 9 or week == 10 or week == 12 or week == 14 or week == 15 %}
       <div class="inputRow">
@@ -313,6 +310,9 @@
         {% endif %}
         <p class="irrigationField">{{fform.fertilizer}} lbs</p>
       </div>
+      {% endif %}
+      {% else %}
+      <div class="inputRow">Your water limit has been reached. No more irrigation or fertigation can be applied</div>
       {% endif %}
     </div>
 

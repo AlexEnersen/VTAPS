@@ -294,6 +294,17 @@ def weeklySelection(request, game):
             waterLimit = game.waterLimit
             if waterLimit != "unlimited":
                 waterLimit = float(waterLimit)
+
+                if game.week > 6 and fertilizerQuantity is not None:
+                    fertIrr = float(fertilizerQuantity) * 0.01
+                    diff = waterLimit - float(fertIrr)
+                    if diff < 0:
+                        fertIrr = waterLimit
+                        fertilizerQuantity = waterLimit * 100
+                        diff = 0
+                    waterLimit = diff
+                
+
                 for index, irr in enumerate(irrigationQuantity):
                     if irr == None:
                         irrigationQuantity[index] = 0
@@ -341,12 +352,12 @@ def weeklySelection(request, game):
                     game.nitrogen_sufficiency = 100
                     game.nitrogen_sufficiency_array.append(100)
 
-            irrigationQuantity = getIrrigation(request)
+            # irrigationQuantity = getIrrigation(request)
             game.monday_irrigation.append(irrigationQuantity[0])
             game.thursday_irrigation.append(irrigationQuantity[1])
             if request.POST.get('fertilizer') != None:
-
-                game.weekly_fertilizer.append(request.POST.get('fertilizer'))
+                game.weekly_fertilizer.append(fertilizerQuantity)
+                # game.weekly_fertilizer.append(request.POST.get('fertilizer'))
 
         game.week += 1
 
