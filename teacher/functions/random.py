@@ -135,7 +135,7 @@ def monthlyFabricator(weather_text):
             forecastString = f"{day[0]:<7}{day[1]:>6}{str(randHighTemp):>6}{str(randLowTemp):>6}{str(randRain):>6}{day[5]:>6}{day[6]:>6}\n"
             monthlyForecast += forecastString
         
-    return "".join([preamble, monthlyForecast])
+    return "".join([preamble, monthlyForecast]).split("\n")
 
 
 
@@ -183,7 +183,6 @@ def forecastRain(rain):
     return(value)
 
 def changeWeatherYear(weatherText, year):
-    weatherText = weatherText.split("\n")
     newText = []
     for line in weatherText:
         items = line.split(" ")
