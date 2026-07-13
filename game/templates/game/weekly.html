@@ -288,31 +288,31 @@
     onsubmit="this.querySelector('.continueButton').disabled = true"
   >
     <div class="subRow">
-      {% if water_limit == "unlimited" or water_limit > 0 %}
-      <div class="inputRow">
-        <p class="irrigationLabel">Monday Irrigation:</p>
-        <p class="irrigationField">{{iform.monday}} in.</p>
-      </div>
+      {% csrf_token %} {% if water_limit == "unlimited" or water_limit > 0 %}
+        <div class="inputRow">
+          <p class="irrigationLabel">Monday Irrigation:</p>
+          <p class="irrigationField">{{iform.monday}} in.</p>
+        </div>
 
-      <div class="inputRow">
-        <p class="irrigationLabel">Thursday Irrigation:</p>
-        <p class="irrigationField">{{iform.thursday}} in.</p>
-      </div>
+        <div class="inputRow">
+          <p class="irrigationLabel">Thursday Irrigation:</p>
+          <p class="irrigationField">{{iform.thursday}} in.</p>
+        </div>
 
-      {% csrf_token %} {% if week == 1 or week == 6 or week == 9 or week == 10 or week == 12 or week == 14 or week == 15 %}
-      <div class="inputRow">
-        {% if week == 1 %}
-        <p class="irrigationLabel">Week {{week}} At-Plant Fertilizer:</p>
-        {% elif week == 6 %}
-        <p class="irrigationLabel">Week {{week}} Side-Dress:</p>
-        {% else %}
-        <p class="irrigationLabel">Week {{week}} Fertigation:</p>
+        {% csrf_token %} {% if week == 1 or week == 6 or week == 9 or week == 10 or week == 12 or week == 14 or week == 15 %}
+          <div class="inputRow">
+            {% if week == 1 %}
+            <p class="irrigationLabel">Week {{week}} At-Plant Fertilizer:</p>
+            {% elif week == 6 %}
+            <p class="irrigationLabel">Week {{week}} Side-Dress:</p>
+            {% else %}
+            <p class="irrigationLabel">Week {{week}} Fertigation:</p>
+            {% endif %}
+            <p class="irrigationField">{{fform.fertilizer}} lbs</p>
+          </div>
         {% endif %}
-        <p class="irrigationField">{{fform.fertilizer}} lbs</p>
-      </div>
-      {% endif %}
       {% else %}
-      <div class="inputRow">Your water limit has been reached. No more irrigation or fertigation can be applied</div>
+        <div class="inputRow">Your water limit has been reached. No more irrigation or fertigation can be applied</div>
       {% endif %}
     </div>
 
