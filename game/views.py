@@ -295,6 +295,7 @@ def weeklySelection(request, game):
             if waterLimit != "unlimited":
                 waterLimit = float(waterLimit)
 
+                print()
                 if game.week > 6 and fertilizerQuantity is not None:
                     fertIrr = float(fertilizerQuantity) * 0.01
                     diff = waterLimit - float(fertIrr)
