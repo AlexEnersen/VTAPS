@@ -1359,19 +1359,19 @@ def createCSV(irr_total, fert_total, final_yield, final_bushel_cost, pfp, nleach
         else:
             monday_irrigation = 0
             thursday_irrigation = 0
-        if index == 0:
+        if index == 0 and len(gameProfile.weekly_fertilizer) > 0:
             fertilizer = gameProfile.weekly_fertilizer[0]
-        elif index == 5:
+        elif index == 5 and len(gameProfile.weekly_fertilizer) > 1:
             fertilizer = gameProfile.weekly_fertilizer[1]
-        elif index == 8:
+        elif index == 8 and len(gameProfile.weekly_fertilizer) > 2:
             fertilizer = gameProfile.weekly_fertilizer[2]
-        elif index == 9:
+        elif index == 9 and len(gameProfile.weekly_fertilizer) > 3:
             fertilizer = gameProfile.weekly_fertilizer[3]
-        elif index == 11:
+        elif index == 11 and len(gameProfile.weekly_fertilizer) > 4:
             fertilizer = gameProfile.weekly_fertilizer[4]
-        elif index == 13:
+        elif index == 13 and len(gameProfile.weekly_fertilizer) > 5:
             fertilizer = gameProfile.weekly_fertilizer[5]
-        elif index == 14:
+        elif index == 14 and len(gameProfile.weekly_fertilizer) > 6:
             fertilizer = gameProfile.weekly_fertilizer[6]
         else:
             if index < len(gameProfile.projected_yields)-1:
