@@ -348,6 +348,7 @@ def gamePage(game):
         # context['group_wue_graph'] = groupAttributeGraph(game, studentList, 'WUE')
         context['group_wp_graph'] = groupAttributeGraph(game, studentList, 'WP')
         context['group_yield_vs_et_graph'] = groupAttributeGraph(game, studentList, 'YvET')
+        context['group_profit_per_acre_graph'] = groupAttributeGraph(game, studentList, 'Profit')
 
     context['urlStudent'] = f'/teacher/game/{game.id}/downloadStudents'
     context['urlTeacher'] = f'/teacher/game/{game.id}/downloadClass'
@@ -377,8 +378,8 @@ def groupAttributeGraph(game, studentList, attribute):
 
     for student in studentList:
         try:
-            if attribute != 'Yield':
-                attributeNames.append(student.username)
+            # if attribute != 'Yield':
+            attributeNames.append(student.username)
             gameProfile = GameProfile.objects.get(user=student.user)
             if attribute == 'Cost':
                 attributeAmount.append(gameProfile.total_cost)
@@ -392,21 +393,20 @@ def groupAttributeGraph(game, studentList, attribute):
                 attributeAmount.append(gameProfile.waterProductivity)
             elif attribute == 'Leaching':
                 attributeAmount.append(gameProfile.nitrogen_leaching_array) 
-                attributeNames.append(student.username)
             elif attribute == 'Yield':
                 attributeAmount.append(gameProfile.projected_yields)    
-                attributeNames.append(student.username)
             elif attribute == 'Sufficiency':
                 attributeAmount.append(gameProfile.nitrogen_sufficiency_array)
             elif attribute == 'YvET':
                 attributeAmount.append(gameProfile.yield_vs_et)
+            elif attribute == 'Profit':
+                attributeAmount.append(gameProfile.profit)
 
         except:
             if attribute != 'Yield':
                 attributeAmount.append(0)
 
     fig, ax = plt.subplots()
-
 
     if attribute == 'Cost':
         xlabel = 'Students'
@@ -435,7 +435,7 @@ def groupAttributeGraph(game, studentList, attribute):
         title = 'Water Productivity Per Student'
         ax.bar(attributeNames, attributeAmount, color='skyblue')
     elif attribute == 'Yield':
-        xlabel = 'Week'
+        xlabel = 'Weeks'
         ylabel = 'Projected Yield'
         title = "Projected Yield Per Student"
 
@@ -450,7 +450,7 @@ def groupAttributeGraph(game, studentList, attribute):
         ax.legend(attributeNames, loc="upper left")
         ax.set_ylim(bottom=0)
     elif attribute == 'Sufficiency':
-        xlabel = 'Week'
+        xlabel = 'Weeks'
         ylabel = 'Nitrogen Sufficiency Index'
         title = "Nitrogen Sufficiency Index Per Student"
 
@@ -465,7 +465,7 @@ def groupAttributeGraph(game, studentList, attribute):
         ax.legend(attributeNames, loc="upper left")
         ax.set_ylim(bottom=0)
     elif attribute == 'Leaching':
-        xlabel = 'Students'
+        xlabel = 'Weeks'
         ylabel = 'Nitrate Leached (lbs/ac)'
         title = 'Nitrate Leached Per Student'
 
@@ -483,6 +483,11 @@ def groupAttributeGraph(game, studentList, attribute):
         xlabel = 'Students'
         ylabel = 'Yield vs ET'
         title = 'Yield vs ET Per Student'
+        ax.bar(attributeNames, attributeAmount, color='skyblue')
+    elif attribute == 'Profit':
+        xlabel = 'Students'
+        ylabel = 'Profit per Acre'
+        title = 'Profit per Acre'
         ax.bar(attributeNames, attributeAmount, color='skyblue')
 
     ax.set_xlabel(xlabel)
@@ -504,7 +509,7 @@ def downloadStudents(request, id):
 
     buf = io.StringIO(newline='')
     writer = csv.writer(buf)
-    writer.writerow(['Username', 'Week', 'Nitrogen Sufficiency Index', "Monday Irrigation (in)", "Thursday Irrigation (in)", "Fertilizer (lbs)"])
+    writer.writerow(['Username', 'Week', 'Nitrogen Sufficiency Index', "Monday Irrigation (in)", "Thursday Irrigation (in)", "Fertilizer (lbs)", "Fertigation Irrigation"])
     for index, player in enumerate(game.players):
         try:
             student = Student.objects.get(username=player, code=game.code)
@@ -521,19 +526,27 @@ def downloadStudents(request, id):
                 playerInfo.append(gameProfile.thursday_irrigation[index2])
             if index2 == 0 and len(gameProfile.weekly_fertilizer) > 0:
                 playerInfo.append(gameProfile.weekly_fertilizer[0])
+                playerInfo.append("-")
             elif index2 == 5 and len(gameProfile.weekly_fertilizer) > 1:
                 playerInfo.append(gameProfile.weekly_fertilizer[1])
+                playerInfo.append("-")
             elif index2 == 8 and len(gameProfile.weekly_fertilizer) > 2:
                 playerInfo.append(gameProfile.weekly_fertilizer[2])
+                playerInfo.append(gameProfile.fertigation[0])
             elif index2 == 9 and len(gameProfile.weekly_fertilizer) > 3:
                 playerInfo.append(gameProfile.weekly_fertilizer[3])
+                playerInfo.append(gameProfile.fertigation[1])
             elif index2 == 11 and len(gameProfile.weekly_fertilizer) > 4:
                 playerInfo.append(gameProfile.weekly_fertilizer[4])
+                playerInfo.append(gameProfile.fertigation[2])
             elif index2 == 13 and len(gameProfile.weekly_fertilizer) > 5:
                 playerInfo.append(gameProfile.weekly_fertilizer[5])
+                playerInfo.append(gameProfile.fertigation[3])
             elif index2 == 14 and len(gameProfile.weekly_fertilizer) > 6:
                 playerInfo.append(gameProfile.weekly_fertilizer[6])
+                playerInfo.append(gameProfile.fertigation[4])
             elif index2 < 21:
+                playerInfo.append("-")
                 playerInfo.append("-")
 
             writer.writerow(playerInfo)
@@ -566,7 +579,7 @@ def downloadClass(request, id):
 
     buf = io.StringIO(newline='')
     writer = csv.writer(buf)
-    writer.writerow(['Username', "Irrigation Total (in)", "Fertilizer Total (lbs)", "Final Yield (bu/ac)", "$ Cost/bu", "Nitrogen Use Efficiency (lbs. N/bu)", "N Leaching (lbs/ac)", "Yield vs ET (bu/in)"])
+    writer.writerow(['Username', "Irrigation Total (in)", "Fertilizer Total (lbs)", "Fertigation Irrigation (in)", "Final Yield (bu/ac)", "$ Cost/bu", "Nitrogen Use Efficiency (lbs. N/bu)", "N Leaching (lbs/ac)", "Yield vs ET (bu/in)", "Profit per Acre ($/ac)"])
     for index, player in enumerate(game.players):
         try:
             student = Student.objects.get(username=player, code=game.code)
@@ -577,21 +590,25 @@ def downloadClass(request, id):
         if len(gameProfile.projected_yields) > 0:
             irr_total = round(sum(gameProfile.monday_irrigation) + sum(gameProfile.thursday_irrigation), 1)
             fert_total = round(sum(gameProfile.weekly_fertilizer), 1)
+            fertigation_irr_total = round(sum(gameProfile.fertigation), 1)
             final_yield = round(gameProfile.projected_yields[-1], 1)
             cost_per_bushel = round(gameProfile.total_cost / final_yield, 2)
             pfp = round(gameProfile.partialFactorProductivity, 1)
             n_leaching = round(gameProfile.nitrogen_leaching, 1)
             yield_vs_et = round(gameProfile.yield_vs_et, 1)
+            profit = round(gameProfile.profit, 2)
         else:
             irr_total = -1
             fert_total = -1
+            fertigation_irr_total = -1
             final_yield = -1
             cost_per_bushel = -1
             pfp = -1
             n_leaching = -1
             yield_vs_et = -1
+            profit = -1
         
-        writer.writerow([player, irr_total, fert_total, final_yield, cost_per_bushel, pfp, n_leaching, yield_vs_et])
+        writer.writerow([player, irr_total, fert_total, fertigation_irr_total, final_yield, cost_per_bushel, pfp, n_leaching, yield_vs_et, profit])
 
     data = buf.getvalue().encode("utf-8-sig")
         

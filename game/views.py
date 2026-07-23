@@ -292,14 +292,18 @@ def weeklySelection(request, game):
             irrigationQuantity = getIrrigation(request)
             
             waterLimit = game.waterLimit
+            if fertilizerQuantity is not None:
+                fertigation = float(fertilizerQuantity) * 0.01
+            else:
+                fertigation = 0
             if waterLimit != "unlimited":
                 waterLimit = float(waterLimit)
 
                 if game.week > 6 and fertilizerQuantity is not None:
-                    fertIrr = float(fertilizerQuantity) * 0.01
-                    diff = waterLimit - float(fertIrr)
+                    fertigation
+                    diff = waterLimit - fertigation
                     if diff < 0:
-                        fertIrr = waterLimit
+                        fertigation = waterLimit
                         fertilizerQuantity = waterLimit * 100
                         diff = 0
                     waterLimit = diff
@@ -357,6 +361,8 @@ def weeklySelection(request, game):
             game.thursday_irrigation.append(irrigationQuantity[1])
             if request.POST.get('fertilizer') != None:
                 game.weekly_fertilizer.append(fertilizerQuantity)
+                if game.week > 6:
+                    game.fertigation.append(fertigation)
                 # game.weekly_fertilizer.append(request.POST.get('fertilizer'))
 
         game.week += 1
@@ -545,6 +551,7 @@ def finalResults(request, gameProfile):
     context['corn_price'] = gameProfile.game.cornPrice
     context['profit'] = context['corn_price'] - context['bushel_cost']
     context['profit_per_acre'] = context['profit']  * context['yield']
+    gameProfile.profit = context['profit_per_acre']
 
     controlYield = getFinalYield(controlGameOutputs)
     context['yield_vs_et'] = round((finalYield - controlYield)/sum(history['et']), 1)
