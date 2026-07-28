@@ -357,9 +357,38 @@ em {
   color: var(--light-text-color);
   font-size: 18px;
   margin-top: 24px;
-  transition: opacity 0.2s
+  transition: opacity 0.2s;
 }
 .backText:hover {
-  opacity: 1.0;
-  transition: opacity 0.2s
+  opacity: 1;
+  transition: opacity 0.2s;
+}
+
+.tooltipWrapper {
+  position: relative;
+  /* display: inline-block; */
+}
+
+.tooltipText {
+  visibility: hidden;
+  opacity: 0;
+  width: 220px;
+  background-color: #333;
+  color: #fff;
+  text-align: left;
+  border-radius: 6px;
+  padding: 8px 10px;
+  position: absolute;
+  z-index: 10;
+  bottom: 105%;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: opacity 0.2s;
+  font-size: 0.85rem;
+  font-weight: 400;
+}
+
+.tooltipWrapper:hover .tooltipText {
+  visibility: visible;
+  opacity: 1;
 }

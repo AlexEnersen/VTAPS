@@ -1,4 +1,5 @@
-{% extends "game/base.html" %} {% block content %} {% load static %} {% if game_id != None %}
+{% extends "game/base.html" %} {% block content %} {% load static %} 
+{% if game_id != None %}
 <div class="gameAccountHeader">
   <div class="column">
     <p class="className">{{ username }}</p>
@@ -11,84 +12,130 @@
   <div class="finalInfoContainer">
     <div class="tableWrapper">
       <table class="finalTable">
-        <tr class="infoRow">
-          <td class="alignLeft">Total Rainfall:</td>
+        <tr class="tooltipWrapper">
+          <td class="alignLeft">
+            Total Rainfall:
+            <span class="tooltipText">{{ rainfall_explainer }}</span>
+          </td>
           <td>{{rain_amount|floatformat:2}} in.</td>
         </tr>
-        <tr class="infoRow">
-          <td class="alignLeft">Total ET:</td>
+        <tr class="tooltipWrapper">
+          <td class="alignLeft">
+            Total ET:
+            <span class="tooltipText">{{ et_explainer }}</span>
+          </td>
           <td>{{et_amount|floatformat:2}} in.</td>
         </tr>
-        <tr class="infoRow">
-          <td class="alignLeft bold">Total Irrigation:</td>
+        <tr class="tooltipWrapper">
+          <td class="alignLeft bold">
+            Total Irrigation:
+            <span class="tooltipText">{{ irrigation_explainer }}</span>
+          </td>
           <td class="bold">{{irr_amount|floatformat:2}} in.</td>
         </tr>
-        <tr class="infoRow">
-          <td class="alignLeft bold">Total Nitrogen:</td>
+        <tr class="tooltipWrapper">
+          <td class="alignLeft bold">
+            Total Nitrogen:
+            <span class="tooltipText">{{ nitrogen_explainer }}</span>
+          </td>
           <td class="bold">{{fert_amount|floatformat:0}} lbs.</td>
         </tr>
-        <tr class="infoRow">
-          <td class="alignLeft bold">Water Nitrates:</td>
+        <tr class="tooltipWrapper">
+          <td class="alignLeft bold">
+            Water Nitrates:
+            <span class="tooltipText">{{ water_nitrate_explainer }}</span>
+          </td>
           <td class="bold">{{nitrate_amount|floatformat:2}} lbs.</td>
         </tr>
-        <tr class="infoRow">
-          <td class="alignLeft bold">Nitrogen Leached:</td>
+        <tr class="tooltipWrapper">
+          <td class="alignLeft bold">
+            Nitrogen Leached:
+            <span class="tooltipText">{{ nitrogen_leached_explainer }}</span>
+          </td>
           <td class="bold">{{NLeaching|floatformat:2}} lbs.</td>
         </tr>
       </table>
     </div>
     <div class="tableWrapper">
       <table class="finalTable">
-        <tr class="infoRow">
+        <tr class="tooltipWrapper">
           <td class="alignLeft">Hybrid:</td>
           <td>{{hybrid}}</td>
         </tr>
-        <tr class="infoRow">
-          <td class="alignLeft">Seed Cost:</td>
+        <tr class="tooltipWrapper">
+          <td class="alignLeft">
+            Seed Cost:
+            <span class="tooltipText">{{ seed_cost_explainer }}</span>
+          </td>
           <td>${{seed_cost|floatformat:2}}</td>
         </tr>
-        <tr class="infoRow">
-          <td class="alignLeft">Irrigation Cost:</td>
+        <tr class="tooltipWrapper">
+          <td class="alignLeft">
+            Irrigation Cost:
+            <span class="tooltipText">{{ irrigation_cost_explainer }}</span>
+          </td>
           <td>${{irr_cost|floatformat:2}}</td>
         </tr>
-        <tr class="infoRow">
-          <td class="alignLeft">Fertilizer Cost:</td>
+        <tr class="tooltipWrapper">
+          <td class="alignLeft">
+            Fertilizer Cost:
+            <span class="tooltipText">{{ fertilizer_cost_explainer }}</span>
+          </td>
           <td>${{fert_cost|floatformat:2}}</td>
         </tr>
-        <tr class="infoRow">
-          <td class="alignLeft">Other Costs:</td>
+        <tr class="tooltipWrapper">
+          <td class="alignLeft">
+            Other Costs:
+            <span class="tooltipText">{{ other_costs_explainer }}</span>
+          </td>
           <td>${{other_costs|floatformat:2}}</td>
         </tr>
-        <tr class="infoRow">
+        <tr class="tooltipWrapper">
           <td class="alignLeft">Total Cost:</td>
           <td>${{total_cost|floatformat:2}}</td>
         </tr>
-        <tr class="infoRow">
+        <tr class="tooltipWrapper">
           <td class="bold alignLeft">Yield:</td>
           <td class="bold">{{yield|floatformat:2}} bu</td>
         </tr>
-        <tr class="infoRow">
-          <td class="italic alignLeft">Cost per Bushel:</td>
+        <tr class="tooltipWrapper">
+          <td class="italic alignLeft">
+            Cost per Bushel:
+            <span class="tooltipText">{{ cost_per_bushel_explainer }}</span>
+          </td>
           <td class="italic">${{bushel_cost|floatformat:2}}/bu</td>
         </tr>
-        <tr class="infoRow">
-          <td class="alignLeft">Corn Price:</td>
+        <tr class="tooltipWrapper">
+          <td class="alignLeft">
+            Corn Price:</td>
           <td class="">${{corn_price|floatformat:2}}/bu</td>
         </tr>
-        <tr class="infoRow">
-          <td class="bold alignLeft">Profit:</td>
+        <tr class="tooltipWrapper">
+          <td class="bold alignLeft">
+            Profit:
+            <span class="tooltipText">{{ profit_explainer }}</span>
+          </td>
           <td class="bold">${{profit|floatformat:2}}/bu</td>
         </tr>
-        <tr class="infoRow">
-          <td class="bold alignLeft">Profit per Acre:</td>
+        <tr class="tooltipWrapper">
+          <td class="bold alignLeft">
+            Profit per Acre:
+            <span class="tooltipText">{{ profit_per_acre_explainer }}</span>
+          </td>
           <td class="bold">${{profit_per_acre|floatformat:2}}</td>
         </tr>
-        <tr class="infoRow">
-          <td class="bold alignLeft">Nitrogen Use Efficiency:</td>
+        <tr class="tooltipWrapper">
+          <td class="bold alignLeft">
+            Nitrogen Use Efficiency:
+            <span class="tooltipText">{{ NUE_explainer }}</span>
+          </td>
           <td class="bold">{{PFP|floatformat:2}} lbs. N/bu</td>
         </tr>
-        <tr class="infoRow">
-          <td class="bold alignLeft">Yield vs Evapotranspiration:</td>
+        <tr class="tooltipWrapper">
+          <td class="bold alignLeft">
+            Yield vs Evapotranspiration:
+            <span class="tooltipText">{{ yield_vs_et_explainer }}</span>
+          </td>
           <td class="bold">{{yield_vs_et|floatformat:1}} bu/in</td>
         </tr>
       </table>

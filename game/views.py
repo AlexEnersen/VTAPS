@@ -203,6 +203,12 @@ def intro(request, game_id=None):
         gameProfile.save()
 
 
+    context = {}
+    context['irrigation_cost'] = game.irrigationCost
+    context['nitrogen_cost'] = game.nitrogenCost
+    context['other_costs'] = game.otherCosts
+    print(context)
+
     if game_id is None:
         request.session['game_id'] = game.id
     return render(request, "game/intro.html", context)
@@ -569,6 +575,23 @@ def finalResults(request, gameProfile):
     )
 
     context['url'] = '/game/download' if request.user == None else f'/game/download/{gameProfile.id}'
+
+    context['rainfall_explainer'] = "Total Rainfall: Amount of rainfall received during the growing season"
+    context['et_explainer'] = "Total ET: Amount of crop water use or evapotranspiration (evaporation from the soil and leaf surfaces and water transpired through the plant) during the growing season. A typical irrigated corn crop used 24-26 inches of ET per year."
+    context['irrigation_explainer'] = "Total Irrigation: Amount of irrigation water applied including fertigation irrigation applications"
+    context['nitrogen_explainer'] = "Total Nitrogen: Amount of nitrogen applied during at plant, sidedress and fertigation applications"
+    context['water_nitrate_explainer'] = "Water Nitrates: Amount of nitrogen in the irrigation water calculated by multiplying the constant 0.23 times the parts per million (ppm) nitrates in the irrigation water times the inches applied"
+    context['nitrogen_leached_explainer'] = "Nitrogen Leached: Estimated pounds of nitrogen leached is calculated by multiplying 9 pounds nitrogen per inch of water that drains below the root zone."
+    context['seed_cost_explainer'] = "Seed Cost: The cost per bag of seed was included with the Hybrid name. Seed cost is calculated by diving the cost per bag by 80,000 seeds in a bag and multiplying the result by the selected seeding rate."
+    context['irrigation_cost_explainer'] = f"Irrigation Cost: Calculated by multiplying the inches applied by ${gameProfile.game.irrigationCost:.2f} per acre inch."
+    context['fertilizer_cost_explainer'] = f"Fertilizer Cost: Calculated by multiplying the pounds of nitrogen applied by ${gameProfile.game.nitrogenCost:.2f} per pound and adding the application costs for At Plant and Sidedress @ $8.50 per acre and $1.25 per acre for fertigation applications."
+    context['other_costs_explainer'] = "Other Costs: Other costs included in the Crop Budget accessible from the Introduction page include cost such as herbicide, insecticide, planting, harvesting, cash rent/return or owned investments, overhead and interest on operating funds."
+    context['cost_per_bushel_explainer'] = "Cost Per Bushel: Calculated as total cost divided by ending yield"
+    context['profit_explainer'] = "Profit: Calculated as Corn price minus Cost Per Bushel"
+    context['profit_per_acre_explainer'] = "Profit Per Acre: Calculated as profit/loss per bushel times ending yield"
+    context['NUE_explainer'] = "Nitrogen Use Efficiency: Calculated as pounds of nitrogen fertilizer applied divided by ending yield. Recent advances in precision nitrogen application have allowed farmers to have a NUE of 0.6 lbs. N/bu or lower. As with any efficiency calculation, having the lowest efficiency is usually not a good indication of profitability. Rather top yields that are efficiently managed are desired to optimize profitability."
+    context['yield_vs_et_explainer'] = "Yield vs. ET: is calculated by dividing actual yield by the amount of ET for the season. In practical terms, this can be calculated by taking irrigated yield minus dryland yield and dividing by irrigation application. A Yield vs. ET goal should be 11-15 bushels per inch of water applied."
+
 
     return context
 

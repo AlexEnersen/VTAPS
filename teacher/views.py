@@ -336,6 +336,7 @@ def gamePage(game):
         context['players'].append(playerInfo)
 
     context['group_cost_graph'] = groupAttributeGraph(game, studentList, 'Cost')
+    context['group_cost_explainer'] = "Test test test test"
     context['group_yield_graph'] = groupAttributeGraph(game, studentList, 'Yield')
     context['group_leaching_graph'] = groupAttributeGraph(game, studentList, 'Leaching')
     context['group_sufficiency_graph'] = groupAttributeGraph(game, studentList, 'Sufficiency')
