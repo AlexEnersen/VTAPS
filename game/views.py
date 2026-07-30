@@ -203,11 +203,9 @@ def intro(request, game_id=None):
         gameProfile.save()
 
 
-    context = {}
     context['irrigation_cost'] = game.irrigationCost
     context['nitrogen_cost'] = game.nitrogenCost
     context['other_costs'] = game.otherCosts
-    print(context)
 
     if game_id is None:
         request.session['game_id'] = game.id
