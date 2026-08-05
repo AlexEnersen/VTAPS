@@ -70,13 +70,13 @@ def reset(response):
     currentGames.delete()
     if game_id:
         del response.session['game_id']
-        
+    
     logout(response)
     # Teacher.objects.all().delete()
     # Student.objects.all().delete()
     # GameProfile.objects.all().delete()
     # Game.objects.all().delete()
-    # non_superusers = User.objects.filter(is_superuser = False)
+    # superusers = User.objects.filter(is_superuser = True)
     # non_superusers.delete()
     
     # print(User.objects.filter(is_superuser = False, teacher__isnull = True))

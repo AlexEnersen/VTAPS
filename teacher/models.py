@@ -266,7 +266,7 @@ class Game(models.Model):
     
     nitrogenCost = models.FloatField(default=0.6)
     irrigationCost = models.FloatField(default=6.50)
-    waterNitrates = models.FloatField(default=25.0)
+    waterNitrates = models.FloatField(default=0.0)
     cornPrice = models.FloatField(default=4.25)
     otherCosts = models.DecimalField(default=742.79, decimal_places=2, max_digits=6)
     weatherFile = models.CharField(default="NEME2101.WTH")

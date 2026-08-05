@@ -469,6 +469,27 @@ def weeklySelection(request, game):
 
     game.save()
     context['bushel_cost'] = round(context['total_cost']/230, 2)
+
+    context['rainfall_explainer'] = "Rainfall: Amount of rainfall received during the growing season"
+    context['evapotranspiration_explainer'] = "Evapotranspiration: Amount of crop water use or evapotranspiration (evaporation from the soil and leaf surfaces and water transpired through the plant) during the growing season. A typical irrigated corn crop uses 24-26 inches of ET per year."
+    context['irrigation_explainer'] = "Irrigation: Amount of irrigation water applied including fertigation irrigation applications"
+    context['fertilizer_explainer'] = "Fertilizer: Amount of nitrogen applied during at plant, sidedress and fertigation applications"
+    context['water_nitrate_explainer'] = "Water Nitrates: Amount of nitrogen in the irrigation water calculated by multiplying the constant 0.23 times the parts per million (ppm) nitrates in the irrigation water times the inches applied"
+    context['nitrogen_leach_explainer'] = "Nitrogen Leached: Estimated pounds of nitrogen leached. Water that drains below the root zone typically carries 9 pounds of nitrogen per inch"
+    context['nitrogen_sufficiency_index_explainer'] = "Nitrogen Sufficiency Index: Nitrogen Sufficiency Index will be calculated beginning in week 5 once the crop canopy is more developed. For the V-TAPS program it is calculated as the amount of nitrogen taken up by the plant for the participants simulation divided by the amount of nitrogen taken up by the plant on a fully fertilized and fully irrigated plot, them multiplied by 100 to give a percent. The V-TAPS NSI is designed to simulate a Nitrogen Sufficiency Index from a canopy reflectance sensor or drone/satellite imagery that triggers additional nitrogen applications once the NSI drops below 95%."
+    context['growth_stage_explainer'] = "Growth Stage: Insert growth stage pictures"
+    context['seed_cost_explainer'] = "Seed Cost: The cost per bag of seed was included with the Hybrid name. Seed cost is calculated by diving the cost per bag by 80,000 seeds in a bag and multiplying the result by the selected seeding rate."
+    context['irrigation_cost_explainer'] = f"Irrigation Cost: Calculated by multiplying the inches applied by ${game.game.irrigationCost:.2f} per acre inch."
+    context['fertilizer_cost_explainer'] = f"Fertilizer Cost: Calculated by multiplying the pounds of nitrogen applied by ${game.game.nitrogenCost:.2f} per pound and adding the application costs for At Plant and Sidedress @ $8.50 per acre and $1.25 per acre for fertigation applications."
+    context['other_costs_explainer'] = "Other Costs: Other costs included in the Crop Budget accessible from the Introduction page include cost such as herbicide, insecticide, planting, harvesting, cash rent/return or owned investments, overhead and interest on operating funds."
+    context['cost_per_bushel_explainer'] = "Cost Per Bushel: Calculated as total cost divided by the Average Production History (APH) yield"
+    context['profit_per_acre_explainer'] = "Profit Per Acre: Calculated as profit/loss per bushel times ending yield"
+    
+    context['soil_water_by_depth_explainer'] = "Soil Water by Depth Graph: The soil water by depth graph shows how the soil water changes over time at various soil water depths. As the crop uses water for transpiration, the soil water declines. Increases or spikes shows when irrigation water or rainfall has entered the soil at that depth. Watching the soil water at various depths can give you an indication of where the plant is using water from and how far a rainfall or irrigation events refills (or penetrates) the soil water."
+    context['root_depth_explainer'] = "Root Depth Graph: The Root depth graph shows how far down the active root zone has progressed as the season progresses."
+    context['cumulative_soil_water_explainer'] = "Cumulative Soil Water Graph: The Black line represents the daily soil water level. The Blue area represents the optimal soil water level to maintain top yields and limit deep percolation. The top of the Blue area represents field capacity. The bottom of the Blue area represents 50% of field capacity. If the Black line moves above the Blue area, the soil is above field capacity and gravity causes water to drain below the rootzone. If the Black line moves below the Blue area, the corn plants may be experiencing water stress that could lead to reduced yields. The nitrogen application bars (brown color) shows when nitrogen was applied which can help visualize then nitrogen leaching occurs (when nitrogen is available and the soil is above field capacity)."
+    context['nitrate_leaching_explainer'] = "Nitrate Leaching Graph: Nitrogen leaching is calculated by the DSSAT crop simulation model. Research has shown that if nitrogen is available in the soil and water leaches below the root zone it can take 9 pounds of nitrogen per inch of drainage with it."        
+
     return context
 
 def finalResults(request, gameProfile):
@@ -575,11 +596,11 @@ def finalResults(request, gameProfile):
     context['url'] = '/game/download' if request.user == None else f'/game/download/{gameProfile.id}'
 
     context['rainfall_explainer'] = "Total Rainfall: Amount of rainfall received during the growing season"
-    context['et_explainer'] = "Total ET: Amount of crop water use or evapotranspiration (evaporation from the soil and leaf surfaces and water transpired through the plant) during the growing season. A typical irrigated corn crop used 24-26 inches of ET per year."
+    context['et_explainer'] = "Total ET: Amount of crop water use or evapotranspiration (evaporation from the soil and leaf surfaces and water transpired through the plant) during the growing season. A typical irrigated corn crop uses 24-26 inches of ET per year."
     context['irrigation_explainer'] = "Total Irrigation: Amount of irrigation water applied including fertigation irrigation applications"
     context['nitrogen_explainer'] = "Total Nitrogen: Amount of nitrogen applied during at plant, sidedress and fertigation applications"
     context['water_nitrate_explainer'] = "Water Nitrates: Amount of nitrogen in the irrigation water calculated by multiplying the constant 0.23 times the parts per million (ppm) nitrates in the irrigation water times the inches applied"
-    context['nitrogen_leached_explainer'] = "Nitrogen Leached: Estimated pounds of nitrogen leached is calculated by multiplying 9 pounds nitrogen per inch of water that drains below the root zone."
+    context['nitrogen_leached_explainer'] = "Nitrogen Leached: Estimated pounds of nitrogen leached. Water that drains below the root zone typically carries 9 pounds of nitrogen per inch."
     context['seed_cost_explainer'] = "Seed Cost: The cost per bag of seed was included with the Hybrid name. Seed cost is calculated by diving the cost per bag by 80,000 seeds in a bag and multiplying the result by the selected seeding rate."
     context['irrigation_cost_explainer'] = f"Irrigation Cost: Calculated by multiplying the inches applied by ${gameProfile.game.irrigationCost:.2f} per acre inch."
     context['fertilizer_cost_explainer'] = f"Fertilizer Cost: Calculated by multiplying the pounds of nitrogen applied by ${gameProfile.game.nitrogenCost:.2f} per pound and adding the application costs for At Plant and Sidedress @ $8.50 per acre and $1.25 per acre for fertigation applications."
@@ -588,8 +609,10 @@ def finalResults(request, gameProfile):
     context['profit_explainer'] = "Profit: Calculated as Corn price minus Cost Per Bushel"
     context['profit_per_acre_explainer'] = "Profit Per Acre: Calculated as profit/loss per bushel times ending yield"
     context['NUE_explainer'] = "Nitrogen Use Efficiency: Calculated as pounds of nitrogen fertilizer applied divided by ending yield. Recent advances in precision nitrogen application have allowed farmers to have a NUE of 0.6 lbs. N/bu or lower. As with any efficiency calculation, having the lowest efficiency is usually not a good indication of profitability. Rather top yields that are efficiently managed are desired to optimize profitability."
-    context['yield_vs_et_explainer'] = "Yield vs. ET: is calculated by dividing actual yield by the amount of ET for the season. In practical terms, this can be calculated by taking irrigated yield minus dryland yield and dividing by irrigation application. A Yield vs. ET goal should be 11-15 bushels per inch of water applied."
+    context['yield_vs_et_explainer'] = "Yield vs. ET: is calculated by dividing actual yield by the amount of ET for the season. In practical terms, this can be calculated by taking irrigated yield minus dryland yield and dividing by irrigation application. A Yield vs. ET goal should be 11-15 bushels per inch of water consumed."
 
+    context['cumulative_soil_water_explainer'] = "Cumulative Soil Water Graph: The Black line represents the daily soil water level. The Blue area represents the optimal soil water level to maintain top yields and limit deep percolation. The top of the Blue area represents field capacity. The bottom of the Blue area represents 50% of field capacity. If the Black line moves above the Blue area, the soil is above field capacity and gravity causes water to drain below the rootzone. If the Black line moves below the Blue area, the corn plants may be experiencing water stress that could lead to reduced yields. The nitrogen application bars (brown color) shows when nitrogen was applied which can help visualize then nitrogen leaching occurs (when nitrogen is available and the soil is above field capacity)."
+    context['nitrate_leaching_explainer'] = "Nitrate Leaching Graph: Nitrogen leaching is calculated by the DSSAT crop simulation model. Research has shown that if nitrogen is available in the soil and water leaches below the root zone it can take 9 pounds of nitrogen per inch of drainage with it."        
 
     return context
 

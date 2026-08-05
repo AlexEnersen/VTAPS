@@ -13,46 +13,48 @@
 <a class="continueButton" href="{{ game_url }}">Continue</a>
 
 <p class="introText">
-  The Virtual Testing Ag Performance Solutions (VTAPS) was developed by the
+  The Virtual Testing Ag Performance Solutions (V-TAPS) was developed by the
   University of Nebraska Extension and has been modeled around the highly
   successful UNL-TAPS (<a href="https://taps.unl.edu">taps.unl.edu</a>) program.
-  In the TAPS program farmers and other participants make a series of management
-  decisions as they respond to field, agronomic and technologically based
-  information. At the end of the growing season, the TAPS participants see how
-  they compare (rank) against other participants in terms of profitability,
-  irrigation and nitrogen efficiency and crop yield. The TAPS program has helped
-  participants in the self-realization of management changes that need to be
-  improved, and participants have adopted new technology and management
-  practices on their farming operation as a result of participating in TAPS.
+  In the TAPS program (Burr et al., 2020) farmers and other participants make a
+  series of management decisions as they respond to field, agronomic and
+  technologically based information. At the end of the growing season, the TAPS
+  participants see how they compare (rank) against other participants in terms
+  of profitability, irrigation and nitrogen efficiency and crop yield. The TAPS
+  program has helped participants in the self-realization of management changes
+  that need to be improved, and participants have adopted new technology and
+  management practices on their farming operation as a result of participating
+  in TAPS.
 </p>
 
 <p class="introText">
-  The VTAPS program was developed so that high school ag students, and others,
-  could have a similar TAPS experience. VTAPS participants will select the
-  hybrid and seeding rate they wish to plant. They will also be able to apply
-  nitrogen fertilizer <em>(at ${{nitrogen_cost|floatformat:2}} per pound)</em> for pre-plant
+  The V-TAPS program (Sen et al., 2026) was developed so that high school ag
+  students, and others, could have a similar TAPS experience. V-TAPS
+  participants will select the hybrid and seeding rate they wish to plant. They
+  will also be able to apply nitrogen fertilizer
+  <em>(at ${{nitrogen_cost|floatformat:2}} per pound)</em> for pre-plant
   <em>($8.50 application cost)</em>, sidedress
   <em>($8.50 application cost)</em> and five fertigation applications
   <em>($1.25 application cost/ac)</em>. Participants will also be able to apply
-  irrigation water <em>(${{irrigation_cost|floatformat:2}} per acre inch)</em> twice during each week of the
-  simulation <em>(maximum of 1.0 inches per application)</em>. Other costs such
-  as machinery, materials, land taxes and opportunity costs amount to
-  <em>${{other_costs|floatformat:2}}</em>. Cost of production is calculated on a weekly basis and
-  divided by the Farm Service Agency Annual Production History (APH) of 230
-  bushes per acre. The location of the field is North Platte, NE in a corn
-  soybean no-till crop rotation. The soil type is a Cozad Silt Loam soil, 2%
-  organic matter and water holding capacity of 1.81 inches/ft. Average residual
-  nitrogen at the beginning of the growing season is 20 pounds N per acre and
-  85% initial soil water content.
+  irrigation water
+  <em>(${{irrigation_cost|floatformat:2}} per acre inch)</em> twice during each
+  week of the simulation <em>(maximum of 1.0 inches per application)</em>. Other
+  costs such as machinery, materials, land taxes and opportunity costs amount to
+  <em>${{other_costs|floatformat:2}}</em>. Cost of production is calculated on a
+  weekly basis and divided by the Farm Service Agency Annual Production History
+  (APH) of 230 bushes per acre. The location of the field is North Platte, NE in
+  a corn soybean no-till crop rotation. The soil type is a Cozad Silt Loam soil,
+  2% organic matter and water holding capacity of 1.81 inches/ft. Average
+  residual nitrogen at the beginning of the growing season is 20 pounds N per
+  acre and 85% initial soil water content. Corn is planted on May 1 and is the
+  beginning of the simulation.
 </p>
 
 <p class="introText">
-  At the end of the simulation total cost is divided by the final yield.
-  <a 
-    href="{% static 'xlsx/budget.xlsx' %}" 
-    target="_blank" 
-    rel="noopener"
-    >A complete budget is available here</a
+  At the end of the simulation total cost is divided by the final yield. A
+  complete budget is available here
+  <a href="{% static 'xlsx/budget.xlsx' %}" target="_blank" rel="noopener"
+    >budget link here</a
   >
   All the decisions and generated weather information are fed into a crop
   simulation model, Decision Support System for Agrotechnology Transfer (DSSAT)
@@ -62,24 +64,22 @@
 </p>
 
 <p class="introText">
-  At the end of week 24 participants will be able to see their final yield, cost
-  of production <em>($/bushel)</em> and nitrogen and irrigation efficiency
-  <em
-    >(Water × Nitrogen Intensification Performance Index – WNIPI, Lo et al.,
-    2019)</em
-  >. In a group simulation such as a crop production class, participants will
-  see how they rank in these same categories, allowing them to self-realize what
-  areas of their management decisions are the strongest and which ones could use
-  some improvement. Participants will also be able to see how much nitrogen has
-  potentially leached below the root zone. The single player version of VTAPS
-  will allow participants to try to improve their yield, cost of production and
-  nitrogen and irrigation application efficiency.
+  At the end of week 21 participants will be able to see their final yield, cost
+  of production <em>($/bushel)</em>, profit and nitrogen and irrigation
+  efficiency. In a group simulation such as a crop production class,
+  participants will see how they rank in these same categories, allowing them to
+  self-realize what areas of their management decisions are the strongest and
+  which ones could use some improvement. Participants will also be able to see
+  how much nitrogen has potentially leached below the root zone. The single
+  player version of V-TAPS will allow participants to try to improve their
+  yield, cost of production and nitrogen and irrigation application efficiency
+  with randomly generated weather each time they complete the simulation.
 </p>
 
 <p class="introText">
-  The VTAPS program was developed by Alex Enersen under the guidance of Dr.
+  The V-TAPS program was developed by Alex Enersen under the guidance of Dr.
   Stephen Cooper, Executive Director at the J S Raikes School of Computer
-  Science & Management at UNL. The results of the VTAPS program have been
+  Science & Management at UNL. The results of the V-TAPS program have been
   calibrated with six years of TAPS data from North Platte, NE by Rintu Sen and
   Dr. Saleh Taghvaeian from the UNL Biological Systems Engineering Department.
   The simulated weather data and weather forecasts have been developed by Dr.
@@ -87,22 +87,23 @@
 </p>
 
 <p class="introText">
-  A VTAPS curriculum has been developed for high school ag students to support
-  educational efforts with the VTAPS computer program and is available upon
-  request at taps@unl.edu . The curriculum has 15 lessons each on hybrid
-  selection, nitrogen management and irrigation management.
+  A V-TAPS curriculum has been developed for high school ag students to support
+  educational efforts with the V-TAPS computer program and is available to
+  Educators upon request at taps@unl.edu for an annual subscription of $100. The
+  curriculum has 15 lessons each on hybrid selection, nitrogen management and
+  irrigation management.
 </p>
 
 <p class="introText">
-  Thanks to the following VTAPS Development Committee for your input and
+  Thanks to the following V-TAPS Development Committee for your input and
   support: Alex Enersen, Stephen Cooper, Rintu Sen, Saleh Taghvaeian, Matt
   Stockton, Dirk Charlson, Daran Rudnick, Vaishali Sharda, Krystle Rhoades and
-  Chris Proctor. Thanks to the VTAPS Advisory Committee: John Thorburn, Dave
+  Chris Proctor. Thanks to the V-TAPS Advisory Committee: John Thorburn, Dave
   Eigenberg, Lisa Kemp and Jennifer Swanson. A special thanks goes to Katie
   Hickel, Elbert Traylor and Jessica Russell of the Nebraska Department of
   Water, Energy and Environment, who helped fund this project through the 319
   program and the Nebraska Association Resource Districts for funding the
-  development of the VTAPS project.
+  development of the V-TAPS project.
 </p>
 
 <p class="introText">Sincerely,</p>

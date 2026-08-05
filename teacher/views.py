@@ -213,7 +213,7 @@ def game(response, id):
                     random_years = yearlyRandomizer()
                     fabricated_months = monthlyFabricator(random_years)
                     new_year_weather = changeWeatherYear(fabricated_months, 2020)
-                    forecast_weather = forecastWeather(new_year_weather, forecasting)
+                    forecast_weather = forecastWeather(new_year_weather)
                     zip_file.writestr("weather.txt", "\n".join(new_year_weather).encode('utf-8'))
                     zip_file.writestr("forecast.txt", forecast_weather.encode('utf-8'))
                 zip_buffer.seek(0)     
@@ -234,7 +234,7 @@ def game(response, id):
                     weather = changeWeatherYear(stripped_lines, 2020)
                     filetext.close()
 
-                    forecast_weather = forecastWeather(weather, forecasting)
+                    forecast_weather = forecastWeather(weather)
                     zip_file.writestr("weather.txt", "\n".join(weather).encode('utf-8'))
                     zip_file.writestr("forecast.txt", forecast_weather.encode('utf-8'))
                 zip_buffer.seek(0)     

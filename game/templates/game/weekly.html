@@ -192,49 +192,75 @@
           <th class="historyData">PAST WEEK</th>
           <th class="historyData">TOTAL</th>
         </tr>
-        <tr class="tableRow">
-          <td class="historyLabel lightlyBold">Rainfall</td>
+        <tr class="tooltipWrapper">
+          <td class="historyLabel lightlyBold">
+            Rainfall
+            <span class="tooltipText">{{ rainfall_explainer }}</span>
+          </td>
           <td class="historyData">{{weekly_rain|floatformat:2}} in.</td>
           <td class="historyData">{{total_rain|floatformat:2}} in.</td>
         </tr>
-        <tr>
-          <td class="historyLabel lightlyBold">Evapotranspiration</td>
+        <tr class="tooltipWrapper">
+          <td class="historyLabel lightlyBold">
+            Evapotranspiration
+            <span class="tooltipText">{{ evapotranspiration_explainer }}</span>
+          </td>
           <td class="historyData">{{weekly_et|floatformat:2}} in.</td>
           <td class="historyData">{{total_et|floatformat:2}} in.</td>
         </tr>
-        <tr>
-          <td class="historyLabel lightlyBold">Irrigation</td>
+        <tr class="tooltipWrapper">
+          <td class="historyLabel lightlyBold">
+            Irrigation
+            <span class="tooltipText">{{ irrigation_explainer }}</span>
+          </td>
           <td class="historyData">{{weekly_irr|floatformat:2}} in.</td>
           <td class="historyData">{{total_irr|floatformat:2}} in.</td>
         </tr>
-        <tr>
-          <td class="historyLabel lightlyBold">Fertilizer</td>
+        <tr class="tooltipWrapper">
+          <td class="historyLabel lightlyBold">
+            Fertilizer
+            <span class="tooltipText">{{ fertilizer_explainer }}</span>
+          </td>
           <td class="historyData">{{weekly_fert|floatformat:0}} lbs.</td>
           <td class="historyData">{{total_fert|floatformat:0}} lbs.</td>
         </tr>
-        <tr>
-          <td class="historyLabel lightlyBold">Water Nitrates</td>
+        <tr class="tooltipWrapper">
+          <td class="historyLabel lightlyBold">
+            Water Nitrates
+            <span class="tooltipText">{{ water_nitrate_explainer }}</span>
+          </td>
           <td class="historyData">{{weekly_nitrates|floatformat:2}} lbs.</td>
           <td class="historyData">{{total_nitrates|floatformat:2}} lbs.</td>
         </tr>
-        <tr>
-          <td class="historyLabel lightlyBold">Nitrogen Leached</td>
+        <tr class="tooltipWrapper">
+          <td class="historyLabel lightlyBold">
+            Nitrogen Leached
+            <span class="tooltipText">{{ nitrogen_leach_explainer }}</span>
+          </td>
           <td class="historyData">{{weekly_Nleach|floatformat:2}} lbs.</td>
           <td class="historyData">{{total_Nleach|floatformat:2}} lbs.</td>
         </tr>
         {% if week > 1 %}
-        <tr>
-          <td class="historyLabel lightlyBold">Nitrogen Sufficiency Index</td>
+        <tr class="tooltipWrapper">
+          <td class="historyLabel lightlyBold">
+            Nitrogen Sufficiency Index
+            <span class="tooltipText"
+              >{{ nitrogen_sufficiency_index_explainer }}</span
+            >
+          </td>
           <td class="historyData"></td>
           {% if nitrogen_sufficiency == -1 %}
-            <td class="historyData">--%</td>
+          <td class="historyData">--%</td>
           {% else %}
-            <td class="historyData">{{nitrogen_sufficiency|floatformat:0}}%</td>
+          <td class="historyData">{{nitrogen_sufficiency|floatformat:0}}%</td>
           {% endif %}
         </tr>
         {% endif %}
-        <tr>
-          <td class="historyLabel lightlyBold">Growth Stage</td>
+        <tr class="tooltipWrapper">
+          <td class="historyLabel lightlyBold">
+            Growth Stage
+            <span class="tooltipText">{{ growth_stage_explainer }}</span>
+          </td>
           <td class="historyData"></td>
           <td class="historyData">{{gdu}}</td>
         </tr>
@@ -243,36 +269,51 @@
 
     <div class="tableWrapper">
       <table class="costTable">
-        <tr class="costRow">
-          <td class="costLabel">Seed Cost:</td>
+        <tr class="costRow tooltipWrapper">
+          <td class="costLabel">
+            Seed Cost:
+            <span class="tooltipText">{{ seed_cost_explainer }}</span>
+          </td>
           <td class="costData">${{seed_cost|floatformat:2}}</td>
         </tr>
-        <tr class="costRow">
-          <td class="costLabel">Irrigation Cost:</td>
+        <tr class="costRow tooltipWrapper">
+          <td class="costLabel">
+            Irrigation Cost:
+            <span class="tooltipText">{{ irrigation_cost_explainer }}</span>
+          </td>
           <td class="costData">${{irr_cost|floatformat:2}}</td>
         </tr>
-        <tr class="costRow">
-          <td class="costLabel">Fertilizer Cost:</td>
+        <tr class="costRow tooltipWrapper">
+          <td class="costLabel">
+            Fertilizer Cost:
+            <span class="tooltipText">{{ fertilizer_cost_explainer }}</span>
+          </td>
           <td class="costData">${{fert_cost|floatformat:2}}</td>
         </tr>
-        <tr class="costRow">
-          <td class="costLabel">Other Costs:</td>
+        <tr class="costRow tooltipWrapper">
+          <td class="costLabel">
+            Other Costs:
+            <span class="tooltipText">{{ other_costs_explainer }}</span>
+          </td>
           <td class="costData">${{other_costs|floatformat:2}}</td>
         </tr>
-        <tr class="costRow">
+        <tr class="costRow tooltipWrapper">
           <td class="costLabel lightlyBold">Total Cost:</td>
           <td class="costData lightlyBold">${{total_cost|floatformat:2}}</td>
         </tr>
-        <tr class="costRow">
-          <td class="costLabel italic">Cost Per Bushel:</td>
+        <tr class="costRow tooltipWrapper">
+          <td class="costLabel italic">
+            Cost Per Bushel:
+            <span class="tooltipText">{{ cost_per_bushel_explainer }}</span>
+          </td>
           <td class="costData italic">${{bushel_cost|floatformat:2}}/bu</td>
         </tr>
-        <tr class="costRow">
+        <tr class="costRow tooltipWrapper">
           <td class="costLabel">Price of Corn:</td>
           <td class="costData">${{corn_price|floatformat:2}}/bu</td>
         </tr>
         {% if water_limit != "unlimited" %}
-        <tr class="costRow">
+        <tr class="costRow tooltipWrapper">
           <td class="costLabel">Remaining Water:</td>
           <td class="costData">{{water_limit|floatformat:1}} in</td>
         </tr>
@@ -289,30 +330,34 @@
   >
     <div class="subRow">
       {% csrf_token %} {% if water_limit == "unlimited" or water_limit > 0 %}
-        <div class="inputRow">
-          <p class="irrigationLabel">Monday Irrigation:</p>
-          <p class="irrigationField">{{iform.monday}} in.</p>
-        </div>
+      <div class="inputRow">
+        <p class="irrigationLabel">Monday Irrigation:</p>
+        <p class="irrigationField">{{iform.monday}} in.</p>
+      </div>
 
-        <div class="inputRow">
-          <p class="irrigationLabel">Thursday Irrigation:</p>
-          <p class="irrigationField">{{iform.thursday}} in.</p>
-        </div>
+      <div class="inputRow">
+        <p class="irrigationLabel">Thursday Irrigation:</p>
+        <p class="irrigationField">{{iform.thursday}} in.</p>
+      </div>
 
-        {% csrf_token %} {% if week == 1 or week == 6 or week == 9 or week == 10 or week == 12 or week == 14 or week == 15 %}
-          <div class="inputRow">
-            {% if week == 1 %}
-            <p class="irrigationLabel">Week {{week}} At-Plant Fertilizer:</p>
-            {% elif week == 6 %}
-            <p class="irrigationLabel">Week {{week}} Side-Dress:</p>
-            {% else %}
-            <p class="irrigationLabel">Week {{week}} Fertigation:</p>
-            {% endif %}
-            <p class="irrigationField">{{fform.fertilizer}} lbs</p>
-          </div>
+      {% csrf_token %} {% if week == 1 or week == 6 or week == 9 or week == 10 or week == 12 or week == 14 or week == 15 %}
+      <div class="inputRow">
+        {% if week == 1 %}
+        <p class="irrigationLabel">Week {{week}} At-Plant Fertilizer:</p>
+        {% elif week == 6 %}
+        <p class="irrigationLabel">Week {{week}} Side-Dress:</p>
+        {% else %}
+        <p class="irrigationLabel">Week {{week}} Fertigation:</p>
         {% endif %}
+        <p class="irrigationField">{{fform.fertilizer}} lbs</p>
+      </div>
+      {% endif %} 
+      
       {% else %}
-        <div class="inputRow">Your water limit has been reached. No more irrigation or fertigation can be applied</div>
+      <div class="inputRow">
+        Your water limit has been reached. No more irrigation or fertigation can
+        be applied
+      </div>
       {% endif %}
     </div>
 
@@ -324,10 +369,25 @@
     <p class="title">Graphs</p>
     <div class="graphContainer">
       <div class="graphs">
-        <div>{{ aquaspy_graph | safe }}</div>
-        <div>{{ water_layer_graph | safe }}</div>
-        <div>{{ root_depth_graph | safe }}</div>
-        <div>{{ nitrogen_stress_graph | safe }}</div>
+        <div class="tooltipWrapper">
+          <div>{{ aquaspy_graph | safe }}</div>
+          <span class="tooltipText">{{ cumulative_soil_water_explainer }}</span>
+        </div>
+
+        <div class="tooltipWrapper">
+          <div>{{ water_layer_graph | safe }}</div>
+          <span class="tooltipText">{{ soil_water_by_depth_explainer }}</span>
+        </div>
+
+        <div class="tooltipWrapper">
+          <div>{{ root_depth_graph | safe }}</div>
+          <span class="tooltipText">{{ root_depth_explainer }}</span>
+        </div>
+
+        <div class="tooltipWrapper">
+          <div>{{ nitrogen_stress_graph | safe }}</div>
+          <span class="tooltipText">{{ nitrate_leaching_explainer }}</span>
+        </div>
       </div>
     </div>
   </div>

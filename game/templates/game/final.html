@@ -155,8 +155,12 @@
   <div class="graphContainer">
     <div class="graphSubContainer">
       <h1 class="underline">Results</h1>
-      <div class="graph">{{ aquaspy_graph | safe }}</div>
-      <div class="graph">{{ nitrogen_leaching_graph | safe }}</div>
+      <div class="graph tooltipWrapper">{{ aquaspy_graph | safe }}
+          <span class="tooltipText">{{ cumulative_soil_water_explainer }}</span>
+      </div>
+      <div class="graph tooltipWrapper">{{ nitrogen_leaching_graph | safe }}
+        <span class="tooltipText">{{ nitrate_leaching_explainer }}</span>
+      </div>
     </div>
   </div>
 </div>

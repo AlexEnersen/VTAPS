@@ -372,20 +372,20 @@ em {
 .tooltipText {
   visibility: hidden;
   opacity: 0;
-  width: 220px;
+  width: 92.5%;
   background-color: #333;
   color: #fff;
   text-align: left;
   border-radius: 6px;
-  padding: 8px 10px;
+  padding: 8px 3%;
   position: absolute;
   z-index: 10;
   bottom: 105%;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 1%;
   transition: opacity 0.2s;
   font-size: 0.85rem;
   font-weight: 400;
+  pointer-events: none;
 }
 
 .tooltipWrapper:hover .tooltipText {
