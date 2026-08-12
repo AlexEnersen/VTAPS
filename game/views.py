@@ -116,19 +116,38 @@ def runGame(request, game_id=None):
     try:
         gameProfile = GameProfile.objects.get(game=game, user=user)
 
-        if gameProfile.hybrid is None and request.POST.get('hybrid') is None:
-            hybrid_form = GameProfileForm()
-            fert_form = FertilizerInitForm()
+        if request.method == 'POST':
+            if 'week1' in request.POST:
+                    fertilizer_init = FertilizerInit(week1 = request.POST['week1'], week6 = request.POST['week6'], week9 = request.POST['week9'], week10 = request.POST['week10'], week12 = request.POST['week12'], week14 = request.POST['week14'], week15 = request.POST['week15'])
+                    fertilizer_init.save()
+                    gameProfile.fert_id = fertilizer_init.id
+                    print(request.POST)
+                    if not 'back' in request.POST:
+                        print("Hi???")
+                        gameProfile.initialized = True
 
+        if not gameProfile.initialized and gameProfile.init_step == 0:
+            hybrid_form = GameProfileForm()
             if hybrid_form.is_valid():
                 hybrid_form.save()
+            context['hybrid_form'] = hybrid_form
 
+            gameProfile.init_step = 1
+            gameProfile.save()
+            return render(request, "game/init_hybrid.html", context)
+
+        elif not gameProfile.initialized and gameProfile.init_step == 1:
+            if request.method == 'POST':
+                gameProfile.hybrid = request.POST['hybrid']
+                game.seeding_rate = request.POST['seeding_rate']
+            fert_form = FertilizerInitForm()
             if fert_form.is_valid():
                 fert_form.save()
-
-            context['hybrid_form'] = hybrid_form
             context['fert_form'] = fert_form
-            return render(request, "game/init.html", context)
+            gameProfile.init_step = 0
+            gameProfile.save()
+            return render(request, "game/init_fert.html", context)
+        
         else:
             if gameProfile.week < 22 and not gameProfile.finished:              ##### NORMAL MODE
             # if gameProfile.week <= 1 and not gameProfile.finished:            ##### FINAL PAGE    DEBUG MODE
@@ -232,18 +251,12 @@ def weeklySelection(request, game):
     fert_entry = -1
     
     if request.method == "POST":
-        if (game.week == 0) or not game.initialized or 'hybrid' in request.POST:
+        if game.week == 0:
 
             game.waterLimit = game.game.waterLimit
-            game.hybrid = request.POST['hybrid']
             gameInputs['MZX_content'] = setHybrid(gameInputs['MZX_content'], game.hybrid)
 
-            game.seeding_rate = request.POST['seeding_rate']
             gameInputs['MZX_content'] = setSeedingRate(gameInputs['MZX_content'], game.seeding_rate)
-
-            fertilizer_init = FertilizerInit(week1 = request.POST['week1'], week6 = request.POST['week6'], week9 = request.POST['week9'], week10 = request.POST['week10'], week12 = request.POST['week12'], week14 = request.POST['week14'], week15 = request.POST['week15'])
-            fertilizer_init.save()
-            game.fert_id = fertilizer_init.id
 
             gameInputs['WTH_name'] = "NEME2001.WTH"
 

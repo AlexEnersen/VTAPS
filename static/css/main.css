@@ -263,12 +263,13 @@ em {
   text-decoration: none;
   border: 2px solid var(--primary-color);
   color: var(--primary-color);
-  padding: 10px 14px;
+  padding: 8px 14px;
   text-align: center;
-  font-size: 18px;
+  font-size: 19px;
   cursor: pointer;
   font-family: var(--sans-font);
   transition: border 0.2s;
+  background-color: transparent;
 }
 
 .logoutButton {

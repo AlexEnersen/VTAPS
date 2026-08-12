@@ -124,6 +124,7 @@ class GameProfile(models.Model):
     week = models.IntegerField(default=0)
     fert_id = models.IntegerField(default=-1, blank=False)
     initialized = models.BooleanField(default=False)
+    init_step = models.IntegerField(default=0)
     computing = models.BooleanField(default=False)
     finished = models.BooleanField(default=False)
     

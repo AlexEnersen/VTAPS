@@ -1,0 +1,67 @@
+{% extends "game/base.html" %} {% block content %} {% load static %} 
+{% csrf_token %} {% if game_id != None %}
+<div class="gameAccountHeader">
+  <div class="column">
+    <p class="className">{{ username }}</p>
+    <p class="className marginLeft">Class: {{ game_name }}</p>
+  </div>
+  <a href="/student/logout" class="logoutButton">Logout</a>
+</div>
+{% endif %}
+<div>
+  <form
+    action=""
+    method="post"
+    onsubmit="this.querySelector('.continueButton').disabled = true;"
+  >
+    {% csrf_token %}
+    <div class="formContainer">
+      <div class="hybridForm">
+        <h1>Hybrid Selection</h1>
+        <div class="hybridContainer">{{ hybrid_form }}</div>
+        <div class="column">
+          <h3>Hybrid Info</h3>
+          <a
+            href="{% static 'pdfs/213-19VT2PRIB.pdf' %}"
+            target="_blank"
+            rel="noopener"
+            >Channel213-19VT2PRIB</a
+          >
+          <a
+            href="{% static 'pdfs/Fontanelle 11D637.pdf' %}"
+            target="_blank"
+            rel="noopener"
+            >Fontanelle 11D637</a
+          >
+          <a
+            href="{% static 'pdfs/Pioneer 801.pdf' %}"
+            target="_blank"
+            rel="noopener"
+            >Pioneer 0801AM</a
+          >
+          <a
+            href="{% static 'pdfs/Pioneer P1197AM.pdf' %}"
+            target="_blank"
+            rel="noopener"
+            >Pioneer 1197AM</a
+          >
+          <a
+            href="{% static 'pdfs/P1366AML.pdf' %}"
+            target="_blank"
+            rel="noopener"
+            >Pioneer 1366AML</a
+          >
+          <a
+            href="{% static 'pdfs/P1185AM.pdf' %}"
+            target="_blank"
+            rel="noopener"
+            >Pioneer 1185AM</a
+          >
+        </div>
+      </div>
+    </div>
+    <input class="continueButton" type="submit" value="Continue" />
+  </form>
+</div>
+
+{% endblock %}
