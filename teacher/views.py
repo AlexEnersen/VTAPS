@@ -72,12 +72,26 @@ except Exception as error:
 def teacherHome(response):
     if response.user in User.objects.filter(is_superuser=True):
         form = SuperuserForm()
+        print(response.POST)
         if response.method == 'POST':
-            user = User.objects.get(email = response.POST['email'])
-            teacher = user.teacher
-            teacher.confirmed = True
-            teacher.authorized = True
-            teacher.save()
+            if 'confirm_email' in response.POST:
+                user = User.objects.get(email = response.POST['confirm_email'])
+                teacher = user.teacher
+                teacher.confirmed = True
+                teacher.save()
+            elif 'auth_email' in response.POST:
+                user = User.objects.get(email = response.POST['auth_email'])
+                teacher = user.teacher
+                teacher.authorized = True
+                teacher.save()
+            elif 'unauthorize' in response.POST:
+                user = User.objects.get(email = response.POST['unauthorize'])
+                teacher = user.teacher
+                teacher.authorized = False
+                teacher.save()
+            elif 'reject_email' in response.POST:
+                user = User.objects.get(email = response.POST['reject_email'])
+                user.delete()
 
         unconfirmed_users = Teacher.objects.filter(confirmed = False, authorized = False)
         unauthorized_users = Teacher.objects.filter(confirmed = True, authorized = False)
