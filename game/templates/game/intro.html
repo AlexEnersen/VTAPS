@@ -1,5 +1,5 @@
-{% extends "game/base.html" %} {% block content %} {% load static %} 
-{% csrf_token %} {% if game_id != None %}
+{% extends "game/base.html" %} {% block content %} {% load static %} {%
+csrf_token %} {% if game_id != None %}
 <div class="gameAccountHeader">
   <div class="column">
     <p class="className">{{ username }}</p>
@@ -32,7 +32,7 @@
   students, and others, could have a similar TAPS experience. V-TAPS
   participants will select the hybrid and seeding rate they wish to plant. They
   will also be able to apply nitrogen fertilizer
-  <em>(at ${{nitrogen_cost|floatformat:2}} per pound)</em> for pre-plant
+  <em>(at ${{nitrogen_cost|floatformat:2}} per pound)</em> for at-plant
   <em>($8.50 application cost)</em>, sidedress
   <em>($8.50 application cost)</em> and five fertigation applications
   <em>($1.25 application cost/ac)</em>. Participants will also be able to apply
@@ -42,9 +42,9 @@
   costs such as machinery, materials, land taxes and opportunity costs amount to
   <em>${{other_costs|floatformat:2}}</em>. Cost of production is calculated on a
   weekly basis and divided by the Farm Service Agency Annual Production History
-  (APH) of 230 bushes per acre. The location of the field is North Platte, NE in
-  a corn soybean no-till crop rotation. The soil type is a Cozad Silt Loam soil,
-  2% organic matter and water holding capacity of 1.81 inches/ft. Average
+  (APH) of 230 bushels per acre. The location of the field is North Platte, NE
+  in a corn soybean no-till crop rotation. The soil type is a Cozad Silt Loam
+  soil, 2% organic matter and water holding capacity of 1.81 inches/ft. Average
   residual nitrogen at the beginning of the growing season is 20 pounds N per
   acre and 85% initial soil water content. Corn is planted on May 1 and is the
   beginning of the simulation.
@@ -73,7 +73,8 @@
   how much nitrogen has potentially leached below the root zone. The single
   player version of V-TAPS will allow participants to try to improve their
   yield, cost of production and nitrogen and irrigation application efficiency
-  with randomly generated weather each time they complete the simulation.
+  with different randomly generated weather each time they complete the
+  simulation.
 </p>
 
 <p class="introText">
@@ -89,9 +90,11 @@
 <p class="introText">
   A V-TAPS curriculum has been developed for high school ag students to support
   educational efforts with the V-TAPS computer program and is available to
-  Educators upon request at taps@unl.edu for an annual subscription of $100. The
+  Educators upon request at <a href="mailto:taps@unl.edu">taps@unl.edu</a>. The
   curriculum has 15 lessons each on hybrid selection, nitrogen management and
-  irrigation management.
+  irrigation management. The V-TAPS Computer program is available to Educators
+  for an annual subscription of $100 upon request at
+  <a href="mailto:taps@unl.edu">taps@unl.edu</a>.
 </p>
 
 <p class="introText">
@@ -112,11 +115,11 @@
   Chuck Burr <br />Nebraska Extension Educator & VTAPS Project Lead
 </p>
 
-<p class="introText">REFERENCES</p>
+<p class="introText">
+Burr, C. A., Rudnick, D. R., Stockton, M. C., Tigner, R., & Rhoades, K. (2020). Engaging Farmers and the Agriculture Industry Through the Testing Agricultural Performance Solutions Program. Journal of Extension, 58(5), Article 13. <a href="https://doi.org/10.34068/joe.58.05.13">https://doi.org/10.34068/joe.58.05.13</a>.
+</p>
 
 <p class="introText">
-  Lo, T., Rudnick, D.R., Burr, C.A., Stockton, M.C., & Werle, R. (2019).
-  Approaches to evaluating grower irrigation and fertilizer nitrogen amount and
-  timing. Agricultural Water Management. 213: 693-706.
+  Add Rintu, Saleh, Enerson, Cooper, Burr. A Model-Integrated Serious Game for Decision Experimentation in Irrigation and Nitrogen Management. Planned to be submitted to Journal of Computers and Electronics in Agriculture in July 2026.
 </p>
 {% endblock %}

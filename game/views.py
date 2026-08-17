@@ -123,7 +123,6 @@ def runGame(request, game_id=None):
                     gameProfile.fert_id = fertilizer_init.id
                     print(request.POST)
                     if not 'back' in request.POST:
-                        print("Hi???")
                         gameProfile.initialized = True
 
         if not gameProfile.initialized and gameProfile.init_step == 0:

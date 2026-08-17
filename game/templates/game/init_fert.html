@@ -1,11 +1,5 @@
 {% extends "game/base.html" %} {% block content %} {% load static %} 
 {% csrf_token %} {% if game_id != None %}
-<style>
-  .secondaryButton {
-    font-size: 20px;
-    background-color: transparent;
-  }
-</style>
 <div class="gameAccountHeader">
   <div class="column">
     <p class="className">{{ username }}</p>

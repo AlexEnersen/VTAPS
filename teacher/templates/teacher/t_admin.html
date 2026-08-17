@@ -85,15 +85,28 @@
       class="rowContainer {% if forloop.counter|divisibleby:2 == 0 %} grayRow {% endif %}"
     >
       <p class="rowText">{{un_user.user.email}}</p>
-      <form method="post">
-        {% csrf_token %}
-        <input
-          type="hidden"
-          name="auth_email"
-          value="{{ un_user.user.email }}"
-        />
-        <button type="submit" class="admin_button logoutButton">Authorize Teacher</button>
-      </form>
+      <div class="row">
+        <form method="post">
+          {% csrf_token %}
+          <input
+            type="hidden"
+            name="remove_email"
+            value="{{ un_user.user.email }}"
+          />
+          <button type="submit" class="admin_button logoutButton red">
+            Remove Teacher
+          </button>
+        </form>
+        <form method="post">
+          {% csrf_token %}
+          <input
+            type="hidden"
+            name="auth_email"
+            value="{{ un_user.user.email }}"
+          />
+          <button type="submit" class="admin_button logoutButton">Authorize Teacher</button>
+        </form>
+      </div>
     </div>
     {% endfor %}
   </div>
