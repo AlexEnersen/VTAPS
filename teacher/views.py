@@ -94,7 +94,7 @@ def teacherHome(response):
                 user.delete()
             elif 'remove_email' in response.POST:
                 user = User.objects.get(email = response.POST['remove_email'])
-                user.delete() 
+                user.delete()
 
         unconfirmed_users = Teacher.objects.filter(confirmed = False, authorized = False)
         unauthorized_users = Teacher.objects.filter(confirmed = True, authorized = False)

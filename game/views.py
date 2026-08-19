@@ -138,7 +138,7 @@ def runGame(request, game_id=None):
         elif not gameProfile.initialized and gameProfile.init_step == 1:
             if request.method == 'POST':
                 gameProfile.hybrid = request.POST['hybrid']
-                game.seeding_rate = request.POST['seeding_rate']
+                gameProfile.seeding_rate = request.POST['seeding_rate']
             fert_form = FertilizerInitForm()
             if fert_form.is_valid():
                 fert_form.save()
@@ -388,6 +388,8 @@ def weeklySelection(request, game):
 
     gameInputs = downloadInputs(gamePath)
     gameOutputs = downloadOutputs(gamePath)
+
+    print(getFinalYield(gameOutputs))
 
     if gameOutputs is False:
         computeDSSAT(game.hybrid, gameInputs, gamePath)
@@ -1399,9 +1401,9 @@ def downloadOutputs(gamePath):
                 #         print(index, " INP LINE:", line)
                 # elif name == 'WARNING.OUT':
                 #     for line in content:
-                        # if environment == 'prod':
-                        #     logger.info(line)
-                        # print(line)
+                #         if environment == 'prod':
+                #             logger.info(line)
+                #         print(line)
 
         return data
     except:
