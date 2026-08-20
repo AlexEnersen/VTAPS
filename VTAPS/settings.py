@@ -78,9 +78,15 @@ CSRF_COOKIE_DOMAIN = 'vtaps.org' if env_var == 'prod' else None
 
 CSRF_TRUSTED_ORIGINS=['http://127.0.0.1:8000', 'http://localhost:8000', 'https://vtaps.org']
 
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
+if env == 'prod':
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
 
 # Application definition
 

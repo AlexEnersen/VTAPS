@@ -389,8 +389,6 @@ def weeklySelection(request, game):
     gameInputs = downloadInputs(gamePath)
     gameOutputs = downloadOutputs(gamePath)
 
-    print(getFinalYield(gameOutputs))
-
     if gameOutputs is False:
         computeDSSAT(game.hybrid, gameInputs, gamePath)
         time.sleep(5)
