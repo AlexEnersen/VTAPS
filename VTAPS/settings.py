@@ -81,7 +81,7 @@ CSRF_TRUSTED_ORIGINS=['http://127.0.0.1:8000', 'http://localhost:8000', 'https:/
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
-if env == 'prod':
+if env_var == 'prod':
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_SSL_REDIRECT = True
     SECURE_HSTS_SECONDS = 31536000
