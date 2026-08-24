@@ -4,6 +4,7 @@ def setSeedingRate(text, seedingRate):
     planting = 0
     for i, line in enumerate(text):
 
+
         items = line.split(" ")
         items = [x for x in items if x]
         if len(items) > 0:
@@ -12,7 +13,7 @@ def setSeedingRate(text, seedingRate):
             elif planting > 0:
                 planting += 1
                 if planting == 3:
-                    newLine = f" 1 20122 20135  {newPop:>4}  {newPop:>4}     S     R    76     0     5   -99   -99   -99   -99   -99                        Maize\n"
+                    newLine = f" {items[0]} {items[1]} {items[2]}  {newPop:>4}  {newPop:>4}     {items[5]}     {items[6]}    {items[7]}     {items[8]}     {items[9]}   {items[10]}   {items[11]}   {items[12]}   {items[13]}   {items[14]}                        {items[15]}\n"
                     text[i] = newLine
                     return text
         

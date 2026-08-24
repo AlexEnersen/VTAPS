@@ -12,6 +12,7 @@ import matplotlib
 matplotlib.use('agg')
 import io
 import copy
+import json
 import zipfile
 import boto3
 import environ
@@ -121,7 +122,6 @@ def runGame(request, game_id=None):
                     fertilizer_init = FertilizerInit(week1 = request.POST['week1'], week6 = request.POST['week6'], week9 = request.POST['week9'], week10 = request.POST['week10'], week12 = request.POST['week12'], week14 = request.POST['week14'], week15 = request.POST['week15'])
                     fertilizer_init.save()
                     gameProfile.fert_id = fertilizer_init.id
-                    print(request.POST)
                     if not 'back' in request.POST:
                         gameProfile.initialized = True
 
@@ -252,11 +252,11 @@ def weeklySelection(request, game):
     if request.method == "POST":
         if game.week == 0:
 
+
             game.waterLimit = game.game.waterLimit
             gameInputs['MZX_content'] = setHybrid(gameInputs['MZX_content'], game.hybrid)
 
             gameInputs['MZX_content'] = setSeedingRate(gameInputs['MZX_content'], game.seeding_rate)
-
             gameInputs['WTH_name'] = "NEME2001.WTH"
 
             weatherFile = game.game.weatherFile
@@ -387,6 +387,7 @@ def weeklySelection(request, game):
         return None
 
     gameInputs = downloadInputs(gamePath)
+
     gameOutputs = downloadOutputs(gamePath)
 
     if gameOutputs is False:
@@ -445,8 +446,6 @@ def weeklySelection(request, game):
     context['total_Nleach'] = round(sum(history['Nleach']), 2)
     context['water_limit'] = game.waterLimit if game.waterLimit == 'unlimited' else float(game.waterLimit)
         
-
-    gameInputs['MZX_content'] = gameInputs['MZX_content']
 
     context['week'] = game.week
     context['corn_price'] = game.game.cornPrice
@@ -514,6 +513,10 @@ def finalResults(request, gameProfile):
     if gameOutputs is False:
         computeDSSAT(gameProfile.hybrid, gameInputs, gamePath)
         return None
+
+    # with open("output.txt", "w") as file:
+    #     json.dump(gameInputs, file, indent=4)
+    #     json.dump(gameOutputs, file, indent=4)
 
     start_date = str(int(getDate(gameInputs['MZX_content'])))
     start_day = int(str(start_date)[len(str(start_date)) - 3:])
@@ -1397,11 +1400,11 @@ def downloadOutputs(gamePath):
                 #     for line in content:
                 #         index += 1
                 #         print(index, " INP LINE:", line)
-                # elif name == 'WARNING.OUT':
-                #     for line in content:
-                #         if environment == 'prod':
-                #             logger.info(line)
-                #         print(line)
+                elif name == 'WARNING.OUT':
+                    for line in content:
+                        if environment == 'prod':
+                            logger.info(line)
+                        print(line)
 
         return data
     except:
