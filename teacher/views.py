@@ -394,11 +394,14 @@ def groupAttributeGraph(game, studentList, attribute):
     attributeNames = []
     attributeAmount = []
 
+    print()
     for student in studentList:
         try:
             # if attribute != 'Yield':
             attributeNames.append(student.username)
-            gameProfile = GameProfile.objects.get(user=student.user)
+            print(student.username)
+            print(student.user)
+            gameProfile = GameProfile.objects.get(game=game, user=student.user)
             if attribute == 'Cost':
                 attributeAmount.append(gameProfile.total_cost)
             elif attribute == 'PFP':

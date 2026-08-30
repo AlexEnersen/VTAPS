@@ -70,6 +70,9 @@ def reset(response):
     currentGames.delete()
     if game_id:
         del response.session['game_id']
+
+    user = User.objects.get(email="asoll@bancroft-rosalie.org")
+    print(user.username)
     
     logout(response)
     # Teacher.objects.all().delete()

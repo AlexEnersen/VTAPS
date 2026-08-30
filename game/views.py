@@ -104,6 +104,7 @@ def runGame(request, game_id=None):
     if request.user.is_authenticated:
         try:
             user = request.user
+            print(user)
             context['username'] = user.student.username
         except:
             logout(request)
