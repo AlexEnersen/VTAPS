@@ -218,6 +218,8 @@ def game(response, id):
             game.cornPrice = response.POST['cornPrice']
             game.otherCosts = response.POST['otherCosts']
             game.waterLimit = response.POST['waterLimit']
+            game.initWeek = int(response.POST['startWeek'])
+            game.weekLimit = min(game.initWeek + 6, 21)
 
             forecasting = response.POST.get('forecasting', False)
 

@@ -296,10 +296,37 @@ def weeklySelection(request, game):
                 file.close()
 
 
+            game.week = game.game.initWeek
+
+            fert_init = FertilizerInit.objects.get(id=game.fert_id)
+            if game.week > 1:
+                game.weekly_fertilizer.append(fert_init.week1)
+                gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fert_init.week1, [], int(date) + (1*7), game.game.waterNitrates)
+            if game.week > 6:
+                game.weekly_fertilizer.append(fert_init.week6)
+                gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fert_init.week6, [], int(date) + (6*7), game.game.waterNitrates)
+            if game.week > 9:
+                game.weekly_fertilizer.append(fert_init.week9)
+                gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fert_init.week9, [], int(date) + (9*7), game.game.waterNitrates)
+            if game.week > 10:
+                game.weekly_fertilizer.append(fert_init.week10)
+                gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fert_init.week10, [], int(date) + (10*7), game.game.waterNitrates)
+            if game.week > 12:
+                game.weekly_fertilizer.append(fert_init.week12)
+                gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fert_init.week12, [], int(date) + (12*7), game.game.waterNitrates)
+            if game.week > 14:
+                game.weekly_fertilizer.append(fert_init.week14)
+                gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fert_init.week14, [], int(date) + (14*7), game.game.waterNitrates)
+            if game.week > 15:
+                game.weekly_fertilizer.append(fert_init.week15)
+                gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fert_init.week15, [], int(date) + (15*7), game.game.waterNitrates)
+
+            
+            
             uploadInputs(gameInputs, gamePath)
             game.initialized = True
-            game.week = 0
             gameInputs = downloadInputs(gamePath)
+            computeDSSAT(game.hybrid, gameInputs, gamePath)
 
         else:
             game.computing = True
@@ -340,11 +367,11 @@ def weeklySelection(request, game):
             gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fertilizerQuantity, irrigationQuantity, int(date), game.game.waterNitrates)
             gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], irrigationQuantity, fertilizerQuantity, int(date), game.week)
             
-        computeDSSAT(game.hybrid, gameInputs, gamePath)
+            computeDSSAT(game.hybrid, gameInputs, gamePath)
 
-        nextDate = str(int(date)+7)
+            nextDate = str(int(date)+7)
 
-        if game.week > 0:
+        # if game.week > 0:
             gameOutputs = downloadOutputs(gamePath)
             if gameOutputs is not False and 'OOV_content' in gameOutputs:
                 projectedYield = getFinalYield(gameOutputs)
@@ -382,7 +409,7 @@ def weeklySelection(request, game):
                     game.fertigation.append(fertigation)
                 # game.weekly_fertilizer.append(request.POST.get('fertilizer'))
 
-        game.week += 1
+            game.week += 1
 
         game.save()
         return None
@@ -400,12 +427,16 @@ def weeklySelection(request, game):
         gameOutputs = downloadOutputs(gamePath)
         if len(gameOutputs) == 0:
             return False
+        
+    for line in gameInputs['MZX_content']:
+        print(line)
 
     historyDict = getHistory(date, start_day, gameInputs, gameOutputs, game.weekly_fertilizer)
     history = historyDict['history']
     recentHistory = historyDict['recentHistory']
 
-    if game.week > 1:
+
+    if game.week > game.game.initWeek:
         game.computing = False
         game.save()
         context['aquaspy_graph'] = plotAquaSpy(date, start_day, gameInputs, gameOutputs, game.weekly_fertilizer)[0]
@@ -449,6 +480,7 @@ def weeklySelection(request, game):
         
 
     context['week'] = game.week
+    context['initWeek'] = game.game.initWeek
     context['corn_price'] = game.game.cornPrice
 
     iform = IrrigationEntriesForm()

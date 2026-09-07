@@ -241,6 +241,24 @@ WATER_LIMITS = [
     ("unlimited", 'unlimited')
 ]
 
+STARTWEEKOPTIONS = [
+    (1, "Week 1"),
+    (2, "Week 2"),
+    (3, "Week 3"),
+    (4, "Week 4"),
+    (5, "Week 5"),
+    (6, "Week 6"),
+    (7, "Week 7"),
+    (8, "Week 8"),
+    (9, "Week 9"),
+    (10, "Week 10"),
+    (11, "Week 11"),
+    (12, "Week 12"),
+    (13, "Week 13"),
+    (14, "Week 14"),
+    (15, "Week 15"),
+]
+
 class Teacher(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
@@ -263,6 +281,7 @@ class Game(models.Model):
     code = models.CharField(blank=True)
     created = models.BooleanField(default = False)
     passwordsFinished = models.BooleanField(default = False)
+    initWeek = models.IntegerField(default = 1)
     
     nitrogenCost = models.FloatField(default=0.6)
     irrigationCost = models.FloatField(default=6.50)
@@ -284,3 +303,4 @@ class GameSetup(models.Model):
     weatherFile = models.CharField("North Platte Weather:", choices=WEATHER_CHOICES, default="NEME2101.WTH", max_length=40)
     forecasting = models.BooleanField("Forecast?", default=True)
     waterLimit = models.CharField("Water Limit:", choices=WATER_LIMITS, default="unlimited", max_length = 40)
+    startWeek = models.IntegerField("Starting Week:", choices=STARTWEEKOPTIONS, default=1)
