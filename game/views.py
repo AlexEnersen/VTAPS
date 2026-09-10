@@ -308,18 +308,23 @@ def weeklySelection(request, game):
             if game.week > 9:
                 game.weekly_fertilizer.append(fert_init.week9)
                 gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fert_init.week9, [], int(date) + (9*7), game.game.waterNitrates)
+                gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], [0], fert_init.week9, int(date) + (9*7), 9)
             if game.week > 10:
                 game.weekly_fertilizer.append(fert_init.week10)
                 gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fert_init.week10, [], int(date) + (10*7), game.game.waterNitrates)
+                gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], [0], fert_init.week10, int(date) + (10*7), 10)
             if game.week > 12:
                 game.weekly_fertilizer.append(fert_init.week12)
                 gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fert_init.week12, [], int(date) + (12*7), game.game.waterNitrates)
+                gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], [0], fert_init.week12, int(date) + (12*7), 12)
             if game.week > 14:
                 game.weekly_fertilizer.append(fert_init.week14)
                 gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fert_init.week14, [], int(date) + (14*7), game.game.waterNitrates)
+                gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], [0], fert_init.week14, int(date) + (14*7), 14)
             if game.week > 15:
                 game.weekly_fertilizer.append(fert_init.week15)
                 gameInputs['MZX_content'] = addFertilizer(gameInputs['MZX_content'], fert_init.week15, [], int(date) + (15*7), game.game.waterNitrates)
+                gameInputs['MZX_content'] = addIrrigation(gameInputs['MZX_content'], [0], fert_init.week15, int(date) + (15*7), 15)
 
             
             
@@ -427,9 +432,6 @@ def weeklySelection(request, game):
         gameOutputs = downloadOutputs(gamePath)
         if len(gameOutputs) == 0:
             return False
-        
-    for line in gameInputs['MZX_content']:
-        print(line)
 
     historyDict = getHistory(date, start_day, gameInputs, gameOutputs, game.weekly_fertilizer)
     history = historyDict['history']
