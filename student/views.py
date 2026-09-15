@@ -48,14 +48,14 @@ def studentLogin(response):
         form = LoginStudentForm(request=response, data=response.POST)
         if form.is_valid():
             login(response, form.get_user())
+            gameProfile = GameProfile.objects.get(user=form.get_user())
+            gameProfile.init_step = 0
+            gameProfile.save()
             return redirect("/student")
     else:
         form = LoginStudentForm()
     return render(response, "student/s_login.html", {"form":form})
 
 def studentLogout(response):
-    gameProfile = GameProfile.objects.get(user=response.user)
-    gameProfile.init_step = 0
-    gameProfile.save()
     logout(response)
     return redirect("/")
