@@ -5,6 +5,7 @@ from django.contrib.auth import login, authenticate, logout, update_session_auth
 from .models import Student
 from main.models import User
 from teacher.models import Game
+from game.models import GameProfile
 from .forms import LoginStudentForm, NewPasswordForm
 import os
 
@@ -53,5 +54,8 @@ def studentLogin(response):
     return render(response, "student/s_login.html", {"form":form})
 
 def studentLogout(response):
+    gameProfile = GameProfile.objects.get(user=response.user)
+    gameProfile.init_step = 0
+    gameProfile.save()
     logout(response)
     return redirect("/")

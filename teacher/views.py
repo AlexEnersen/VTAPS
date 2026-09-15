@@ -537,6 +537,7 @@ def downloadStudents(request, id):
         except:
             continue
 
+        print(gameProfile.initWeek)
         for index2, nsi in enumerate(gameProfile.nitrogen_sufficiency_array):
             playerInfo = [player]
             playerInfo.append(index2+1 if index2 < 21 else 'End')
