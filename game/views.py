@@ -1293,7 +1293,6 @@ def computeDSSAT(hybrid, gameInputs, gamePath):
     uploadInputs(gameInputs, gamePath) 
     zip_buffer = io.BytesIO()
 
-    hybrid = None
     subHybrid = list(filter(None, hybrid.split(" ")))[0]
     commandString = "../../DSCSM048 %s A %s" % (subHybrid, gameInputs['MZX_name'])
 
