@@ -48,9 +48,13 @@ def studentLogin(response):
         form = LoginStudentForm(request=response, data=response.POST)
         if form.is_valid():
             login(response, form.get_user())
-            gameProfile = GameProfile.objects.get(user=form.get_user())
-            gameProfile.init_step = 0
-            gameProfile.save()
+            try: 
+                gameProfile = GameProfile.objects.get(user=form.get_user())
+                gameProfile.init_step = 0
+                gameProfile.save()
+            except:
+                print("New Game Profile")
+
             return redirect("/student")
     else:
         form = LoginStudentForm()
