@@ -1068,7 +1068,7 @@ def plotAquaSpy(date, start_day, gameInputs, gameOutputs, fertHistory, yAxis=-1)
             x_values.append((15*7)-6)
     ax1.bar(x_values, fertHistory, color="sienna", width=0.1 + (0.1 * (len(waterRange)/7)))
     if len(fertHistory) == 0:
-        fertHistory = [0]
+        fertHistory = [0] 
     ax1.set_ylim(0, 200)
     fig.tight_layout() 
 
