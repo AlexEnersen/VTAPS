@@ -1,5 +1,4 @@
-{% extends "game/base.html" %} {% block content %} {% load static %} 
-{% if game_id != None %}
+{% extends "game/base.html" %} {% block content %} {% load static %} {% if game_id != None %}
 <div class="gameAccountHeader">
   <div class="column">
     <p class="className">{{ username }}</p>
@@ -31,28 +30,28 @@
             Total Irrigation:
             <span class="tooltipText">{{ irrigation_explainer }}</span>
           </td>
-          <td class="bold">{{irr_amount|floatformat:2}} in.</td>
+          <td class="bold">{{irr_amount|floatformat:2}} in/ac</td>
         </tr>
         <tr class="tooltipWrapper">
           <td class="alignLeft bold">
             Total Nitrogen:
             <span class="tooltipText">{{ nitrogen_explainer }}</span>
           </td>
-          <td class="bold">{{fert_amount|floatformat:0}} lbs.</td>
+          <td class="bold">{{fert_amount|floatformat:0}} lbs/ac</td>
         </tr>
         <tr class="tooltipWrapper">
-          <td class="alignLeft bold">
+          <td class="alignLeft">
             Water Nitrates:
             <span class="tooltipText">{{ water_nitrate_explainer }}</span>
           </td>
-          <td class="bold">{{nitrate_amount|floatformat:2}} lbs.</td>
+          <td>{{nitrate_amount|floatformat:2}} lbs.</td>
         </tr>
         <tr class="tooltipWrapper">
-          <td class="alignLeft bold">
+          <td class="alignLeft">
             Nitrogen Leached:
             <span class="tooltipText">{{ nitrogen_leached_explainer }}</span>
           </td>
-          <td class="bold">{{NLeaching|floatformat:2}} lbs.</td>
+          <td>{{NLeaching|floatformat:2}} lbs.</td>
         </tr>
       </table>
     </div>
@@ -106,23 +105,22 @@
           <td class="italic">${{bushel_cost|floatformat:2}}/bu</td>
         </tr>
         <tr class="tooltipWrapper">
-          <td class="alignLeft">
-            Corn Price:</td>
+          <td class="alignLeft">Corn Price:</td>
           <td class="">${{corn_price|floatformat:2}}/bu</td>
         </tr>
         <tr class="tooltipWrapper">
-          <td class="bold alignLeft">
-            Profit:
+          <td class="alignLeft">
+            Profit per Bushel:
             <span class="tooltipText">{{ profit_explainer }}</span>
           </td>
-          <td class="bold">${{profit|floatformat:2}}/bu</td>
+          <td>${{profit|floatformat:2}}/bu</td>
         </tr>
         <tr class="tooltipWrapper">
           <td class="bold alignLeft">
             Profit per Acre:
             <span class="tooltipText">{{ profit_per_acre_explainer }}</span>
           </td>
-          <td class="bold">${{profit_per_acre|floatformat:2}}</td>
+          <td class="bold">${{profit_per_acre|floatformat:2}}/ac</td>
         </tr>
         <tr class="tooltipWrapper">
           <td class="bold alignLeft">
@@ -155,10 +153,12 @@
   <div class="graphContainer">
     <div class="graphSubContainer">
       <h1 class="underline">Results</h1>
-      <div class="graph tooltipWrapper">{{ aquaspy_graph | safe }}
-          <span class="tooltipText">{{ cumulative_soil_water_explainer }}</span>
+      <div class="graph tooltipWrapper">
+        {{ aquaspy_graph | safe }}
+        <span class="tooltipText">{{ cumulative_soil_water_explainer }}</span>
       </div>
-      <div class="graph tooltipWrapper">{{ nitrogen_leaching_graph | safe }}
+      <div class="graph tooltipWrapper">
+        {{ nitrogen_leaching_graph | safe }}
         <span class="tooltipText">{{ nitrate_leaching_explainer }}</span>
       </div>
     </div>
