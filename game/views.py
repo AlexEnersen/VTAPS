@@ -349,7 +349,6 @@ def weeklySelection(request, game):
                 waterLimit = float(waterLimit)
 
                 if game.week > 6 and fertilizerQuantity is not None:
-                    fertigation
                     diff = waterLimit - fertigation
                     if diff < 0:
                         fertigation = waterLimit
@@ -414,6 +413,7 @@ def weeklySelection(request, game):
                     game.fertigation.append(fertigation)
                 # game.weekly_fertilizer.append(request.POST.get('fertilizer'))
 
+            game.et_array.append(sum(getHistory(str(int(date)+7), start_day, gameInputs, gameOutputs, game.weekly_fertilizer)['recentHistory']['et']))
             game.week += 1
 
         game.save()
@@ -516,24 +516,24 @@ def weeklySelection(request, game):
     game.save()
     context['bushel_cost'] = round(context['total_cost']/230, 2)
 
-    context['rainfall_explainer'] = "Rainfall: Amount of rainfall received during the growing season"
-    context['evapotranspiration_explainer'] = "Evapotranspiration: Amount of crop water use or evapotranspiration (evaporation from the soil and leaf surfaces and water transpired through the plant) during the growing season. A typical irrigated corn crop uses 24-26 inches of ET per year."
-    context['irrigation_explainer'] = "Irrigation: Amount of irrigation water applied including fertigation irrigation applications"
-    context['fertilizer_explainer'] = "Fertilizer: Amount of nitrogen applied during at plant, sidedress and fertigation applications"
-    context['water_nitrate_explainer'] = "Water Nitrates: Amount of nitrogen in the irrigation water calculated by multiplying the constant 0.23 times the parts per million (ppm) nitrates in the irrigation water times the inches applied"
-    context['nitrogen_leach_explainer'] = "Nitrogen Leached: Estimated pounds of nitrogen leached. Water that drains below the root zone typically carries 9 pounds of nitrogen per inch"
-    context['nitrogen_sufficiency_index_explainer'] = "Nitrogen Sufficiency Index: Nitrogen Sufficiency Index will be calculated beginning in week 5 once the crop canopy is more developed. For the V-TAPS program it is calculated as the amount of nitrogen taken up by the plant for the participants simulation divided by the amount of nitrogen taken up by the plant on a fully fertilized and fully irrigated plot, them multiplied by 100 to give a percent. The V-TAPS NSI is designed to simulate a Nitrogen Sufficiency Index from a canopy reflectance sensor or drone/satellite imagery that triggers additional nitrogen applications once the NSI drops below 95%."
+    context['rainfall_explainer'] = "Rainfall: Amount of rainfall received during each period."
+    context['evapotranspiration_explainer'] = "Evapotranspiration: Amount of crop water use or evapotranspiration (evaporation from the soil and leaf surfaces and water transpired through the plant) during each period. A typical irrigated corn crop uses 24-26 inches of ET per year."
+    context['irrigation_explainer'] = "Irrigation: Amount of irrigation water applied including fertigation irrigation applications."
+    context['fertilizer_explainer'] = "Fertilizer: Amount of nitrogen applied during at plant, sidedress and fertigation applications."
+    context['water_nitrate_explainer'] = "Water Nitrates: Amount of nitrogen in the irrigation water calculated by multiplying the constant 0.23 times the parts per million (ppm) nitrates in the irrigation water times the inches applied."
+    context['nitrogen_leach_explainer'] = "Nitrogen Leached: Estimated pounds of nitrogen leached. Water that drains below the root zone typically carries 9 pounds of nitrogen per inch."
+    context['nitrogen_sufficiency_index_explainer'] = "Nitrogen Sufficiency Index: Nitrogen Sufficiency Index will be calculated beginning in week 5 once the crop canopy is more developed. For the V-TAPS program it is calculated as the amount of nitrogen taken up by the plant for the participants simulation divided by the amount of nitrogen taken up by the plant on a fully fertilized and fully irrigated plot, then multiplied by 100 to give a percent. The V-TAPS NSI is designed to simulate a Nitrogen Sufficiency Index from a canopy reflectance sensor or drone/satellite imagery that triggers additional nitrogen applications once the NSI drops below 95%."
     context['growth_stage_explainer'] = "Growth Stage: Insert growth stage pictures"
     context['seed_cost_explainer'] = "Seed Cost: The cost per bag of seed was included with the Hybrid name. Seed cost is calculated by diving the cost per bag by 80,000 seeds in a bag and multiplying the result by the selected seeding rate."
     context['irrigation_cost_explainer'] = f"Irrigation Cost: Calculated by multiplying the inches applied by ${game.game.irrigationCost:.2f} per acre inch."
     context['fertilizer_cost_explainer'] = f"Fertilizer Cost: Calculated by multiplying the pounds of nitrogen applied by ${game.game.nitrogenCost:.2f} per pound and adding the application costs for At Plant and Sidedress @ $8.50 per acre and $1.25 per acre for fertigation applications."
     context['other_costs_explainer'] = "Other Costs: Other costs included in the Crop Budget accessible from the Introduction page include cost such as herbicide, insecticide, planting, harvesting, cash rent/return or owned investments, overhead and interest on operating funds."
-    context['cost_per_bushel_explainer'] = "Cost Per Bushel: Calculated as total cost divided by the Average Production History (APH) yield"
-    context['profit_per_acre_explainer'] = "Profit Per Acre: Calculated as profit/loss per bushel times ending yield"
+    context['cost_per_bushel_explainer'] = "Cost Per Bushel: Calculated as total cost divided by the Average Production History (APH) yield."
+    context['profit_per_acre_explainer'] = "Profit Per Acre: Calculated as profit/loss per bushel times ending yield."
     
-    context['soil_water_by_depth_explainer'] = "Soil Water by Depth Graph: The soil water by depth graph shows how the soil water changes over time at various soil water depths. As the crop uses water for transpiration, the soil water declines. Increases or spikes shows when irrigation water or rainfall has entered the soil at that depth. Watching the soil water at various depths can give you an indication of where the plant is using water from and how far a rainfall or irrigation events refills (or penetrates) the soil water."
+    context['soil_water_by_depth_explainer'] = "Soil Water by Depth Graph: The soil water by depth graph shows how the soil water changes over time at various soil water depths. As the crop uses water for transpiration, the soil water declines. Increases or spikes shows when irrigation water or rainfall has entered the soil at that depth. Watching the soil water at various depths can give you an indication of where the plant is using water from and how far a rainfall or irrigation events refills (or penetrates) the soil."
     context['root_depth_explainer'] = "Root Depth Graph: The Root depth graph shows how far down the active root zone has progressed as the season progresses."
-    context['cumulative_soil_water_explainer'] = "Cumulative Soil Water Graph: The Black line represents the daily soil water level. The Blue area represents the optimal soil water level to maintain top yields and limit deep percolation. The top of the Blue area represents field capacity. The bottom of the Blue area represents 50% of field capacity. If the Black line moves above the Blue area, the soil is above field capacity and gravity causes water to drain below the rootzone. If the Black line moves below the Blue area, the corn plants may be experiencing water stress that could lead to reduced yields. The nitrogen application bars (brown color) shows when nitrogen was applied which can help visualize then nitrogen leaching occurs (when nitrogen is available and the soil is above field capacity)."
+    context['cumulative_soil_water_explainer'] = "Cumulative Soil Water Graph: The Black line represents the daily soil water level. The Blue area represents the optimal soil water level to maintain top yields and limit deep percolation. The top of the Blue area represents field capacity. The bottom of the Blue area represents 50% of the total available water (field capacity minus permanent wilting point). If the Black line moves above the Blue area, the soil is above field capacity and gravity causes water to drain below the rootzone. If the Black line moves below the Blue area, the corn plants may be experiencing water stress that could lead to reduced yields. The nitrogen application bars (brown color) shows when nitrogen was applied which can help visualize then nitrogen leaching occurs (when nitrogen is available and the soil is above field capacity)."
     context['nitrate_leaching_explainer'] = "Nitrate Leaching Graph: Nitrogen leaching is calculated by the DSSAT crop simulation model. Research has shown that if nitrogen is available in the soil and water leaches below the root zone it can take 9 pounds of nitrogen per inch of drainage with it."        
 
     return context
@@ -634,7 +634,7 @@ def finalResults(request, gameProfile):
 
     gameProfile.save()
 
-    csv = createCSV(context['irr_amount'], context['fert_amount'], context['yield'], context['bushel_cost'], context['PFP'], context['NLeaching'], context['yield_vs_et'], gameProfile)
+    csv = createCSV(context['irr_amount'], context['fert_amount'], context['yield'], context['bushel_cost'], context['PFP'], context['NLeaching'], context['yield_vs_et'], gameProfile, history['et'])
     s3.put_object(
         Bucket="finalresultsbucket",
         Key=f"{gamePath}/final_summary.csv",
@@ -644,24 +644,24 @@ def finalResults(request, gameProfile):
     )
 
     context['url'] = '/game/download' if request.user == None else f'/game/download/{gameProfile.id}'
-
-    context['rainfall_explainer'] = "Total Rainfall: Amount of rainfall received during the growing season"
-    context['et_explainer'] = "Total ET: Amount of crop water use or evapotranspiration (evaporation from the soil and leaf surfaces and water transpired through the plant) during the growing season. A typical irrigated corn crop uses 24-26 inches of ET per year."
-    context['irrigation_explainer'] = "Total Irrigation: Amount of irrigation water applied including fertigation irrigation applications"
-    context['nitrogen_explainer'] = "Total Nitrogen: Amount of nitrogen applied during at plant, sidedress and fertigation applications"
-    context['water_nitrate_explainer'] = "Water Nitrates: Amount of nitrogen in the irrigation water calculated by multiplying the constant 0.23 times the parts per million (ppm) nitrates in the irrigation water times the inches applied"
+    
+    context['rainfall_explainer'] = "Rainfall: Amount of rainfall received during each period."
+    context['et_explainer'] = "Total ET: Amount of crop water use or evapotranspiration (evaporation from the soil and leaf surfaces and water transpired through the plant) during each period. A typical irrigated corn crop uses 24-26 inches of ET per year."
+    context['irrigation_explainer'] = "Total Irrigation: Amount of irrigation water applied including fertigation irrigation applications."
+    context['nitrogen_explainer'] = "Total Nitrogen: Amount of nitrogen applied during at plant, sidedress and fertigation applications."
+    context['water_nitrate_explainer'] = "Water Nitrates: Amount of nitrogen in the irrigation water calculated by multiplying the constant 0.23 times the parts per million (ppm) nitrates in the irrigation water times the inches applied."
     context['nitrogen_leached_explainer'] = "Nitrogen Leached: Estimated pounds of nitrogen leached. Water that drains below the root zone typically carries 9 pounds of nitrogen per inch."
     context['seed_cost_explainer'] = "Seed Cost: The cost per bag of seed was included with the Hybrid name. Seed cost is calculated by diving the cost per bag by 80,000 seeds in a bag and multiplying the result by the selected seeding rate."
     context['irrigation_cost_explainer'] = f"Irrigation Cost: Calculated by multiplying the inches applied by ${gameProfile.game.irrigationCost:.2f} per acre inch."
     context['fertilizer_cost_explainer'] = f"Fertilizer Cost: Calculated by multiplying the pounds of nitrogen applied by ${gameProfile.game.nitrogenCost:.2f} per pound and adding the application costs for At Plant and Sidedress @ $8.50 per acre and $1.25 per acre for fertigation applications."
     context['other_costs_explainer'] = "Other Costs: Other costs included in the Crop Budget accessible from the Introduction page include cost such as herbicide, insecticide, planting, harvesting, cash rent/return or owned investments, overhead and interest on operating funds."
-    context['cost_per_bushel_explainer'] = "Cost Per Bushel: Calculated as total cost divided by ending yield"
-    context['profit_explainer'] = "Profit: Calculated as Corn price minus Cost Per Bushel"
-    context['profit_per_acre_explainer'] = "Profit Per Acre: Calculated as profit/loss per bushel times ending yield"
+    context['cost_per_bushel_explainer'] = "Cost Per Bushel: Calculated as total cost divided by ending yield."
+    context['profit_explainer'] = "Profit: Calculated as Corn price minus Cost Per Bushel."
+    context['profit_per_acre_explainer'] = "Profit Per Acre: Calculated as profit/loss per bushel times ending yield."
     context['NUE_explainer'] = "Nitrogen Use Efficiency: Calculated as pounds of nitrogen fertilizer applied divided by ending yield. Recent advances in precision nitrogen application have allowed farmers to have a NUE of 0.6 lbs. N/bu or lower. As with any efficiency calculation, having the lowest efficiency is usually not a good indication of profitability. Rather top yields that are efficiently managed are desired to optimize profitability."
     context['yield_vs_et_explainer'] = "Yield vs. ET: is calculated by dividing actual yield by the amount of ET for the season. In practical terms, this can be calculated by taking irrigated yield minus dryland yield and dividing by irrigation application. A Yield vs. ET goal should be 11-15 bushels per inch of water consumed."
 
-    context['cumulative_soil_water_explainer'] = "Cumulative Soil Water Graph: The Black line represents the daily soil water level. The Blue area represents the optimal soil water level to maintain top yields and limit deep percolation. The top of the Blue area represents field capacity. The bottom of the Blue area represents 50% of field capacity. If the Black line moves above the Blue area, the soil is above field capacity and gravity causes water to drain below the rootzone. If the Black line moves below the Blue area, the corn plants may be experiencing water stress that could lead to reduced yields. The nitrogen application bars (brown color) shows when nitrogen was applied which can help visualize then nitrogen leaching occurs (when nitrogen is available and the soil is above field capacity)."
+    context['cumulative_soil_water_explainer'] = "Cumulative Soil Water Graph: The Black line represents the daily soil water level. The Blue area represents the optimal soil water level to maintain top yields and limit deep percolation. The top of the Blue area represents field capacity. The bottom of the Blue area represents 50% of the total available water (field capacity minus permanent wilting point). If the Black line moves above the Blue area, the soil is above field capacity and gravity causes water to drain below the rootzone. If the Black line moves below the Blue area, the corn plants may be experiencing water stress that could lead to reduced yields. The nitrogen application bars (brown color) shows when nitrogen was applied which can help visualize then nitrogen leaching occurs (when nitrogen is available and the soil is above field capacity)."
     context['nitrate_leaching_explainer'] = "Nitrate Leaching Graph: Nitrogen leaching is calculated by the DSSAT crop simulation model. Research has shown that if nitrogen is available in the soil and water leaches below the root zone it can take 9 pounds of nitrogen per inch of drainage with it."        
 
     return context
@@ -1038,7 +1038,7 @@ def plotAquaSpy(date, start_day, gameInputs, gameOutputs, fertHistory, yAxis=-1)
     ax.fill_between(limitRange, ulimitArray, llimitArray, alpha=alpha)
     ax.set_xlabel('Days since planting')
     ax.set_ylabel("Soil Water (in)")
-    ax.set_title("Cumulative Soil Water", fontsize=16)
+    ax.set_title("Root Zone Soil Water", fontsize=16)
 
     for d in range(7, len(waterRange), 7):
         ax.axvline(x=d, color="gray", linestyle=":", linewidth=1)
@@ -1174,7 +1174,7 @@ def getHistory(date, start_day, gameInputs, gameOutputs, weeklyFertilizer):
         else:
             rain = mmToInches(float(items[4]))
             history['rain'].append(rain)
-            if currDay >= day-7:
+            if currDay >= day-6:
                 recentHistory['rain'].append(rain)
     
     onIrrigation = False
@@ -1238,7 +1238,7 @@ def getHistory(date, start_day, gameInputs, gameOutputs, weeklyFertilizer):
             break
         else:
             history['et'].append(mmToInches(float(items[10])))
-            if currDay >= day - 7:
+            if currDay >= day - 6:
                 recentHistory['et'].append(mmToInches(float(items[10])))
 
     for line in gameOutputs['NiBal_content']:
@@ -1254,7 +1254,7 @@ def getHistory(date, start_day, gameInputs, gameOutputs, weeklyFertilizer):
             break
         else:
             history['Nleach'].append(float(items[13])*0.892)
-            if currDay >= day - 7:
+            if currDay >= day - 6:
                 recentHistory['Nleach'].append(float(items[13])*0.892)
 
         
@@ -1438,55 +1438,70 @@ def downloadOutputs(gamePath):
                 #     for line in content:
                 #         index += 1
                 #         print(index, " INP LINE:", line)
-                elif name == 'WARNING.OUT':
-                    for line in content:
-                        if environment == 'prod':
-                            logger.info(line)
-                        print(line)
+                # elif name == 'WARNING.OUT':
+                #     for line in content:
+                #         if environment == 'prod':
+                #             logger.info(line)
+                #         print(line)
 
         return data
     except:
         return False
     
-def createCSV(irr_total, fert_total, final_yield, final_bushel_cost, pfp, nleaching, yieldVsET, gameProfile):
+def createCSV(irr_total, fert_total, final_yield, final_bushel_cost, pfp, nleaching, yieldVsET, gameProfile, et_history):
     buf = io.StringIO(newline='')
     writer = csv.writer(buf)
     writer.writerow(["Irrigation Total (in)", "Fertilizer Total (lbs)", "Final Yield (bu/ac)", "$ Cost/bu", "Nitrogen Use Efficiency (lbs. N/bu)", "N Leaching (lbs/ac)", "Yield vs ET (bu/in)"])
     writer.writerow([round(irr_total, 1), round(fert_total, 1), round(final_yield, 1), round(final_bushel_cost, 2), round(pfp, 1), round(nleaching, 1), round(yieldVsET, 1)])
 
+    initWeek = gameProfile.game.initWeek
+    fertigationIndex = 0
+    irrigationIndex = 0
     writer.writerow([])
-    writer.writerow(['Week', 'Nitrogen Sufficiency Index', "Monday Irrigation (in)", "Thursday Irrigation (in)", "Fertilizer (lbs)"])
+    writer.writerow(['Week', 'Nitrogen Sufficiency Index', "Fertilizer (lbs)", "Monday Irrigation (in)", "Thursday Irrigation (in)", "Fertigation Irrigation (in)", "ET (in)"])
     for index, nsi in enumerate(gameProfile.nitrogen_sufficiency_array):
-        if len(gameProfile.monday_irrigation) > index:
-            monday_irrigation = gameProfile.monday_irrigation[index]
-            thursday_irrigation = gameProfile.thursday_irrigation[index]
+        index += initWeek
+        et = et_history[index]
+        fertigation = 0
+        if len(gameProfile.monday_irrigation) > irrigationIndex:
+            monday_irrigation = gameProfile.monday_irrigation[irrigationIndex]
+            thursday_irrigation = gameProfile.thursday_irrigation[irrigationIndex]
         else:
             monday_irrigation = 0
             thursday_irrigation = 0
-        if index == 0 and len(gameProfile.weekly_fertilizer) > 0:
+        irrigationIndex += 1
+        if index == 1 and len(gameProfile.weekly_fertilizer) > 0:
             fertilizer = gameProfile.weekly_fertilizer[0]
-        elif index == 5 and len(gameProfile.weekly_fertilizer) > 1:
+        elif index == 6 and len(gameProfile.weekly_fertilizer) > 1:
             fertilizer = gameProfile.weekly_fertilizer[1]
-        elif index == 8 and len(gameProfile.weekly_fertilizer) > 2:
+        elif index == 9 and len(gameProfile.weekly_fertilizer) > 2:
             fertilizer = gameProfile.weekly_fertilizer[2]
-        elif index == 9 and len(gameProfile.weekly_fertilizer) > 3:
+            fertigation = gameProfile.fertigation[fertigationIndex]
+            fertigationIndex += 1
+        elif index == 10 and len(gameProfile.weekly_fertilizer) > 3:
             fertilizer = gameProfile.weekly_fertilizer[3]
-        elif index == 11 and len(gameProfile.weekly_fertilizer) > 4:
+            fertigation = gameProfile.fertigation[fertigationIndex]
+            fertigationIndex += 1
+        elif index == 12 and len(gameProfile.weekly_fertilizer) > 4:
             fertilizer = gameProfile.weekly_fertilizer[4]
-        elif index == 13 and len(gameProfile.weekly_fertilizer) > 5:
+            fertigation = gameProfile.fertigation[fertigationIndex]
+            fertigationIndex += 1
+        elif index == 14 and len(gameProfile.weekly_fertilizer) > 5:
             fertilizer = gameProfile.weekly_fertilizer[5]
-        elif index == 14 and len(gameProfile.weekly_fertilizer) > 6:
+            fertigation = gameProfile.fertigation[fertigationIndex]
+            fertigationIndex += 1
+        elif index == 15 and len(gameProfile.weekly_fertilizer) > 6:
             fertilizer = gameProfile.weekly_fertilizer[6]
+            fertigation = gameProfile.fertigation[fertigationIndex]
+            fertigationIndex += 1
         else:
-            if index < len(gameProfile.projected_yields)-1:
-                fertilizer = "-"
-            else:
-                fertilizer = 0
+            fertilizer = "-"
+            fertigation = "-"
                 
         monday_irrigation = 0 if monday_irrigation == None else monday_irrigation
         thursday_irrigation = 0 if thursday_irrigation == None else thursday_irrigation
-        fertilizer = 0 if fertilizer == "-" or fertilizer == None else fertilizer
-        writer.writerow([index+1 if index < len(gameProfile.projected_yields)-1 else 'End', round(nsi, 1), round(monday_irrigation, 1), round(thursday_irrigation, 1), fertilizer])
+        fertilizer = 0 if fertilizer == None else fertilizer
+        writer.writerow([index, round(nsi, 1), fertilizer, round(monday_irrigation, 1), round(thursday_irrigation, 1), fertigation, et])
 
     return buf.getvalue().encode("utf-8-sig")
 

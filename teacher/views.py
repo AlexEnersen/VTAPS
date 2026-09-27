@@ -529,7 +529,7 @@ def downloadStudents(request, id):
 
     buf = io.StringIO(newline='')
     writer = csv.writer(buf)
-    writer.writerow(['Username', 'Week', 'Nitrogen Sufficiency Index', "Monday Irrigation (in)", "Thursday Irrigation (in)", "Fertilizer (lbs)", "Fertigation Irrigation"])
+    writer.writerow(['Week', 'Nitrogen Sufficiency Index', "Fertilizer (lbs)", "Monday Irrigation (in)", "Thursday Irrigation (in)", "Fertigation Irrigation (in)", "ET (in)"])
     for index, player in enumerate(game.players):
         try:
             student = Student.objects.get(username=player, code=game.code)
@@ -537,42 +537,56 @@ def downloadStudents(request, id):
         except:
             continue
 
-        for index2, nsi in enumerate(gameProfile.nitrogen_sufficiency_array):
-            playerInfo = [player]
-            playerInfo.append(index2+1 if index2 < 21 else 'End')
-            playerInfo.append(round(nsi, 1))
-            if len(gameProfile.monday_irrigation) > index2:
-                playerInfo.append(gameProfile.monday_irrigation[index2])
-                playerInfo.append(gameProfile.thursday_irrigation[index2])
-            if index2 == 0 and len(gameProfile.weekly_fertilizer) > 0:
-                playerInfo.append(gameProfile.weekly_fertilizer[0])
-                playerInfo.append("-")
-            elif index2 == 5 and len(gameProfile.weekly_fertilizer) > 1:
-                playerInfo.append(gameProfile.weekly_fertilizer[1])
-                playerInfo.append("-")
-            elif index2 == 8 and len(gameProfile.weekly_fertilizer) > 2:
-                playerInfo.append(gameProfile.weekly_fertilizer[2])
-                playerInfo.append(gameProfile.fertigation[0])
-            elif index2 == 9 and len(gameProfile.weekly_fertilizer) > 3:
-                playerInfo.append(gameProfile.weekly_fertilizer[3])
-                playerInfo.append(gameProfile.fertigation[1])
-            elif index2 == 11 and len(gameProfile.weekly_fertilizer) > 4:
-                playerInfo.append(gameProfile.weekly_fertilizer[4])
-                playerInfo.append(gameProfile.fertigation[2])
-            elif index2 == 13 and len(gameProfile.weekly_fertilizer) > 5:
-                playerInfo.append(gameProfile.weekly_fertilizer[5])
-                playerInfo.append(gameProfile.fertigation[3])
-            elif index2 == 14 and len(gameProfile.weekly_fertilizer) > 6:
-                playerInfo.append(gameProfile.weekly_fertilizer[6])
-                playerInfo.append(gameProfile.fertigation[4])
-            elif index2 < 21:
-                playerInfo.append("-")
-                playerInfo.append("-")
+        initWeek = gameProfile.game.initWeek
+        fertigationIndex = 0
+        irrigationIndex = 0
+        writer.writerow([])
+        print(gameProfile.et_array)
+        print(gameProfile.weekly_fertilizer)
+        for index, nsi in enumerate(gameProfile.nitrogen_sufficiency_array):
+            index += initWeek
+            et = gameProfile.et_array[index-1]
+            fertigation = 0
+            if len(gameProfile.monday_irrigation) > irrigationIndex:
+                monday_irrigation = gameProfile.monday_irrigation[irrigationIndex]
+                thursday_irrigation = gameProfile.thursday_irrigation[irrigationIndex]
+            else:
+                monday_irrigation = 0
+                thursday_irrigation = 0
+            irrigationIndex += 1
+            if index == 1 and len(gameProfile.weekly_fertilizer) > 0:
+                fertilizer = gameProfile.weekly_fertilizer[0]
+            elif index == 6 and len(gameProfile.weekly_fertilizer) > 1:
+                fertilizer = gameProfile.weekly_fertilizer[1]
+            elif index == 9 and len(gameProfile.weekly_fertilizer) > 2:
+                fertilizer = gameProfile.weekly_fertilizer[2]
+                fertigation = gameProfile.fertigation[fertigationIndex]
+                fertigationIndex += 1
+            elif index == 10 and len(gameProfile.weekly_fertilizer) > 3:
+                fertilizer = gameProfile.weekly_fertilizer[3]
+                fertigation = gameProfile.fertigation[fertigationIndex]
+                fertigationIndex += 1
+            elif index == 12 and len(gameProfile.weekly_fertilizer) > 4:
+                fertilizer = gameProfile.weekly_fertilizer[4]
+                fertigation = gameProfile.fertigation[fertigationIndex]
+                fertigationIndex += 1
+            elif index == 14 and len(gameProfile.weekly_fertilizer) > 5:
+                fertilizer = gameProfile.weekly_fertilizer[5]
+                fertigation = gameProfile.fertigation[fertigationIndex]
+                fertigationIndex += 1
+            elif index == 15 and len(gameProfile.weekly_fertilizer) > 6:
+                fertilizer = gameProfile.weekly_fertilizer[6]
+                fertigation = gameProfile.fertigation[fertigationIndex]
+                fertigationIndex += 1
+            else:
+                fertilizer = "-"
+                fertigation = "-"
+                    
+            monday_irrigation = 0 if monday_irrigation == None else monday_irrigation
+            thursday_irrigation = 0 if thursday_irrigation == None else thursday_irrigation
+            fertilizer = 0 if fertilizer == None else fertilizer
+            writer.writerow([index, round(nsi, 1), fertilizer, round(monday_irrigation, 1), round(thursday_irrigation, 1), fertigation, et])
 
-            writer.writerow(playerInfo)
-
-            if index2 == len(gameProfile.projected_yields)-1:
-                writer.writerow([])
 
     data = buf.getvalue().encode("utf-8-sig")
         

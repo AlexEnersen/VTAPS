@@ -151,6 +151,7 @@ class GameProfile(models.Model):
 
     waterLimit = models.CharField(default="unlimited")
 
+    et_array = ArrayField(models.FloatField(default=0), default=list, blank=True)
     yield_vs_et = models.FloatField(default=-1)
 
     profit = models.FloatField(default=0)
