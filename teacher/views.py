@@ -540,13 +540,19 @@ def downloadStudents(request, id):
         initWeek = gameProfile.game.initWeek
         fertigationIndex = 0
         irrigationIndex = 0
-        writer.writerow([])
-        for index, nsi in enumerate(gameProfile.nitrogen_sufficiency_array):
-            index += initWeek
+        if len(gameProfile.monday_irrigation) > 0:
+            writer.writerow([])
+        for index, _ in enumerate(gameProfile.monday_irrigation):
             try:
-                et = gameProfile.et_array[index-1]
+                et = gameProfile.et_array[index]
             except:
                 et = 0
+
+            try:
+                nsi = gameProfile.nitrogen_sufficiency_array[index]
+            except:
+                nsi = 0
+            index += initWeek
             fertigation = 0
             if len(gameProfile.monday_irrigation) > irrigationIndex:
                 monday_irrigation = gameProfile.monday_irrigation[irrigationIndex]
@@ -555,33 +561,36 @@ def downloadStudents(request, id):
                 monday_irrigation = 0
                 thursday_irrigation = 0
             irrigationIndex += 1
-            if index == 1 and len(gameProfile.weekly_fertilizer) > 0:
-                fertilizer = gameProfile.weekly_fertilizer[0]
-            elif index == 6 and len(gameProfile.weekly_fertilizer) > 1:
-                fertilizer = gameProfile.weekly_fertilizer[1]
-            elif index == 9 and len(gameProfile.weekly_fertilizer) > 2:
-                fertilizer = gameProfile.weekly_fertilizer[2]
-                fertigation = gameProfile.fertigation[fertigationIndex]
-                fertigationIndex += 1
-            elif index == 10 and len(gameProfile.weekly_fertilizer) > 3:
-                fertilizer = gameProfile.weekly_fertilizer[3]
-                fertigation = gameProfile.fertigation[fertigationIndex]
-                fertigationIndex += 1
-            elif index == 12 and len(gameProfile.weekly_fertilizer) > 4:
-                fertilizer = gameProfile.weekly_fertilizer[4]
-                fertigation = gameProfile.fertigation[fertigationIndex]
-                fertigationIndex += 1
-            elif index == 14 and len(gameProfile.weekly_fertilizer) > 5:
-                fertilizer = gameProfile.weekly_fertilizer[5]
-                fertigation = gameProfile.fertigation[fertigationIndex]
-                fertigationIndex += 1
-            elif index == 15 and len(gameProfile.weekly_fertilizer) > 6:
-                fertilizer = gameProfile.weekly_fertilizer[6]
-                fertigation = gameProfile.fertigation[fertigationIndex]
-                fertigationIndex += 1
-            else:
-                fertilizer = "-"
-                fertigation = "-"
+            try:
+                if index == 1 and len(gameProfile.weekly_fertilizer) > 0:
+                    fertilizer = gameProfile.weekly_fertilizer[0]
+                elif index == 6 and len(gameProfile.weekly_fertilizer) > 1:
+                    fertilizer = gameProfile.weekly_fertilizer[1]
+                elif index == 9 and len(gameProfile.weekly_fertilizer) > 2:
+                    fertilizer = gameProfile.weekly_fertilizer[2]
+                    fertigation = gameProfile.fertigation[fertigationIndex]
+                    fertigationIndex += 1
+                elif index == 10 and len(gameProfile.weekly_fertilizer) > 3:
+                    fertilizer = gameProfile.weekly_fertilizer[3]
+                    fertigation = gameProfile.fertigation[fertigationIndex]
+                    fertigationIndex += 1
+                elif index == 12 and len(gameProfile.weekly_fertilizer) > 4:
+                    fertilizer = gameProfile.weekly_fertilizer[4]
+                    fertigation = gameProfile.fertigation[fertigationIndex]
+                    fertigationIndex += 1
+                elif index == 14 and len(gameProfile.weekly_fertilizer) > 5:
+                    fertilizer = gameProfile.weekly_fertilizer[5]
+                    fertigation = gameProfile.fertigation[fertigationIndex]
+                    fertigationIndex += 1
+                elif index == 15 and len(gameProfile.weekly_fertilizer) > 6:
+                    fertilizer = gameProfile.weekly_fertilizer[6]
+                    fertigation = gameProfile.fertigation[fertigationIndex]
+                    fertigationIndex += 1
+                else:
+                    fertilizer = "-"
+                    fertigation = "-"
+            except:
+                fertigation = 0
                     
             monday_irrigation = 0 if monday_irrigation == None else monday_irrigation
             thursday_irrigation = 0 if thursday_irrigation == None else thursday_irrigation
