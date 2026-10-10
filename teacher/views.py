@@ -541,11 +541,12 @@ def downloadStudents(request, id):
         fertigationIndex = 0
         irrigationIndex = 0
         writer.writerow([])
-        print(gameProfile.et_array)
-        print(gameProfile.weekly_fertilizer)
         for index, nsi in enumerate(gameProfile.nitrogen_sufficiency_array):
             index += initWeek
-            et = gameProfile.et_array[index-1]
+            try:
+                et = gameProfile.et_array[index-1]
+            except:
+                et = 0
             fertigation = 0
             if len(gameProfile.monday_irrigation) > irrigationIndex:
                 monday_irrigation = gameProfile.monday_irrigation[irrigationIndex]
