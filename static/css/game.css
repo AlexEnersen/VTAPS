@@ -340,3 +340,37 @@ hr {
   left: 4px;
   top: 24px;
 }
+
+.tooltipGrowthImage {
+  position: absolute;
+  /* width: 50%; */
+  right: 0;
+  pointer-events: none;
+  bottom: 105%;
+  left: 1%;
+  z-index: 10;
+  border-radius: 6px;
+  padding: 8px 3%;
+  background-color: #333;
+  opacity: 0;
+  transition: opacity 0.2s;
+  /* background-color: transparent; */
+}
+
+.tooltipWrapper:hover .tooltipGrowthImage {
+  visibility: visible;
+  opacity: 1;
+}
+
+
+.tooltipText {
+  visibility: hidden;
+  color: #fff;
+  text-align: left;
+  position: absolute;
+}
+
+.growthImage {
+  /* height: 50%; */
+  width: 100%;
+}

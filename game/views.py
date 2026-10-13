@@ -465,6 +465,40 @@ def weeklySelection(request, game):
             context['nitrogen_sufficiency'] = -1
 
     context['gdu'] = getGDU(date, gameOutputs)
+    context['src'] = 'none'
+
+    if context['gdu'] == 'V1':
+        context['src'] = "../static/images/growthstages/V-TAPS V1.jpeg"
+    elif context['gdu'] == 'V2':
+        context['src'] = "../static/images/growthstages/V-TAPS V2.jpeg"
+    elif context['gdu'] == 'V3':
+        context['src'] = "../static/images/growthstages/V-TAPS V3.jpeg"
+    elif context['gdu'] == 'V4':
+        context['src'] = "../static/images/growthstages/V-TAPS V4.jpeg"
+    elif context['gdu'] == 'V6':
+        context['src'] = "../static/images/growthstages/V-TAPS V6.jpeg"
+    elif context['gdu'] == 'V9':
+        context['src'] = "../static/images/growthstages/V-TAPS V9.jpg"
+    elif context['gdu'] == 'V12':
+        context['src'] = "../static/images/growthstages/V-TAPS V12.jpg"
+    elif context['gdu'] == 'V14':
+        context['src'] = "../static/images/growthstages/V-TAPS V14.jpg"
+    elif context['gdu'] == 'V17':
+        context['src'] = "../static/images/growthstages/V-TAPS V17.jpg"
+    elif context['gdu'] == 'VT':
+        context['src'] = "../static/images/growthstages/V-TAPS VT.jpg"
+    elif context['gdu'] == 'R1':
+        context['src'] = "../static/images/growthstages/V-TAPS R1.jpg"
+    elif context['gdu'] == 'R2':
+        context['src'] = "../static/images/growthstages/V-TAPS R2.jpeg"
+    elif context['gdu'] == 'R3':
+        context['src'] = "../static/images/growthstages/V-TAPS R3.jpg"
+    elif context['gdu'] == 'R4':
+        context['src'] = "../static/images/growthstages/V-TAPS R4.jpeg"
+    elif context['gdu'] == 'R5':
+        context['src'] = "../static/images/growthstages/V-TAPS R5.jpg"
+    elif context['gdu'] == 'R6':
+        context['src'] = "../static/images/growthstages/V-TAPS R6.jpg"
 
     context['weekly_rain'] = round(sum(recentHistory['rain']), 2)
     context['total_rain'] = round(sum(history['rain']), 2)

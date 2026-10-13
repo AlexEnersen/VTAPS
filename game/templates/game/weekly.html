@@ -259,10 +259,13 @@
         <tr class="tooltipWrapper">
           <td class="historyLabel lightlyBold">
             Growth Stage
-            <span class="tooltipText">{{ growth_stage_explainer }}</span>
           </td>
           <td class="historyData"></td>
-          <td class="historyData">{{gdu}}</td>
+          <td class="historyData">
+            {{gdu}} {% if src != 'none' %}
+            <span class="tooltipGrowthImage"><img class="growthImage" src="{{src}}" /></span>
+            {% endif %}
+          </td>
         </tr>
       </table>
     </div>
