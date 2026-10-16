@@ -542,6 +542,7 @@ def downloadStudents(request, id):
         irrigationIndex = 0
         if len(gameProfile.monday_irrigation) > 0:
             writer.writerow([])
+            writer.writerow([f'Player: {player}'])
         for index, _ in enumerate(gameProfile.monday_irrigation):
             try:
                 et = gameProfile.et_array[index]
