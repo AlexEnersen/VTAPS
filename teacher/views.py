@@ -72,7 +72,6 @@ except Exception as error:
 def teacherHome(response):
     if response.user in User.objects.filter(is_superuser=True):
         form = SuperuserForm()
-        print(response.POST)
         if response.method == 'POST':
             if 'confirm_email' in response.POST:
                 user = User.objects.get(email = response.POST['confirm_email'])
@@ -106,6 +105,8 @@ def teacherHome(response):
         return render(response, "teacher/t_home.html", {"user": None, "authenticated": None})
     else:
         user = response.user
+        userGames = list(Game.objects.filter(id__in=user.games))
+        print(userGames)
         try:
             teacher = user.teacher
         except:
@@ -120,9 +121,10 @@ def teacherHome(response):
                 gameObject.deleteURL = f'/teacher/deleteWarning/{game}'
                 userGames.append(gameObject)
             except:
-                toDelete.append(index)
-        for dIndex in reversed(toDelete):
-            del user.games[dIndex]
+                continue
+        #         toDelete.append(index)
+        # for dIndex in reversed(toDelete):
+        #     del user.games[dIndex]
         user.save()
         return render(response, "teacher/t_home.html", {"user": user, "games": userGames})
     
@@ -220,8 +222,8 @@ def game(response, id):
             game.waterLimit = response.POST['waterLimit']
             game.initWeek = int(response.POST['startWeek'])
             game.weekLimit = min(game.initWeek + 6, 21)
+            game.originalWeatherFile = response.POST['weatherFile']
 
-            forecasting = response.POST.get('forecasting', False)
 
             if response.POST['weatherFile'] == 'Random':
                 fileName = f'weather{id}.zip'
@@ -529,7 +531,7 @@ def downloadStudents(request, id):
 
     buf = io.StringIO(newline='')
     writer = csv.writer(buf)
-    writer.writerow(['Week', 'Nitrogen Sufficiency Index', "Fertilizer (lbs)", "Monday Irrigation (in)", "Thursday Irrigation (in)", "Fertigation Irrigation (in)", "ET (in)"])
+    writer.writerow([f'Weather: {game.originalWeatherFile}'])
     for index, player in enumerate(game.players):
         try:
             student = Student.objects.get(username=player, code=game.code)
@@ -543,6 +545,24 @@ def downloadStudents(request, id):
         if len(gameProfile.monday_irrigation) > 0:
             writer.writerow([])
             writer.writerow([f'Player: {player}'])
+            writer.writerow([f'Hybrid: {gameProfile.hybrid}'])
+            writer.writerow([f'Seeding Rate: {gameProfile.seeding_rate}'])
+            preFertArray = ['Pre-Fertilization:']
+            if initWeek > 1 and len(gameProfile.weekly_fertilizer) > 0:
+                preFertArray.append(f'Week 1: {gameProfile.weekly_fertilizer[0]}')
+            if initWeek > 6 and len(gameProfile.weekly_fertilizer) > 1:
+                preFertArray.append(f'Week 6: {gameProfile.weekly_fertilizer[1]}')
+            if initWeek > 9 and len(gameProfile.weekly_fertilizer) > 2:
+                preFertArray.append(f'Week 9: {gameProfile.weekly_fertilizer[2]}')
+            if initWeek > 10 and len(gameProfile.weekly_fertilizer) > 3:
+                preFertArray.append(f'Week 10: {gameProfile.weekly_fertilizer[3]}')
+            if initWeek > 12 and len(gameProfile.weekly_fertilizer) > 4:
+                preFertArray.append(f'Week 12: {gameProfile.weekly_fertilizer[4]}')
+            if initWeek > 14 and len(gameProfile.weekly_fertilizer) > 5:
+                preFertArray.append(f'Week 14: {gameProfile.weekly_fertilizer[5]}')
+            if initWeek > 15 and len(gameProfile.weekly_fertilizer) > 6:
+                preFertArray.append(f'Week 15: {gameProfile.weekly_fertilizer[6]}')
+            writer.writerow(['Week', 'Nitrogen Sufficiency Index', "Fertilizer (lbs)", "Monday Irrigation (in)", "Thursday Irrigation (in)", "Fertigation Irrigation (in)", "ET (in)"])
         for index, _ in enumerate(gameProfile.monday_irrigation):
             try:
                 et = gameProfile.et_array[index]

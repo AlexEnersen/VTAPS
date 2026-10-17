@@ -289,6 +289,7 @@ class Game(models.Model):
     cornPrice = models.FloatField(default=4.25)
     otherCosts = models.DecimalField(default=742.79, decimal_places=2, max_digits=6)
     weatherFile = models.CharField(default="NEME2101.WTH")
+    originalWeatherFile = models.CharField(default="NEME2101.WTH")
     waterLimit = models.CharField(default="unlimited")
 
 class WeekEntries(models.Model):
