@@ -467,7 +467,9 @@ def weeklySelection(request, game):
     context['gdu'] = getGDU(date, gameOutputs)
     context['src'] = 'none'
 
-    if context['gdu'] == 'V1':
+    if context['gdu'] == 'VE':
+        context['src'] = "../static/images/growthstages/V-TAPS VE.jpeg"
+    elif context['gdu'] == 'V1':
         context['src'] = "../static/images/growthstages/V-TAPS V1.jpeg"
     elif context['gdu'] == 'V2':
         context['src'] = "../static/images/growthstages/V-TAPS V2.jpeg"
@@ -1588,9 +1590,11 @@ def getGDU(date, gameOutputs):
     maxLeaves = 0
 
     stage = 0
+    tempStage = 0
 
     gwad = 0
     maxGWAD = 0
+    print("date:", date)
     for line in gameOutputs['OPG_content']:
         items = list(filter(None, line.split(" ")))
         if len(items) <= 1:
@@ -1620,14 +1624,6 @@ def getGDU(date, gameOutputs):
             if gwadNum > maxGWAD:
                 maxGWAD = gwadNum
 
-            # stageNum = int(items[5])
-            # if stageNum == 3:
-            #     stage = 'R1'
-            # elif stageNum == 4:
-            #     stage = 'R2'
-            # elif stageNum == 5:
-            #     stage = 'R6'
-
     reading = False
     reading2 = False
     for line in gameOutputs['OME_content']:
@@ -1649,7 +1645,9 @@ def getGDU(date, gameOutputs):
             stageNum = items[8]
 
             if int(doy) <= int(day):
-                if stageNum == '03':
+                if stageNum == '09':
+                    tempStage = 'VE'
+                elif stageNum == '03':
                     stage = "R1"
                 elif stageNum == '04':
                     stage = 'R2'
@@ -1679,7 +1677,10 @@ def getGDU(date, gameOutputs):
         return 'VT'
     elif leaves < maxLeaves:
         if leaves == 0:
-            return 'Planting'
+            if tempStage == 0:
+                return 'Planting'
+            else:
+                return tempStage
         else:
             return f'V{int(leaves)}'
         

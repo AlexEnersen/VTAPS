@@ -106,7 +106,6 @@ def teacherHome(response):
     else:
         user = response.user
         userGames = list(Game.objects.filter(id__in=user.games))
-        print(userGames)
         try:
             teacher = user.teacher
         except:
@@ -547,21 +546,22 @@ def downloadStudents(request, id):
             writer.writerow([f'Player: {player}'])
             writer.writerow([f'Hybrid: {gameProfile.hybrid}'])
             writer.writerow([f'Seeding Rate: {gameProfile.seeding_rate}'])
-            preFertArray = ['Pre-Fertilization:']
             if initWeek > 1 and len(gameProfile.weekly_fertilizer) > 0:
-                preFertArray.append(f'Week 1: {gameProfile.weekly_fertilizer[0]}')
-            if initWeek > 6 and len(gameProfile.weekly_fertilizer) > 1:
-                preFertArray.append(f'Week 6: {gameProfile.weekly_fertilizer[1]}')
-            if initWeek > 9 and len(gameProfile.weekly_fertilizer) > 2:
-                preFertArray.append(f'Week 9: {gameProfile.weekly_fertilizer[2]}')
-            if initWeek > 10 and len(gameProfile.weekly_fertilizer) > 3:
-                preFertArray.append(f'Week 10: {gameProfile.weekly_fertilizer[3]}')
-            if initWeek > 12 and len(gameProfile.weekly_fertilizer) > 4:
-                preFertArray.append(f'Week 12: {gameProfile.weekly_fertilizer[4]}')
-            if initWeek > 14 and len(gameProfile.weekly_fertilizer) > 5:
-                preFertArray.append(f'Week 14: {gameProfile.weekly_fertilizer[5]}')
-            if initWeek > 15 and len(gameProfile.weekly_fertilizer) > 6:
-                preFertArray.append(f'Week 15: {gameProfile.weekly_fertilizer[6]}')
+                preFertArray = ['Pre-Fertilization:']
+                preFertArray.append(f'Week 1: {gameProfile.weekly_fertilizer[0]} lbs')
+                if initWeek > 6 and len(gameProfile.weekly_fertilizer) > 1:
+                    preFertArray.append(f'Week 6: {gameProfile.weekly_fertilizer[1]} lbs')
+                if initWeek > 9 and len(gameProfile.weekly_fertilizer) > 2:
+                    preFertArray.append(f'Week 9: {gameProfile.weekly_fertilizer[2]} lbs')
+                if initWeek > 10 and len(gameProfile.weekly_fertilizer) > 3:
+                    preFertArray.append(f'Week 10: {gameProfile.weekly_fertilizer[3]} lbs')
+                if initWeek > 12 and len(gameProfile.weekly_fertilizer) > 4:
+                    preFertArray.append(f'Week 12: {gameProfile.weekly_fertilizer[4]} lbs')
+                if initWeek > 14 and len(gameProfile.weekly_fertilizer) > 5:
+                    preFertArray.append(f'Week 14: {gameProfile.weekly_fertilizer[5]} lbs')
+                if initWeek > 15 and len(gameProfile.weekly_fertilizer) > 6:
+                    preFertArray.append(f'Week 15: {gameProfile.weekly_fertilizer[6]} lbs')
+                writer.writerow(preFertArray)
             writer.writerow(['Week', 'Nitrogen Sufficiency Index', "Fertilizer (lbs)", "Monday Irrigation (in)", "Thursday Irrigation (in)", "Fertigation Irrigation (in)", "ET (in)"])
         for index, _ in enumerate(gameProfile.monday_irrigation):
             try:
