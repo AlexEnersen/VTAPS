@@ -1596,6 +1596,7 @@ def getGDU(date, gameOutputs):
     maxGWAD = 0
     print("date:", date)
     for line in gameOutputs['OPG_content']:
+        print(line)
         items = list(filter(None, line.split(" ")))
         if len(items) <= 1:
             if reading:
@@ -1627,6 +1628,7 @@ def getGDU(date, gameOutputs):
     reading = False
     reading2 = False
     for line in gameOutputs['OME_content']:
+        print(line)
         items = list(filter(None, line.split(" ")))
         if len(items) < 1:
             continue
@@ -1676,7 +1678,7 @@ def getGDU(date, gameOutputs):
     elif leaves >= maxLeaves:
         return 'VT'
     elif leaves < maxLeaves:
-        if leaves == 0:
+        if leaves < 2:
             if tempStage == 0:
                 return 'Planting'
             else:
