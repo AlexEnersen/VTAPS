@@ -1594,9 +1594,7 @@ def getGDU(date, gameOutputs):
 
     gwad = 0
     maxGWAD = 0
-    print("date:", date)
     for line in gameOutputs['OPG_content']:
-        print(line)
         items = list(filter(None, line.split(" ")))
         if len(items) <= 1:
             if reading:
@@ -1628,7 +1626,6 @@ def getGDU(date, gameOutputs):
     reading = False
     reading2 = False
     for line in gameOutputs['OME_content']:
-        print(line)
         items = list(filter(None, line.split(" ")))
         if len(items) < 1:
             continue
@@ -1646,6 +1643,9 @@ def getGDU(date, gameOutputs):
             doy = items[4]
             stageNum = items[8]
 
+            if int(doy) > (int(day) + 7):
+                break
+
             if int(doy) <= int(day):
                 if stageNum == '09':
                     tempStage = 'VE'
@@ -1656,7 +1656,8 @@ def getGDU(date, gameOutputs):
                 elif stageNum == '05':
                     stage = 'R6'
             elif int(doy) > int(day):
-                break
+                if stageNum == '09':
+                    return 'VE'
     
     if maxGWAD > 0:
         gwadRatio = gwad/maxGWAD
