@@ -468,7 +468,7 @@ def weeklySelection(request, game):
     context['src'] = 'none'
 
     if context['gdu'] == 'VE':
-        context['src'] = "../static/images/growthstages/V-TAPS VE.jpeg"
+        context['src'] = "../static/images/growthstages/V-TAPS VE.jpg"
     elif context['gdu'] == 'V1':
         context['src'] = "../static/images/growthstages/V-TAPS V1.jpeg"
     elif context['gdu'] == 'V2':
