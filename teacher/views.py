@@ -222,6 +222,7 @@ def game(response, id):
             game.initWeek = int(response.POST['startWeek'])
             game.weekLimit = min(game.initWeek + 6, 21)
             game.originalWeatherFile = response.POST['weatherFile']
+            game.customPriceOn = True if 'customPriceOn' in response.POST else False
 
 
             if response.POST['weatherFile'] == 'Random':
@@ -374,6 +375,8 @@ def gamePage(game):
     context['urlStudent'] = f'/teacher/game/{game.id}/downloadStudents'
     context['urlTeacher'] = f'/teacher/game/{game.id}/downloadClass'
     context['urlAddStudents'] = f'/teacher/game/{game.id}/addStudents'
+
+    context['customPriceOn'] = game.customPriceOn
 
     return context
     

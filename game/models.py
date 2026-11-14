@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from django.conf import settings
 from teacher.models import Game
+from decimal import Decimal
 
 HYBRID_CHOICES = [
     ('IB2074 Channel213-19VTPRIB', 'Channel213-19VTPRIB ($270/bag)'),
@@ -155,6 +156,8 @@ class GameProfile(models.Model):
     yield_vs_et = models.FloatField(default=-1)
 
     profit = models.FloatField(default=0)
+
+    cornPrice = models.FloatField(default=Decimal('4.25'))
     
 class FertilizerEntries1(models.Model):
     fertilizer = models.IntegerField(blank=False, default=0, choices=FERT_CHOICES_1)

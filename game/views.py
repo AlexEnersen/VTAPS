@@ -219,6 +219,7 @@ def intro(request, game_id=None):
         gameProfile = GameProfile.objects.get(game=game, user=user)
     except GameProfile.DoesNotExist:
         gameProfile = GameProfile(game=game, user=user)
+        gameProfile.cornPrice = game.cornPrice
         gameProfile.save()
 
 
@@ -519,7 +520,7 @@ def weeklySelection(request, game):
 
     context['week'] = game.week
     context['initWeek'] = game.game.initWeek
-    context['corn_price'] = game.game.cornPrice
+    context['corn_price'] = game.cornPrice
 
     iform = IrrigationEntriesForm()
     if iform.is_valid():
@@ -659,7 +660,7 @@ def finalResults(request, gameProfile):
     context['et_amount'] = sum(history['et'])
     context['rain_amount'] = sum(history['rain'])
     
-    context['corn_price'] = gameProfile.game.cornPrice
+    context['corn_price'] = gameProfile.cornPrice
     context['profit'] = context['corn_price'] - context['bushel_cost']
     context['profit_per_acre'] = context['profit']  * context['yield']
     gameProfile.profit = context['profit_per_acre']

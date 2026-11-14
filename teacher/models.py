@@ -291,6 +291,7 @@ class Game(models.Model):
     weatherFile = models.CharField(default="NEME2101.WTH")
     originalWeatherFile = models.CharField(default="NEME2101.WTH")
     waterLimit = models.CharField(default="unlimited")
+    customPriceOn = models.BooleanField(default=False)
 
 class WeekEntries(models.Model):
     week = models.IntegerField("Week Limit", blank=False, choices=WEEK_CHOICES)
@@ -305,3 +306,4 @@ class GameSetup(models.Model):
     forecasting = models.BooleanField("Forecast?", default=True)
     waterLimit = models.CharField("Water Limit:", choices=WATER_LIMITS, default="unlimited", max_length = 40)
     startWeek = models.IntegerField("Starting Week:", choices=STARTWEEKOPTIONS, default=1)
+    customPriceOn = models.BooleanField("Custom Corn Price?", default=False)
