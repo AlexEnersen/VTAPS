@@ -219,7 +219,6 @@ def intro(request, game_id=None):
         gameProfile = GameProfile.objects.get(game=game, user=user)
     except GameProfile.DoesNotExist:
         gameProfile = GameProfile(game=game, user=user)
-        gameProfile.cornPrice = game.cornPrice
         gameProfile.save()
 
 

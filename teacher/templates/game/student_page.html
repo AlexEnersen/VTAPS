@@ -3,52 +3,8 @@
   <div class="teacherGamePage">
     <div class="teacherGameColumnLeft">
       <h1 class="header">Players</h1>
-      <p class="weekChangeField">Code: {{code}}</p>
-      <table class="gameSummaryTable">
-        <tr class="gameSummaryRow">
-          <th class="gameSummaryCell gameSummaryHeader">Player</th>
-          <th class="gameSummaryCell gameSummaryHeader">Next Week</th>
-          <th class="gameSummaryCell gameSummaryHeader">Caught Up</th>
-          {% if customPriceOn %}
-            <th class="gameSummaryCell gameSummaryHeader">Market Price</th>
-          {% endif %}
-          <th class="gameSummaryCell gameSummaryHeader">Reset Password</th>
-        </tr>
-        {% for player in players %} {% if player.week > week_limit %}
-        <tr class="gameSummaryRow">
-          <td class="gameSummaryCell">{{player.username}}</td>
-          <td class="gameSummaryCell">{{player.week}}</td>
-          {% if customPriceOn %}
-            <th class="gameSummaryCell">{{player.cornPrice}}</th>
-          {% endif %}
-          <td class="gameSummaryCell">X</td>
-          <td class="gameSummaryCell">
-            <a href="{{ player.change_password_url}}"
-              ><img
-                class="resetIcon"
-                src="{% static 'images/reset.png' %}"
-                alt="reset"
-            /></a>
-          </td>
-        </tr>
-        {% else %}
-        <tr class="gameSummaryRow">
-          <td class="gameSummaryCell">{{player.username}}</td>
-          <td class="gameSummaryCell">{{player.week}}</td>
-          <td class="gameSummaryCell"></td>
-          <td class="gameSummaryCell">
-            <a href="{{ player.change_password_url}}"
-              ><img
-                class="resetIcon"
-                src="{% static 'images/reset.png' %}"
-                alt="reset"
-            /></a>
-          </td>
-        </tr>
-        {% endif %} {% endfor %}
-      </table>
-      <div class="rowContainer">
-        <p class="weekChangeField">Week Limit: {{week_limit_display}}</p>
+      <p class="classCodeField">Code: {{code}}</p>
+      <div class="rowContainer rowClamp">
         <a class="addStudentLink" href="{{ urlAddStudents }}">
           <img
             class="addIcon"
@@ -57,14 +13,70 @@
           />Add Students</a
         >
       </div>
-      <form method="post" class="row center weekChangeField">
-        {% csrf_token %}
-        <p class="weekChangeField">{{week_form.week}}</p>
+      <div class="rowContainer">
+        <p class="weekChangeField">Week Limit: {{week_limit_display}}</p>
+        <div class="row">
+          <form method="post" class="row weekChangeField">
+            {% csrf_token %}
+            <input
+              class="secondaryButton weekButton"
+              type="submit"
+              value="Change Week Limit"
+            />
+            <p class="weekChangeField">{{week_form.week}}</p>
+          </form>
+        </div>
+      </div>
+      <form method="post" class="gameSummaryForm">
+        {% csrf_token %} {{ formset.management_form }}
+        <table class="gameSummaryTable">
+          <tr class="gameSummaryRow">
+            <th class="gameSummaryCell gameSummaryHeader">Player</th>
+            <th class="gameSummaryCell gameSummaryHeader">Next Week</th>
+            <th class="gameSummaryCell gameSummaryHeader">Caught Up</th>
+            {% if customPriceOn %}
+            <th class="gameSummaryCell gameSummaryHeader">Market Price</th>
+            {% endif %}
+            <th class="gameSummaryCell gameSummaryHeader">Reset Password</th>
+          </tr>
+
+          {% for form in formset %}
+          <tr class="gameSummaryRow">
+            <td class="gameSummaryCell">
+              {{ form.id }}
+              {{form.instance.user.student.username}}
+            </td>
+            <td class="gameSummaryCell">{{form.instance.week}}</td>
+            <td class="gameSummaryCell">
+              {% if form.instance.week > week_limit %}X{% endif %}
+            </td>
+            {% if customPriceOn %}
+            <td class="gameSummaryCell editableCell">
+              {{ form.cornPrice }} {{ form.cornPrice.errors }}
+            </td>
+            {% endif %}
+            <td class="gameSummaryCell">
+              <a
+                href="/teacher/changeStudentPassword/{{ game_id }}/{{ form.instance.user.student.username|urlencode:'' }}"
+              >
+                <img
+                  class="resetIcon"
+                  src="{% static 'images/reset.png' %}"
+                  alt="reset"
+                />
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </table>
+        {% if customPriceOn %}
         <input
-          class="secondaryButton weekButton"
+          class="secondaryButton updatePricesButton"
           type="submit"
-          value="Change Week Limit"
+          name="update_prices"
+          value="Update Prices"
         />
+        {% endif %}
       </form>
       <div class="row left">
         <a class="downloadButton" href="{{ urlStudent }}">

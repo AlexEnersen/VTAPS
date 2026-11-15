@@ -12,7 +12,6 @@ urlpatterns = [
     path('deleteWarning/<int:id>', views.deleteGameWarning, name="deleteGameWarning"),
     path('delete/<int:id>', views.deleteGame, name="deleteGame"),
     path('confirm/<str:activation_key>/', views.teacherConfirm, name='teacherConfirm'),
-    path('createGame/<int:id>/', views.createGame, name="createGame"),
     path('game/<int:id>/downloadStudents', views.downloadStudents, name="downloadStudents"),
     path('game/<int:id>/downloadClass', views.downloadClass, name="downloadClass"),
     path('game/<int:id>/addStudents', views.addStudents, name="addStudents"),

@@ -22,6 +22,8 @@ from botocore.config import Config
 from django.core import mail
 from django.core.mail import EmailMultiAlternatives
 from .functions.random import *
+from django.forms import modelformset_factory
+from django import forms
 
 environment = os.environ['ENV']
 
@@ -68,6 +70,13 @@ except Exception as error:
         logger.info('error:', error)
     else:
         print('Error:', error)
+
+PriceFormSet = modelformset_factory(
+    GameProfile,
+    fields=('cornPrice',),
+    extra=0,
+    widgets={'cornPrice': forms.NumberInput(attrs={'step': '0.01', 'min': '0'})}
+)
 
 def teacherHome(response):
     if response.user in User.objects.filter(is_superuser=True):
@@ -275,9 +284,16 @@ def game(response, id):
         return render(response, 'game/password_page.html', context)
     else:
         if response.method == 'POST':
-            week = response.POST['week']
-            game.weekLimit = week
-            game.save()
+            if 'week' in response.POST:
+                week = response.POST['week']
+                game.weekLimit = week
+                game.save()
+            elif 'update_prices' in response.POST:
+                formset = PriceFormSet(response.POST, queryset=GameProfile.objects.filter(game=game))
+                if formset.is_valid():
+                    formset.save()
+                elif not formset.is_valid():
+                    print(formset.errors)
             return redirect(f"/teacher/game/{game.id}")
         context = gamePage(game)
         return render(response, 'game/student_page.html', context)
@@ -322,6 +338,11 @@ def passwordPage(game, players = []):
             newPlayer = Student(username=player, code=game.code, user=newUser)
             newPlayer.game = game.id
             newPlayer.save()
+            
+            gameProfile = GameProfile(game=game, user=newUser)
+            gameProfile.cornPrice = game.cornPrice
+            gameProfile.save()
+
             context['players'].append({'username': player, 'password': newPassword})
 
     game.passwordsFinished = True
@@ -329,7 +350,7 @@ def passwordPage(game, players = []):
     return context
 
 def gamePage(game):
-    context = {'players': [], 'code': game.code}
+    context = {'players': [], 'code': game.code, 'game_id': game.id}
     studentList = []
 
     weekForm = WeekForm(initial = {'week': game.weekLimit})
@@ -338,26 +359,13 @@ def gamePage(game):
     context['week_limit_display'] = game.weekLimit if game.weekLimit < 21 else f'{game.weekLimit} (End)'
 
     context['finalWeek'] = False
-    for player in game.players:
-        playerInfo = {'username': player}
-        try:
-            student = Student.objects.get(username=player, code=game.code)
-        except:
-            continue
-        try:
-            gameProfile = GameProfile.objects.get(game=game, user=student.user)
-            playerInfo['week'] = gameProfile.week
-            if gameProfile.week > 21 or gameProfile.finished:
-                context['finalWeek'] = True
-        except:
-            playerInfo['week'] = 0
-        
-        playerInfo['change_password_url'] = f"/teacher/changeStudentPassword/{game.id}/{player}"
-        studentList.append(student)
-        context['players'].append(playerInfo)
+
+    gameProfiles = GameProfile.objects.filter(game=game)
+
+    context['formset'] = PriceFormSet(queryset = gameProfiles)
 
     context['group_cost_graph'] = groupAttributeGraph(game, studentList, 'Cost')
-    context['group_cost_explainer'] = "Test test test test"
+    # context['group_cost_explainer'] = "Test test test test"
     context['group_yield_graph'] = groupAttributeGraph(game, studentList, 'Yield')
     context['group_leaching_graph'] = groupAttributeGraph(game, studentList, 'Leaching')
     context['group_sufficiency_graph'] = groupAttributeGraph(game, studentList, 'Sufficiency')
@@ -379,21 +387,6 @@ def gamePage(game):
     context['customPriceOn'] = game.customPriceOn
 
     return context
-    
-def createGame(response, id):
-    game = Game.objects.get(id=id)
-    game.confirmed = True
-    game.save()
-
-    for player in game.players:
-        user = User(username=player)
-        user.set_unusable_password()
-        user.save()
-        student = Student(user=user)
-        student.games.append(id)
-        student.save()
-
-    return redirect('/teacher')
 
 def groupAttributeGraph(game, studentList, attribute):
 
