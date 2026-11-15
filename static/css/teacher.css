@@ -8,6 +8,14 @@
   width: 100%;
 }
 
+
+.passwordSummaryTable {
+  border: 2px solid black;
+  border-collapse: collapse;
+  width: 20%;
+  min-width: 240px;
+}
+
 .gameSummaryRow {
   width: 100%;
 }
